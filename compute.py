@@ -17,15 +17,25 @@ def MultiStats(*args, **kwargs):
     self = args[0]
     old = kwargs['_old']
     # Get list of subdecks
-    children = self.col.decks.children(self.col.decks.active()[0])
-    childlist = []
-    for item in children:
-        childlist.append(item[1])
-    # Determine which subdecks do not have their own subdecks 
-    nograndchildren = []
-    for item in childlist:
-        if len(self.col.decks.children(item)) == 0:
-            nograndchildren.append(item)
+    if self.wholeCollection:
+        # Get results for all subdecks in collection
+        alldecks = self.col.decks.allIds()
+        # Determine which subdecks do not have their own subdecks
+        nograndchildren = []
+        for item in alldecks:
+            if len(self.col.decks.children(int(item))) == 0 and item != "1":
+                nograndchildren.append(int(item))
+    else:
+        # Get results only for all subdecks of selected deck
+        children = self.col.decks.children(self.col.decks.active()[0])
+        childlist = []
+        for item in children:
+            childlist.append(item[1])
+        # Determine which subdecks do not have their own subdecks 
+        nograndchildren = []
+        for item in childlist:
+            if len(self.col.decks.children(item)) == 0:
+                nograndchildren.append(item)
     resultlist = []
     # Find results for each card in these decks
     for item in nograndchildren:
@@ -210,7 +220,7 @@ def DeckPokemon(*args, **kwargs):
         elif previouslevel < 5:
             msgtxt += ("\nYour egg has hatched into a %s!" % deckmon)
             previouslevel = Level
-        if name != deckmon and previouslevel < Level:
+        if name != deckmon and name != "Egg" and previouslevel < Level:
             msgtxt += ("\nYour %s has evolved into a %s (Level %s)!" % (deckmon, name, Level))
         elif previouslevel < Level:
             msgtxt += ("\nYour %s is now level %s!" % (name, Level))
@@ -272,7 +282,10 @@ def MultiPokemon(*args, **kwargs):
     # Assign empty list to multiData (to be returned at end)
     multiData = []
     # Get multideck results
-    results = MultiStats(*args, **kwargs)
+    if self.wholeCollection:
+        results = MultiStats(*args, **kwargs)
+    else:
+        results = MultiStats(*args, **kwargs)
     # If no results, return
     if len(results) == 0:
         return
@@ -369,7 +382,7 @@ def MultiPokemon(*args, **kwargs):
             elif previouslevel < 5:
                 msgtxt += ("\nYour egg has hatched into a %s!" % deckmon)
                 previouslevel = Level
-            if name != deckmon and previouslevel < Level:
+            if name != deckmon and if name != "Egg" and previouslevel < Level:
                 msgtxt += ("\nYour %s has evolved into a %s (Level %s)!" % (deckmon, name, Level))
             elif previouslevel < Level:
                 msgtxt += ("\nYour %s is now level %s!" % (name, Level))

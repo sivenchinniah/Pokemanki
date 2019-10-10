@@ -16,22 +16,7 @@ def pokemonDisplay(*args, **kwargs):
     did = self.col.decks.active()
     # See if "Whole Collection" is selected - if so, get all assigned Pokemon and assign to multideckmon
     if self.wholeCollection:
-        pokemontotal = json.load(open('pokemanki.json'))
-        sortedpokemontotal = sorted(list(reversed(pokemontotal)), key = lambda x: x[1])
-        modifiedpokemontotal = []
-        for item in sortedpokemontotal:
-            for thing in modifiedpokemontotal:
-                if item[1] == thing[1]:
-                    break
-            else:
-                 modifiedpokemontotal.append(item)
-        multideckmon = []
-        for item in modifiedpokemontotal:
-            # Don't show Pokemon if still an egg (below level 5)
-            if item[2] < 5:
-                multideckmon.append(["Egg", item[1], item[2]])
-            else:
-                multideckmon.append(item)
+        multideckmon = MultiPokemon(*args, **kwargs)
     # If "Whole Collection" not selected, show Pokemon for either single deck or all subdecks and store into multideckmon/deckmon
     elif len(did) > 1:
         multideckmon = MultiPokemon(*args, **kwargs)
