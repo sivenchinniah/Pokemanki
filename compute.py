@@ -382,7 +382,7 @@ def MultiPokemon(*args, **kwargs):
             elif previouslevel < 5:
                 msgtxt += ("\nYour egg has hatched into a %s!" % deckmon)
                 previouslevel = Level
-            if name != deckmon and if name != "Egg" and previouslevel < Level:
+            if name != deckmon and name != "Egg" and previouslevel < Level:
                 msgtxt += ("\nYour %s has evolved into a %s (Level %s)!" % (deckmon, name, Level))
             elif previouslevel < Level:
                 msgtxt += ("\nYour %s is now level %s!" % (name, Level))
