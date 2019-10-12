@@ -187,9 +187,10 @@ def DeckPokemon(*args, **kwargs):
     # Assign new name to modifiedpokemontotal if not already assigned (making sure to assign Deckmon original name if Eevee or Egg)
     if already_assigned == False and name != "Eevee" and name != "Egg":
         deckmonData = (name, self.col.decks.active()[0], Level)
+        modifiedpokemontotal.append(deckmonData)
     elif already_assigned == False:
         deckmonData = (deckmon, self.col.decks.active()[0], Level)
-    modifiedpokemontotal.append(deckmonData)
+        modifiedpokemontotal.append(deckmonData)
     # If already assigned, assign new level/name to modifiedpokemontotal if new level/name
     if already_assigned == True:
         for item in pokemontotal:
