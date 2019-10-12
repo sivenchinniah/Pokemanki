@@ -83,7 +83,7 @@ def FirstPokemon():
                 adjustedivl = (100 * (ivl/100)**0.5)
                 sumivl += adjustedivl
             Level = int(sumivl/len(stats)+0.5)
-            deckmondata = (deckmon, deck, Level)
+            deckmondata = [(deckmon, deck, Level)]
             with open("pokemanki.json", "w") as f:
                 json.dump(deckmondata, f)
             firstpokemon = QMessageBox()
@@ -102,9 +102,11 @@ def FirstPokemon():
 def DeckPokemon(*args, **kwargs):
     self = args[0]
     old = kwargs['_old']
-    
+
+    FirstPokemon()
     # Get existing pokemon from pokemanki.json
     if os.path.exists("pokemanki.json"):
+        
         pokemontotal = json.load(open('pokemanki.json'))
         # Sort list by deck id, reverse sorted to make sure that most recent additions come first
         sortedpokemontotal = sorted(list(reversed(pokemontotal)), key = lambda x: x[1])
@@ -121,7 +123,7 @@ def DeckPokemon(*args, **kwargs):
     else:
         pokemontotal = []
         modifiedpokemontotal = []
-        FirstPokemon()
+
     # Download threshold settings if they exist, otherwise make from scratch
     if os.path.exists("pokemankisettings.json"):
         thresholdsettings = json.load(open("pokemankisettings.json"))
@@ -192,7 +194,7 @@ def DeckPokemon(*args, **kwargs):
         if pokemontier == "A":
             msgbox = QMessageBox()
             msgbox.setWindowTitle("Pokemanki")
-            msgbox.setText("Choose a starter Pokémon for this deck")
+            msgbox.setText("Choose a starter Pokémon for the %s deck" % self.col.decks.name(self.col.decks.active()[0]))
             msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
             msgbox.addButton("Charmander", QMessageBox.AcceptRole)
             msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
@@ -333,7 +335,9 @@ def DeckPokemon(*args, **kwargs):
 def MultiPokemon(*args, **kwargs):
     self = args[0]
     old = kwargs['_old']
+    
     # Same deal as above
+    FirstPokemon()
     if os.path.exists("pokemanki.json"):
         pokemontotal = json.load(open('pokemanki.json'))
         sortedpokemontotal = sorted(list(reversed(pokemontotal)), key = lambda x: x[1])
@@ -347,7 +351,7 @@ def MultiPokemon(*args, **kwargs):
     else:
         pokemontotal = []
         modifiedpokemontotal = []
-        FirstPokemon()
+        
     if os.path.exists("pokemankisettings.json"):
         thresholdsettings = json.load(open("pokemankisettings.json"))
     else:
@@ -420,7 +424,7 @@ def MultiPokemon(*args, **kwargs):
             if pokemontier == "A":
                 msgbox = QMessageBox()
                 msgbox.setWindowTitle("Pokemanki")
-                msgbox.setText("Choose a starter Pokémon for this deck")
+                msgbox.setText("Choose a starter Pokémon for the %s deck" % self.col.decks.name(item[0]))
                 msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
                 msgbox.addButton("Charmander", QMessageBox.AcceptRole)
                 msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
