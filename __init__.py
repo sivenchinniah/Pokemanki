@@ -1,6 +1,6 @@
 # Copyright 2019 Siven Chinniah
 
-# JK I'm probably violating some intellectual property of Nintendo by doing this.
+# JK please feel free to use this however you would like.
 
 from .display import pokemonDisplay
 
@@ -41,8 +41,78 @@ else:
     with open(("%s/pokemankisettings.json" % mediafolder), "w") as f:
         json.dump(thresholdlist, f)
 
+# Nickname Settings
+def Nickname():
+    global mediafolder
+    deckmonlist = json.load(open("%s/pokemanki.json" % mediafolder))
+    displaylist = []
+    for item in deckmonlist:
+        deckname = mw.col.decks.name(item[1])
+        if len(item) == 4:
+            if item[2] < 5:
+                displaytext = "%s - Egg from %s" % (item[3], deckname)
+            elif item[0].startswith("Eevee"):
+                displaytext = "%s - Eevee (Level %s) from %s" % (item[3], item[2], deckname)
+            else:
+                displaytext = "%s - %s (Level %s) from %s" % (item[3], item[0], item[2], deckname)
+        else:
+            if item[2] < 5:
+                displaytext = "Egg from %s" % (deckname)
+            elif item[0].startswith("Eevee"):
+                displaytext = "Eevee (Level %s) from %s" % (item[2], deckname)
+            else:
+                displaytext = "%s (Level %s) from %s" % (item[0], item[2], deckname)
+        displaylist.append(displaytext)
+    totallist = list(zip(deckmonlist, displaylist))
+    nicknamewindow = QWidget()
+    inp, ok = QInputDialog.getItem(nicknamewindow, "Pokemanki", "Choose a Pokémon who you would like to give a new nickname", displaylist, 0, False)
+    deckmon = []
+    nickname = ""
+    if ok and inp:
+        for thing in totallist:
+            if inp in thing:
+                deckmon = thing[0]
+                displaytext = inp
+    if not deckmon:
+        return
+    if len(deckmon) == 4:
+        nickname = deckmon[3]
+    inp, ok = QInputDialog.getText(nicknamewindow, "Pokemanki", ("Enter a new nickname for %s (leave blank to remove nickname)" % displaytext))
+    if ok:
+        if inp:
+            nickname = inp
+            deckmon = [deckmon[0], deckmon[1], deckmon[2], nickname]
+            newnickname = QMessageBox()
+            newnickname.setWindowTitle("Pokemanki")
+            if int(deckmon[2]) < 5:
+                newnickname.setText("New nickname given to Egg - %s" % (nickname))
+            elif deckmon[0].startswith("Eevee"):
+                newnickname.setText("New nickname given to Eevee - %s" % (nickname))
+            else:
+                newnickname.setText("New nickname given to %s - %s" % (deckmon[0], nickname))
+            newnickname.exec_()
+        else:
+            deckmon = [deckmon[0], deckmon[1], deckmon[2]]
+            nicknameremoved = QMessageBox()
+            nicknameremoved.setWindowTitle("Pokemanki")
+            if int(deckmon[2]) < 5:
+                nicknameremoved.setText("Nickname removed from Egg")
+            elif deckmon[0].startswith("Eevee"):
+                nicknameremoved.setText("Nickname removed from Eevee")
+            else:
+                nicknameremoved.setText("Nickname removed from %s" % deckmon[0])
+            nicknameremoved.exec_()
+    modifieddeckmonlist = []
+    for item in deckmonlist:
+        if item[1] == deckmon[1]:
+            modifieddeckmonlist.append(deckmon)
+        else:
+            modifieddeckmonlist.append(item)
+    with open(("%s/pokemanki.json" % mediafolder), "w") as f:
+        json.dump(modifieddeckmonlist, f)
+
 # Threshold Settings
-def Settings():
+def ThresholdSettings():
     global thresholdlist
     global mediafolder
     # Find recommended number of cards for starter Pokemon threshold (based on deck with highest number of cards).
@@ -97,18 +167,21 @@ def ResetPokemon():
         resetdone.exec_()
 
 # Make actions for settings and reset
-settingsaction = QAction("Threshold Settings", mw)
-resetsettingsaction = QAction("Reset", mw)
+nicknameaction = QAction("Nicknames", mw)
+thresholdaction = QAction("Threshold Settings", mw)
+resetaction = QAction("Reset", mw)
 
 # Connect actions to functions
-settingsaction.triggered.connect(Settings)
-resetsettingsaction.triggered.connect(ResetPokemon)
+nicknameaction.triggered.connect(Nickname)
+thresholdaction.triggered.connect(ThresholdSettings)
+resetaction.triggered.connect(ResetPokemon)
 
 # Make new Pokemanki menu under tools
 mw.testmenu = QMenu(_('&Pokemanki'), mw)
 mw.form.menuTools.addMenu(mw.testmenu)
-mw.testmenu.addAction(settingsaction)
-mw.testmenu.addAction(resetsettingsaction)
+mw.testmenu.addAction(nicknameaction)
+mw.testmenu.addAction(thresholdaction)
+mw.testmenu.addAction(resetaction)
 
 # Wrap pokemonDisplay function of display.py with the todayStats function of anki.stats.py
 anki.stats.CollectionStats.todayStats = \

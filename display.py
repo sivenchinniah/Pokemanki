@@ -53,9 +53,15 @@ def _show(self, data, title, subtitle):
     if type(data) == tuple:
         # Don't show level for egg
         if data[0] == "Egg":
-            text = data[0]
+            if len(data) == 4:
+                text = data[3]
+            else:
+                text = data[0]
         else:
-            text = ("%s (Level %s)" % (data[0], data[2]))
+            if len(data) == 4:
+                text = ("%s (Level %s)" % (data[3], data[2]))
+            else:
+                text = ("%s (Level %s)" % (data[0], data[2]))
         table_text += (("""<tr>
                         <td height = 300 width = 300 align = center><img src="/pokemon_images/%s.png" title=%s></td>""") % (data[0], self.col.decks.name(data[1])))
         table_text += (("""<tr>
@@ -69,19 +75,30 @@ def _show(self, data, title, subtitle):
         pokemon_names = []
         pokemon_decks = []
         pokemon_levels = []
+        pokemon_nicknames = []
         sorteddata = sorted(data, key = lambda k: k[2], reverse = True)
         for pokemon in sorteddata:
+            if len(pokemon) == 4:
+                pokemon_nicknames.append(pokemon[3])
+            else:
+                pokemon_nicknames.append(None)
             pokemon_names.append(pokemon[0])
             pokemon_decks.append(pokemon[1])
             pokemon_levels.append(str(pokemon[2]))
-        pokemon_collection = tuple(zip(pokemon_names, pokemon_levels))
+        pokemon_collection = tuple(zip(pokemon_names, pokemon_levels, pokemon_nicknames))
         pokemon_text = []
         table_size = 0
-        for name, level in pokemon_collection:
-            if name == "Egg":
-                text = name
+        for name, level, nickname in pokemon_collection:
+            if int(level) < 5:
+                if nickname:
+                    text = nickname
+                else:
+                    text = name
             else:
-                text = ("%s (Level %s)" % (name, level))
+                if nickname:
+                    text = ("%s (Level %s)" % (nickname, level))
+                else:
+                    text = ("%s (Level %s)" % (name, level))
             pokemon_text.append(text)
             while table_size < (len(pokemon_text) - 2):
                 table_text += (("""<tr>

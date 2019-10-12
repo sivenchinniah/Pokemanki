@@ -125,12 +125,15 @@ def DeckPokemon(*args, **kwargs):
     deckmon = ""
     already_assigned = False
     details = ()
+    nickname = ""
     # Assign Deckmon from modifiedpokemontotal if already assigned
-    for pokemon, deckid, level in modifiedpokemontotal:
-        if deckid == self.col.decks.active()[0]:
-            deckmon = pokemon
+    for item in modifiedpokemontotal:
+        if item[1] == self.col.decks.active()[0]:
+            deckmon = item[0]
             already_assigned = True
-            previouslevel = level
+            previouslevel = item[2]
+            if len(item) == 4:
+                nickname = item[3]
     # Assign Deckmon if not already assigned
     if deckmon == "":
         # If starter Pokemon, allow choice
@@ -184,24 +187,35 @@ def DeckPokemon(*args, **kwargs):
     # Assign new name to modifiedpokemontotal if not already assigned (making sure to assign Deckmon original name if Eevee or Egg)
     if already_assigned == False and name != "Eevee" and name != "Egg":
         deckmonData = (name, self.col.decks.active()[0], Level)
-        modifiedpokemontotal.append(deckmonData)
     elif already_assigned == False:
         deckmonData = (deckmon, self.col.decks.active()[0], Level)
-        modifiedpokemontotal.append(deckmonData)
+    modifiedpokemontotal.append(deckmonData)
     # If already assigned, assign new level/name to modifiedpokemontotal if new level/name
     if already_assigned == True:
-        for pokemon, deckid, level in pokemontotal:
-            if deckid == self.col.decks.active()[0]:
+        for item in pokemontotal:
+            if item[1] == self.col.decks.active()[0]:
                 if name == "Eevee" or name == "Egg":
-                    if (pokemon, deckid, Level) in modifiedpokemontotal:
-                        pass
+                    if nickname:
+                        if (item[0], item[1], Level, nickname) in modifiedpokemontotal:
+                            pass
+                        else:
+                            modifiedpokemontotal.append((item[0], item[1], Level, nickname))
                     else:
-                        modifiedpokemontotal.append((pokemon, deckid, Level))
+                        if (item[0], item[1], Level) in modifiedpokemontotal:
+                            pass
+                        else:
+                            modifiedpokemontotal.append((item[0], item[1], Level))
                 else:
-                    if (name, deckid, Level) in modifiedpokemontotal:
-                        pass
+                    if nickname:
+                        if (name, item[1], Level, nickname) in modifiedpokemontotal:
+                            pass
+                        else:
+                            modifiedpokemontotal.append((name, item[1], Level, nickname))
                     else:
-                        modifiedpokemontotal.append((name, deckid, Level))
+                        if (name, item[1], Level) in modifiedpokemontotal:
+                            pass
+                        else:
+                            modifiedpokemontotal.append((name, item[1], Level))
     # Save new Pokemon data
     with open("pokemanki.json", "w") as f:
         json.dump(modifiedpokemontotal, f)
@@ -212,18 +226,36 @@ def DeckPokemon(*args, **kwargs):
     if already_assigned == True:
         if name == "Egg":
             if Level == 2 and previouslevel < 2:
-                msgtxt += "\nYour egg needs more time to hatch."
+                if nickname:
+                    msgtxt += "\n%s needs more time to hatch." % nickname
+                else:
+                    msgtxt += "\nYour egg needs more time to hatch."
             elif Level == 3 and previouslevel < 3:
-                msgtxt += "\nYour egg moves occasionally. It should hatch soon."
+                if nickname:
+                    msgtxt += "\n%s moves occasionally. It should hatch soon." % nickname
+                else:
+                    msgtxt += "\nYour egg moves occasionally. It should hatch soon."
             elif Level == 4 and previouslevel < 4:
-                msgtxt += "\nYour egg is making sounds! It's about to hatch!"
+                if nickname:
+                    msgtxt += "\n%s is making sounds! It's about to hatch!" % nickname
+                else:
+                    msgtxt += "\nYour egg is making sounds! It's about to hatch!"
         elif previouslevel < 5:
-            msgtxt += ("\nYour egg has hatched into a %s!" % deckmon)
+            if nickname:
+                msgtxt += ("\n%s has hatched! It's a %s!" % (nickname, deckmon))
+            else:
+                msgtxt += ("\nYour egg has hatched! It's a %s!" % deckmon)
             previouslevel = Level
         if name != deckmon and name != "Egg" and previouslevel < Level:
-            msgtxt += ("\nYour %s has evolved into a %s (Level %s)!" % (deckmon, name, Level))
+            if nickname:
+                msgtxt += ("\n%s has evolved into a %s (Level %s)!" % (nickname, name, Level))
+            else:
+                msgtxt += ("\nYour %s has evolved into a %s (Level %s)!" % (deckmon, name, Level))
         elif previouslevel < Level:
-            msgtxt += ("\nYour %s is now level %s!" % (name, Level))
+            if nickname:
+                msgtxt += ("\n%s is now level %s!" % (nickname, Level))
+            else:
+                msgtxt += ("\nYour %s is now level %s!" % (name, Level))
     # Show new Pokemon and eggs
     if already_assigned == False:
         if name == "Egg":
@@ -238,7 +270,10 @@ def DeckPokemon(*args, **kwargs):
         msgbox2.exec_()
 
     # Set displayData for pokemonDisplay function in display.py
-    displayData = (name, self.col.decks.active()[0], Level)
+    if nickname:
+        displayData = (name, self.col.decks.active()[0], Level, nickname)
+    else:
+        displayData = (name, self.col.decks.active()[0], Level)
     # Return displayData
     return displayData
 
@@ -319,11 +354,14 @@ def MultiPokemon(*args, **kwargs):
         deckmon = ""
         already_assigned = False
         details = ()
-        for pokemon, deckid, level in modifiedpokemontotal:
-            if deckid == item[0]:
-                deckmon = pokemon
+        nickname = ""
+        for thing in modifiedpokemontotal:
+            if thing[1] == item[0]:
+                deckmon = thing[0]
                 already_assigned = True
-                previouslevel = level
+                previouslevel = thing[2]
+                if len(thing) == 4:
+                    nickname = thing[3]
         if deckmon == "":
             if pokemontier == "A":
                 msgbox = QMessageBox()
@@ -374,37 +412,70 @@ def MultiPokemon(*args, **kwargs):
         if already_assigned == True:
             if name == "Egg":
                 if Level == 2 and previouslevel < 2:
-                    msgtxt += "\nYour egg needs more time to hatch."
+                    if nickname:
+                        msgtxt += "\n%s needs more time to hatch." % nickname
+                    else:
+                        msgtxt += "\nYour egg needs more time to hatch."
                 elif Level == 3 and previouslevel < 3:
-                    msgtxt += "\nYour egg moves occasionally. It should hatch soon."
+                    if nickname:
+                        msgtxt += "\n%s moves occasionally. It should hatch soon." % nickname
+                    else:
+                        msgtxt += "\nYour egg moves occasionally. It should hatch soon."
                 elif Level == 4 and previouslevel < 4:
-                    msgtxt += "\nYour egg is making sounds! It's about to hatch!"
+                    if nickname:
+                        msgtxt += "\n%s is making sounds! It's about to hatch!" % nickname
+                    else:
+                        msgtxt += "\nYour egg is making sounds! It's about to hatch!"
             elif previouslevel < 5:
-                msgtxt += ("\nYour egg has hatched into a %s!" % deckmon)
+                if nickname:
+                    msgtxt += ("\n%s has hatched! It's a %s!" % (nickname, deckmon))
+                else:
+                    msgtxt += ("\nYour egg has hatched! It's a %s!" % deckmon)
                 previouslevel = Level
             if name != deckmon and name != "Egg" and previouslevel < Level:
-                msgtxt += ("\nYour %s has evolved into a %s (Level %s)!" % (deckmon, name, Level))
+                if nickname:
+                    msgtxt += ("\n%s has evolved into a %s (Level %s)!" % (nickname, name, Level))
+                else:
+                    msgtxt += ("\nYour %s has evolved into a %s (Level %s)!" % (deckmon, name, Level))
             elif previouslevel < Level:
-                msgtxt += ("\nYour %s is now level %s!" % (name, Level))
+                if nickname:
+                    msgtxt += ("\n%s is now level %s!" % (nickname, Level))
+                else:
+                    msgtxt += ("\nYour %s is now level %s!" % (name, Level))
         if already_assigned == False:
             if name == "Egg":
                 msgtxt += "\nYou found an egg!"
             else:
                 msgtxt += ("\nYou caught a %s (Level %s)" % (name, Level))
         if already_assigned == True:
-            for pokemon, deckid, level in pokemontotal:
-                if deckid == item[0]:
+            for thing in pokemontotal:
+                if thing[1] == item[0]:
                     if name == "Eevee" or name =="Egg":
-                        if (pokemon, deckid, Level) in modifiedpokemontotal:
-                            pass
+                        if nickname:
+                            if (thing[0], thing[1], Level, nickname) in modifiedpokemontotal:
+                                pass
+                            else:
+                                modifiedpokemontotal.append((thing[0], thing[1], Level, nickname))
                         else:
-                            modifiedpokemontotal.append((pokemon, deckid, Level))
+                            if (thing[0], thing[1], Level) in modifiedpokemontotal:
+                                pass
+                            else:
+                                modifiedpokemontotal.append((thing[0], thing[1], Level))
                     else:
-                        if (name, deckid, Level) in modifiedpokemontotal:
-                            pass
+                        if nickname:
+                            if (name, thing[1], Level, nickname) in modifiedpokemontotal:
+                                pass
+                            else:
+                                modifiedpokemontotal.append((name, thing[1], Level, nickname))
                         else:
-                            modifiedpokemontotal.append((name, deckid, Level))
-        displayData = (name, item[0], Level)
+                            if (name, thing[1], Level) in modifiedpokemontotal:
+                                pass
+                            else:
+                                modifiedpokemontotal.append((name, thing[1], Level))
+        if nickname:
+            displayData = (name, item[0], Level, nickname)
+        else:
+            displayData = (name, item[0], Level)
         multiData.append(displayData)
 
     # After iterating through each deck, store data into pokemanki.json
