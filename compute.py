@@ -3,6 +3,7 @@ import json
 import os.path
 import random
 from aqt.qt import *
+from aqt import mw
 
 # Retrieve id and ivl for each card in a single deck
 def DeckStats(*args, **kwargs):
@@ -45,7 +46,58 @@ def MultiStats(*args, **kwargs):
     nograndchildresults = list(zip(nograndchildren, resultlist))
 
     return nograndchildresults
-    
+
+def FirstPokemon():
+    global mediafolder
+    deckmonlist = []
+    deckmon = ""
+    if os.path.exists("pokemanki.json"):
+        deckmonlist = json.load(open("pokemanki.json"))
+    if deckmonlist:
+        return
+    alldecks = mw.col.decks.allIds()
+    # Determine which subdecks do not have their own subdecks
+    nograndchildren = []
+    for item in alldecks:
+        if len(mw.col.decks.children(int(item))) == 0 and item != "1":
+            nograndchildren.append(int(item))
+    decklist = []
+    for item in nograndchildren:
+        decklist.append(mw.col.decks.name(item))
+    window = QWidget()
+    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Choose a deck for your starter Pokémon", decklist, 0, False)
+    if ok and inp:
+        msgbox = QMessageBox()
+        msgbox.setWindowTitle("Pokemanki")
+        msgbox.setText("Choose a starter Pokémon for %s" % inp)
+        msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
+        msgbox.addButton("Charmander", QMessageBox.AcceptRole)
+        msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
+        msgbox.exec_()
+        deckmon = msgbox.clickedButton().text()
+        if deckmon:
+            deck = mw.col.decks.byName(inp)['id']
+            stats = mw.col.db.all("""select id, ivl from cards where did in (%s)""" % deck)
+            sumivl = 0
+            for id, ivl in stats:
+                adjustedivl = (100 * (ivl/100)**0.5)
+                sumivl += adjustedivl
+            Level = int(sumivl/len(stats)+0.5)
+            deckmondata = (deckmon, deck, Level)
+            with open("pokemanki.json", "w") as f:
+                json.dump(deckmondata, f)
+            firstpokemon = QMessageBox()
+            firstpokemon.setWindowTitle("Pokemanki")
+            if Level < 5:
+                firstpokemon.setText("You've found a %s egg" % deckmon)
+            else:
+                firstpokemon.setText("You've caught a %s!" % deckmon)
+            firstpokemon.exec_()
+        else:
+            FirstPokemon()
+    else:
+        FirstPokemon()
+
 # Assign Pokemon and levels for single deck
 def DeckPokemon(*args, **kwargs):
     self = args[0]
@@ -69,7 +121,7 @@ def DeckPokemon(*args, **kwargs):
     else:
         pokemontotal = []
         modifiedpokemontotal = []
-
+        FirstPokemon()
     # Download threshold settings if they exist, otherwise make from scratch
     if os.path.exists("pokemankisettings.json"):
         thresholdsettings = json.load(open("pokemankisettings.json"))
@@ -140,7 +192,7 @@ def DeckPokemon(*args, **kwargs):
         if pokemontier == "A":
             msgbox = QMessageBox()
             msgbox.setWindowTitle("Pokemanki")
-            msgbox.setText("Choose a starter Pokémon")
+            msgbox.setText("Choose a starter Pokémon for this deck")
             msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
             msgbox.addButton("Charmander", QMessageBox.AcceptRole)
             msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
@@ -252,7 +304,7 @@ def DeckPokemon(*args, **kwargs):
                 msgtxt += ("\n%s has evolved into a %s (Level %s)!" % (nickname, name, Level))
             else:
                 msgtxt += ("\nYour %s has evolved into a %s (Level %s)!" % (deckmon, name, Level))
-        elif previouslevel < Level:
+        elif previouslevel < Level and name != "Egg" :
             if nickname:
                 msgtxt += ("\n%s is now level %s!" % (nickname, Level))
             else:
@@ -295,6 +347,7 @@ def MultiPokemon(*args, **kwargs):
     else:
         pokemontotal = []
         modifiedpokemontotal = []
+        FirstPokemon()
     if os.path.exists("pokemankisettings.json"):
         thresholdsettings = json.load(open("pokemankisettings.json"))
     else:
@@ -367,7 +420,7 @@ def MultiPokemon(*args, **kwargs):
             if pokemontier == "A":
                 msgbox = QMessageBox()
                 msgbox.setWindowTitle("Pokemanki")
-                msgbox.setText("Choose a starter Pokémon")
+                msgbox.setText("Choose a starter Pokémon for this deck")
                 msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
                 msgbox.addButton("Charmander", QMessageBox.AcceptRole)
                 msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
@@ -438,7 +491,7 @@ def MultiPokemon(*args, **kwargs):
                     msgtxt += ("\n%s has evolved into a %s (Level %s)!" % (nickname, name, Level))
                 else:
                     msgtxt += ("\nYour %s has evolved into a %s (Level %s)!" % (deckmon, name, Level))
-            elif previouslevel < Level:
+            elif previouslevel < Level and name != "Egg":
                 if nickname:
                     msgtxt += ("\n%s is now level %s!" % (nickname, Level))
                 else:
