@@ -5,6 +5,7 @@
 from .display import pokemonDisplay
 
 import anki.stats
+import aqt.overview
 from anki.hooks import wrap
 import shutil
 import inspect, os
@@ -32,7 +33,7 @@ if os.path.exists("%s/collection.media" % profilefolder):
     mediafolder = "%s/collection.media" % profilefolder
 # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
 if os.path.exists("%s/pokemon_images" % mediafolder) == False and os.path.exists(pkmnimgfolder):
-    shutil.move(pkmnimgfolder, mediafolder)
+    shutil.copytree(pkmnimgfolder, "%s/pokemon_images" % mediafolder)
 # Download threshold settings (or make from scratch if not already made)
 if os.path.exists("%s/pokemankisettings.json" % mediafolder):
     thresholdlist = json.load(open("%s/pokemankisettings.json" % mediafolder))
@@ -44,7 +45,14 @@ else:
 # Nickname Settings
 def Nickname():
     global mediafolder
-    deckmonlist = json.load(open("%s/pokemanki.json" % mediafolder))
+    if os.path.exists(open("%s/pokemanki.json" % mediafolder)):
+        deckmonlist = json.load(open("%s/pokemanki.json" % mediafolder))
+    else:
+        nopokemon = QMessageBox()
+        nopokemon.setWindowTitle("Pokemanki")
+        nopokemon.setText("Please open the Stats window to get your Pokémon.")
+        nopokemon.exec_()
+        return
     displaylist = []
     for item in deckmonlist:
         deckname = mw.col.decks.name(item[1])

@@ -303,14 +303,14 @@ def DeckPokemon(*args, **kwargs):
             previouslevel = Level
         if name != deckmon and name != "Egg" and previouslevel < Level:
             if nickname:
-                msgtxt += ("\n%s has evolved into a %s (Level %s)!" % (nickname, name, Level))
+                msgtxt += ("\n%s has evolved into a %s (Level %s)! (+%s)" % (nickname, name, Level, (Level - previouslevel)))
             else:
-                msgtxt += ("\nYour %s has evolved into a %s (Level %s)!" % (deckmon, name, Level))
+                msgtxt += ("\nYour %s has evolved into a %s (Level %s)! (+%s)" % (deckmon, name, Level, (Level - previouslevel)))
         elif previouslevel < Level and name != "Egg" :
             if nickname:
-                msgtxt += ("\n%s is now level %s!" % (nickname, Level))
+                msgtxt += ("\n%s is now level %s! (+%s)" % (nickname, Level, (Level - previouslevel)))
             else:
-                msgtxt += ("\nYour %s is now level %s!" % (name, Level))
+                msgtxt += ("\nYour %s is now level %s! (+%s)" % (name, Level, (Level - previouslevel)))
     # Show new Pokemon and eggs
     if already_assigned == False:
         if name == "Egg":
@@ -492,14 +492,14 @@ def MultiPokemon(*args, **kwargs):
                 previouslevel = Level
             if name != deckmon and name != "Egg" and previouslevel < Level:
                 if nickname:
-                    msgtxt += ("\n%s has evolved into a %s (Level %s)!" % (nickname, name, Level))
+                    msgtxt += ("\n%s has evolved into a %s (Level %s)! (+%s)" % (nickname, name, Level, (Level - previouslevel)))
                 else:
-                    msgtxt += ("\nYour %s has evolved into a %s (Level %s)!" % (deckmon, name, Level))
+                    msgtxt += ("\nYour %s has evolved into a %s (Level %s)! (+%s)" % (deckmon, name, Level, (Level - previouslevel)))
             elif previouslevel < Level and name != "Egg":
                 if nickname:
-                    msgtxt += ("\n%s is now level %s!" % (nickname, Level))
+                    msgtxt += ("\n%s is now level %s! (+%s)" % (nickname, Level, (Level - previouslevel)))
                 else:
-                    msgtxt += ("\nYour %s is now level %s!" % (name, Level))
+                    msgtxt += ("\nYour %s is now level %s! (+%s)" % (name, Level, (Level - previouslevel)))
         if already_assigned == False:
             if name == "Egg":
                 msgtxt += "\nYou found an egg!"

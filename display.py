@@ -4,11 +4,27 @@ from .compute import DeckPokemon, MultiPokemon
 from anki.lang import _
 import json
 from collections import namedtuple
+from aqt import mw
+import shutil
 
 # Display function that gets wrapped into anki.stats.py
 def pokemonDisplay(*args, **kwargs):
     self = args[0]
     old = kwargs['_old']
+    profilename = mw.pm.name
+    # Find current directory
+    currentdirname = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+    # Assign Pokemon Image folder directory name
+    pkmnimgfolder = currentdirname + "/pokemon_images"
+    ankifolder = os.path.dirname(os.path.dirname(currentdirname))
+    if os.path.exists("%s/%s" % (ankifolder, profilename)):
+        profilefolder = ("%s/%s" % (ankifolder, profilename))
+    # Get to collection.media folder
+    if os.path.exists("%s/collection.media" % profilefolder):
+        mediafolder = "%s/collection.media" % profilefolder
+    # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
+    if os.path.exists("%s/pokemon_images" % mediafolder) == False and os.path.exists(pkmnimgfolder):
+        shutil.copytree(pkmnimgfolder, "%s/pokemon_images" % mediafolder)
     # Assign deckmon and multideckmon variables (either tuple or list of tuples)
     deckmon = ()
     multideckmon = []
@@ -54,9 +70,23 @@ def _show(self, data, title, subtitle):
         # Don't show level for egg
         if data[0] == "Egg":
             if len(data) == 4:
-                text = data[3]
+                if data[2] == 1:
+                    text = ("%s (needs a lot more time to hatch)" % data[3])
+                elif data[2] == 2:
+                    text = ("%s (will take some time to hatch)" % data[3])
+                elif data[2] == 3:
+                    text = ("%s (moves around inside sometimes)" % data[3])
+                elif data[2] == 4:
+                    text = ("%s (making sounds inside)" % data[3])
             else:
-                text = data[0]
+                if data[2] == 1:
+                    text = ("%s (needs a lot more time to hatch)" % data[0])
+                elif data[2] == 2:
+                    text = ("%s (will take some time to hatch)" % data[0])
+                elif data[2] == 3:
+                    text = ("%s (moves around inside sometimes)" % data[0])
+                elif data[2] == 4:
+                    text = ("%s (making sounds inside)" % data[0])
         else:
             if len(data) == 4:
                 text = ("%s (Level %s)" % (data[3], data[2]))
@@ -91,9 +121,23 @@ def _show(self, data, title, subtitle):
         for name, level, nickname in pokemon_collection:
             if int(level) < 5:
                 if nickname:
-                    text = nickname
+                    if int(level) == 1:
+                        text = ("%s (needs a lot more time to hatch)" % nickname)
+                    elif int(level) == 2:
+                        text = ("%s (will take some time to hatch)" % nickname)
+                    elif int(level) == 3:
+                        text = ("%s (moves around inside sometimes)" % nickname)
+                    elif int(level) == 4:
+                        text = ("%s (making sounds inside)" % nickname)
                 else:
-                    text = name
+                    if int(level) == 1:
+                        text = ("%s (needs a lot more time to hatch)" % name)
+                    elif int(level) == 2:
+                        text = ("%s (will take some time to hatch)" % name)
+                    elif int(level) == 3:
+                        text = ("%s (moves around inside sometimes)" % name)
+                    elif int(level) == 4:
+                        text = ("%s (making sounds inside)" % name)
             else:
                 if nickname:
                     text = ("%s (Level %s)" % (nickname, level))
