@@ -14,8 +14,9 @@ def pokemonDisplay(*args, **kwargs):
     profilename = mw.pm.name
     # Find current directory
     currentdirname = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-    # Assign Pokemon Image folder directory name
+    # Assign Pokemon Image and Progress Bar folder directory names
     pkmnimgfolder = currentdirname + "/pokemon_images"
+    progressbarfolder = currentdirname + "/progress_bars"
     ankifolder = os.path.dirname(os.path.dirname(currentdirname))
     if os.path.exists("%s/%s" % (ankifolder, profilename)):
         profilefolder = ("%s/%s" % (ankifolder, profilename))
@@ -25,6 +26,8 @@ def pokemonDisplay(*args, **kwargs):
     # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
     if os.path.exists("%s/pokemon_images" % mediafolder) == False and os.path.exists(pkmnimgfolder):
         shutil.copytree(pkmnimgfolder, "%s/pokemon_images" % mediafolder)
+    if os.path.exists("%s/progress_bars" % mediafolder) == False and os.path.exists(progressbarfolder):
+        shutil.copytree(progressbarfolder, "%s/progress_bars" % mediafolder)
     # Assign deckmon and multideckmon variables (either tuple or list of tuples)
     deckmon = ()
     multideckmon = []
@@ -65,38 +68,52 @@ def _show(self, data, title, subtitle):
     text_lines = []
     # Table text
     table_text = ""
+    if os.path.exists("_prestigelist.json"):
+        prestigelist = json.load(open("_prestigelist.json"))
+    else:
+        prestigelist = []
     # If single Pokemon, show centered picture with name and level below
     if type(data) == tuple:
         # Don't show level for egg
         if data[0] == "Egg":
             if len(data) == 4:
-                if data[2] == 1:
+                if int(data[2]) == 1:
                     text = ("%s (needs a lot more time to hatch)" % data[3])
-                elif data[2] == 2:
+                elif int(data[2]) == 2:
                     text = ("%s (will take some time to hatch)" % data[3])
-                elif data[2] == 3:
+                elif int(data[2]) == 3:
                     text = ("%s (moves around inside sometimes)" % data[3])
-                elif data[2] == 4:
+                elif int(data[2]) == 4:
                     text = ("%s (making sounds inside)" % data[3])
             else:
-                if data[2] == 1:
+                if int(data[2]) == 1:
                     text = ("%s (needs a lot more time to hatch)" % data[0])
-                elif data[2] == 2:
+                elif int(data[2]) == 2:
                     text = ("%s (will take some time to hatch)" % data[0])
-                elif data[2] == 3:
+                elif int(data[2]) == 3:
                     text = ("%s (moves around inside sometimes)" % data[0])
-                elif data[2] == 4:
+                elif int(data[2]) == 4:
                     text = ("%s (making sounds inside)" % data[0])
         else:
-            if len(data) == 4:
-                text = ("%s (Level %s)" % (data[3], data[2]))
+            if data[1] in prestigelist:
+                if len(data) == 4:
+                    text = ("%s (Level %s)" % (data[3], int(data[2]) - 50))
+                else:
+                    text = ("%s (Level %s)" % (data[0], int(data[2]) - 50))
             else:
-                text = ("%s (Level %s)" % (data[0], data[2]))
+                if len(data) == 4:
+                    text = ("%s (Level %s)" % (data[3], int(data[2])))
+                else:
+                    text = ("%s (Level %s)" % (data[0], int(data[2])))
         table_text += (("""<tr>
                         <td height = 300 width = 300 align = center><img src="/pokemon_images/%s.png" title=%s></td>""") % (data[0], self.col.decks.name(data[1])))
         table_text += (("""<tr>
                            <td height = 30 width = 250 align = center><b>%s</b></td>
                            </tr>""") % text)
+        if int(data[2]) > 5:
+            table_text += (("""<tr>
+                               <td height = 30 width = 250 align = center><img src="/progress_bars/%s.png"></td>
+                               </tr>""") % int(20*(data[2] - int(data[2]))))
         # Add table_text to txt
         txt += "<table width = 300>" + table_text + "</table>"
     # If multiple Pokemon, show table of Pokemon with name and level below
@@ -115,34 +132,52 @@ def _show(self, data, title, subtitle):
             pokemon_names.append(pokemon[0])
             pokemon_decks.append(pokemon[1])
             pokemon_levels.append(str(pokemon[2]))
-        pokemon_collection = tuple(zip(pokemon_names, pokemon_levels, pokemon_nicknames))
+        pokemon_collection = tuple(zip(pokemon_names, pokemon_decks, pokemon_levels, pokemon_nicknames))
+        pokemon_progress = []
+        for level in pokemon_levels:
+            if float(level) < 5:
+                pokemon_progress.append(None)
+            else:
+                pokemon_progress.append(int(float(20*(float(level) - int(float(level))))))
+        pokemon_progress_text = []
+        for item in pokemon_progress:
+            if item is not None:
+                pokemon_progress_text.append("""<img src="/progress_bars/%s.png">""" % item)
+            else:
+                pokemon_progress_text.append("")
         pokemon_text = []
         table_size = 0
-        for name, level, nickname in pokemon_collection:
-            if int(level) < 5:
+        for name, deck, level, nickname in pokemon_collection:
+            if int(float(level)) < 5:
                 if nickname:
-                    if int(level) == 1:
+                    if int(float(level)) == 1:
                         text = ("%s (needs a lot more time to hatch)" % nickname)
-                    elif int(level) == 2:
+                    elif int(float(level)) == 2:
                         text = ("%s (will take some time to hatch)" % nickname)
-                    elif int(level) == 3:
+                    elif int(float(level)) == 3:
                         text = ("%s (moves around inside sometimes)" % nickname)
-                    elif int(level) == 4:
+                    elif int(float(level)) == 4:
                         text = ("%s (making sounds inside)" % nickname)
                 else:
-                    if int(level) == 1:
+                    if int(float(level)) == 1:
                         text = ("%s (needs a lot more time to hatch)" % name)
-                    elif int(level) == 2:
+                    elif int(float(level)) == 2:
                         text = ("%s (will take some time to hatch)" % name)
-                    elif int(level) == 3:
+                    elif int(float(level)) == 3:
                         text = ("%s (moves around inside sometimes)" % name)
-                    elif int(level) == 4:
+                    elif int(float(level)) == 4:
                         text = ("%s (making sounds inside)" % name)
             else:
-                if nickname:
-                    text = ("%s (Level %s)" % (nickname, level))
+                if deck in prestigelist:
+                    if nickname:
+                        text = ("%s (Level %s) - Prestiged" % (nickname, int(float(level)) - 50))
+                    else:
+                        text = ("%s (Level %s) - Prestiged" % (name, int(float(level)) - 50))
                 else:
-                    text = ("%s (Level %s)" % (name, level))
+                    if nickname:
+                        text = ("%s (Level %s)" % (nickname, int(float(level))))
+                    else:
+                        text = ("%s (Level %s)" % (name, int(float(level))))
             pokemon_text.append(text)
             while table_size < (len(pokemon_text) - 2):
                 table_text += (("""<tr>
@@ -155,6 +190,11 @@ def _show(self, data, title, subtitle):
                                    <td height = 30 width = 250 align = center><b>%s</b></td>
                                    <td height = 30 width = 250 align = center><b>%s</b></td>
                                    </tr>""") % (pokemon_text[table_size], pokemon_text[table_size+1], pokemon_text[table_size+2]))
+                table_text += (("""<tr>
+                                   <td height = 30 width = 250 align = center>%s</td>
+                                   <td height = 30 width = 250 align = center>%s</td>
+                                   <td height = 30 width = 250 align = center>%s</td>
+                                   </tr>""") % (pokemon_progress_text[table_size], pokemon_progress_text[table_size+1], pokemon_progress_text[table_size+2]))
                 table_size += 3
         # Dealing with incomplete rows
         if len(pokemon_text) % 3 == 0:
@@ -170,6 +210,11 @@ def _show(self, data, title, subtitle):
                                <td height = 30 width = 250 align = center></td>
                                <td height = 30 width = 250 align = center></td>
                                </tr>""") % (pokemon_text[table_size]))
+            table_text += (("""<tr>
+                               <td height = 30 width = 250 align = center>%s</td>
+                               <td height = 30 width = 250 align = center></td>
+                               <td height = 30 width = 250 align = center></td>
+                               </tr>""") % (pokemon_progress_text[table_size]))
         elif len(pokemon_text) % 3 == 2:
             table_text += (("""<tr>
                                <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
@@ -181,6 +226,11 @@ def _show(self, data, title, subtitle):
                                <td height = 30 width = 250 align = center><b>%s</b></td>
                                <td height = 30 width = 250 align = center></td>
                                </tr>""") % (pokemon_text[table_size], pokemon_text[table_size+1]))
+            table_text += (("""<tr>
+                               <td height = 30 width = 250 align = center>%s</td>
+                               <td height = 30 width = 250 align = center>%s</td>
+                               <td height = 30 width = 250 align = center></td>
+                               </tr>""") % (pokemon_progress_text[table_size], pokemon_progress_text[table_size+1]))
         # Assign table_text to txt
         txt += "<table width = 750>" + table_text + "</table>"
         # Make bottom line using function from stats.py and assign to text_lines
