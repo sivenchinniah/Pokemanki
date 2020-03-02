@@ -4,13 +4,109 @@ import os.path
 import random
 from aqt.qt import *
 from aqt import mw
+import csv
+import inspect
+import os
+
+config = mw.addonManager.getConfig(__name__)
+currentdirname = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+
+def cardIdsFromDeckIds(queryDb, deckIds):
+    query = "select id from cards where did in {}".format(ids2str(deckIds))
+    cardIds = [i[0] for i in queryDb.all(query)]
+    return cardIds
+
+def cardInterval(queryDb, cid):
+    revLogIvl = queryDb.scalar(
+                    "select ivl from revlog where cid = %s "
+                    "order by id desc limit 1 offset 0" % cid)
+    ctype = queryDb.scalar(
+                "select type from cards where id = %s "
+                "order by id desc limit 1 offset 0" % cid)
+
+    # card interval is "New"
+    if ctype == 0:
+        ivl = 0
+    elif revLogIvl is None:
+        ivl = 0
+    elif revLogIvl < 0:
+        # Anki represents "learning" card review log intervals as negative minutes
+        # So, convert to days
+        ivl = revLogIvl * -1 / 60 / 1440
+    else:
+        ivl = revLogIvl
+
+    return ivl
+
+def loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2):
+    with open(csv_fpath, "r") as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter=",")
+        for line in csv_reader:
+            pokemon = line["pokemon"]
+            tier = line["tier"]
+            first_ev_lv = line["first_evolution_level"]
+            if first_ev_lv.isnumeric():
+                first_ev_lv = int(first_ev_lv)
+            else:
+                first_ev_lv = None
+            first_ev = line["first_evolution"]
+            if first_ev == "NA":
+                first_ev = None
+            second_ev_lv = line["second_evolution_level"]
+            if second_ev_lv.isnumeric():
+                second_ev_lv = int(second_ev_lv)
+            else:
+                second_ev_lv = None
+            second_ev = line["second_evolution"]
+            if second_ev == "NA":
+                second_ev = None
+
+            pokemonlist.append(pokemon)
+            tiers.append(tier)
+            evolutionLevel1.append(first_ev_lv)
+            evolution1.append(first_ev)
+            evolutionLevel2.append(second_ev_lv)
+            evolution2.append(second_ev)
+    return
+
+
+def randomStarter():
+    available_generations = [1]
+    if config['gen2']:
+        available_generations.append(2)
+    if config['gen3']:
+        available_generations.append(3)
+    if config['gen4']:
+        available_generations.append(4)
+    if config['gen5']:
+        available_generations.append(5)
+
+    choice_generation = random.choice(available_generations)
+    if choice_generation == 1:
+        return ["Bulbasaur", "Charmander", "Squirtle"]
+    elif choice_generation == 2:
+        return ["Chikorita", "Cyndaquil", "Totodile"]
+    elif choice_generation == 3:
+        return ["Treecko", "Torchic", "Mudkip"]
+    elif choice_generation == 4:
+        return ["Turtwig", "Chimchar", "Piplup"]
+    elif choice_generation == 5:
+        return ["Snivy", "Tepig" "Oshawott"]
 
 # Retrieve id and ivl for each card in a single deck
 def DeckStats(*args, **kwargs):
     self = args[0]
     old = kwargs['_old']
-    result = self.col.db.all("""select id, ivl from cards where did in %s""" %
-                ids2str(self.col.decks.active()))
+    # result = self.col.db.all("""select id, ivl from cards where did in %s""" %
+    #             ids2str(self.col.decks.active()))
+    activeDeckIds = self.col.decks.active()
+    cardIds = cardIdsFromDeckIds(self.col.db, activeDeckIds)
+
+    result = []
+    for cid in cardIds:
+        ivl = cardInterval(self.col.db, cid)
+        result.append((cid, ivl))
+
     return result
 
 # Retrieve id and ivl for each subdeck that does not have subdecks itself
@@ -40,7 +136,16 @@ def MultiStats(*args, **kwargs):
     resultlist = []
     # Find results for each card in these decks
     for item in nograndchildren:
-        result = self.col.db.all("""select id, ivl from cards where did == %s""" % item)
+        # result = self.col.db.all("""select id, ivl from cards where did == %s""" % item)
+
+        # cardIds = self.col.db.all("""select id from cards where did == %s""" % item)
+        cardIds = cardIdsFromDeckIds(self.col.db, [item])
+
+        result = []
+        for cid in cardIds:
+            ivl = cardInterval(self.col.db, cid)
+            result.append((cid, ivl))
+
         resultlist.append(result)
     # Zip the deck ids with the results
     nograndchildresults = list(zip(nograndchildren, resultlist))
@@ -78,12 +183,24 @@ def FirstPokemon():
         deckmon = msgbox.clickedButton().text()
         if deckmon:
             deck = mw.col.decks.byName(inp)['id']
-            stats = mw.col.db.all("""select id, ivl from cards where did in (%s)""" % deck)
+            # stats = mw.col.db.all("""select id, ivl from cards where did in (%s)""" % deck)
+            
+            # cardIds = mw.col.db.all("""select id from cards where did in (%s)""" % deck)
+            cardIds = cardIdsFromDeckIds(mw.col.db, [deck])
+            stats = []
+            for cid in cardIds:
+                for cid in cardIds:
+                    ivl = cardInterval(mw.col.db, cid)
+                    stats.append((cid, ivl))
+
             sumivl = 0
             for id, ivl in stats:
                 adjustedivl = (100 * (ivl/100)**0.5)
                 sumivl += adjustedivl
-            Level = int(sumivl/len(stats)+0.5)
+            if len(stats) != 0:
+                Level = int(sumivl/len(stats)+0.5)
+            else:
+                Level = 0
             deckmondata = [(deckmon, deck, Level)]
             with open("_pokemanki.json", "w") as f:
                 json.dump(deckmondata, f)
@@ -132,12 +249,51 @@ def DeckPokemon(*args, **kwargs):
         thresholdsettings = [100, 250, 500, 750, 1000]
 
     # Lists containing Pokemon, tiers, first evolution level, first evolution, second evolution level, and second evolution
-    pokemonlist = ['Caterpie', 'Weedle', 'Pidgey', 'Rattata', 'Zubat', 'Spearow', 'Oddish', 'Paras', 'Venonat', 'Meowth', 'Bellsprout', 'Drowzee', 'Krabby', 'Horsea', 'Magikarp', 'Ekans', 'Nidoran F', 'Nidoran M', 'Clefairy', 'Jigglypuff', 'Diglett', 'Poliwag', 'Tentacool', 'Slowpoke', 'Magnemite', 'Doduo', 'Shellder', 'Gastly', 'Exeggcute', 'Cubone', 'Goldeen', 'Staryu', 'Eevee1', 'Eevee2', 'Eevee3', 'Sandshrew', 'Vulpix', 'Psyduck', 'Mankey', 'Growlithe', 'Abra', 'Machop', 'Geodude', 'Ponyta', 'Seel', 'Onix', 'Koffing', 'Scyther', 'Ditto', 'Bulbasaur', 'Charmander', 'Squirtle', 'Pikachu', 'Grimer', 'Lickitung', 'Rhyhorn', 'Tangela', 'Electabuzz', 'Magmar', 'Pinsir', 'Omanyte', 'Kabuto', 'Dratini', "Farfetch'd", 'Voltorb', 'Hitmonlee', 'Hitmonchan', 'Chansey', 'Kangaskhan', 'Mr. Mime', 'Jynx', 'Tauros', 'Lapras', 'Porygon', 'Aerodactyl', 'Snorlax', 'Moltres', 'Zapdos', 'Articuno', 'Mewtwo', 'Mew']
-    tiers = ['D', 'D', 'D', 'E', 'E', 'E', 'D', 'E', 'E', 'D', 'D', 'D', 'E', 'E', 'B', 'D', 'D', 'D', 'E', 'E', 'E', 'D', 'E', 'E', 'D', 'E', 'D', 'B', 'C', 'D', 'E', 'D', 'B', 'B', 'B', 'E', 'D', 'E', 'E', 'B', 'B', 'B', 'B', 'C', 'E', 'D', 'E', 'C', 'F', 'A', 'A', 'A', 'D', 'E', 'F', 'B', 'F', 'C', 'C', 'C', 'D', 'D', 'B', 'F', 'E', 'C', 'C', 'F', 'C', 'F', 'F', 'C', 'C', 'F', 'C', 'C', 'S', 'S', 'S', 'S', 'S']
-    evolutionLevel1 = [7, 7, 18, 20, 22, 20, 21, 24, 31, 28, 21, 26, 28, 32, 40, 22, 16, 16, 32, 32, 26, 25, 30, 37, 30, 31, 32, 25, 36, 28, 33, 25, 36, 36, 36, 22, 32, 33, 28, 36, 16, 28, 25, 40, 34, None, 35, None, None, 16, 16, 16, 32, 38, None, 42, None, None, None, None, 40, 40, 30, None, 30, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
-    evolution1 = ['Metapod', 'Kakuna', 'Pidgeotto', 'Raticate', 'Golbat', 'Fearow', 'Gloom', 'Parasect', 'Venomoth', 'Persian', 'Weepinbell', 'Hypno', 'Kingler', 'Seadra', 'Gyarados', 'Arbok', 'Nidorina', 'Nidorino', 'Clefable', 'Wigglytuff', 'Dugtrio', 'Poliwhirl', 'Tentacruel', 'Slowbro', 'Magneton', 'Dodrio', 'Cloyster', 'Haunter', 'Exeggutor', 'Marowak', 'Seaking', 'Starmie', 'Vaporeon', 'Jolteon', 'Flareon', 'Sandslash', 'Ninetales', 'Golduck', 'Primeape', 'Arcanine', 'Kadabra', 'Machoke', 'Graveler', 'Rapidash', 'Dewgong', None, 'Weezing', None, None, 'Ivysaur', 'Charmeleon', 'Wartortle', 'Raichu', 'Muk', None, 'Rhydon', None, None, None, None, 'Omastar', 'Kabutops', 'Dragonair', None, 'Electrode', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
-    evolutionLevel2 = [10, 10, 36, None, None, None, 36, None, None, None, 36, None, None, None, None, None, 32, 32, None, None, None, 36, None, None, None, None, None, 40, None, None, None, None, None, None, None, None, None, None, None, None, 40, 40, 40, None, None, None, None, None, None, 32, 36, 36, None, None, None, None, None, None, None, None, None, None, 55, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
-    evolution2 = ['Butterfree', 'Beedrill', 'Pidgeot', None, None, None, 'Vileplume', None, None, None, 'Victreebel', None, None, None, None, None, 'Nidoqueen', 'Nidoking', None, None, None, 'Poliwrath', None, None, None, None, None, 'Gengar', None, None, None, None, None, None, None, None, None, None, None, None, 'Alakazam', 'Machamp', 'Golem', None, None, None, None, None, None, 'Venusaur', 'Charizard', 'Blastoise', None, None, None, None, None, None, None, None, None, None, 'Dragonite', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
+
+    pokemonlist = []
+    tiers = []
+    evolutionLevel1 =[]
+    evolution1 = []
+    evolutionLevel2 =[]
+    evolution2 = []
+
+    csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1.csv")
+    loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+
+    if config['gen2']:
+        csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen2.csv")
+        loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+
+        if config['gen4_evolutions']:
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_plus4.csv")
+            loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen2_plus4.csv")
+            loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+        else:
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_no4.csv")
+            loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen2_no4.csv")
+            loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+    else:
+        if config['gen4_evolutions']:
+            # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
+            # so let's just include gen 2 for these evolution lines
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_plus4.csv")
+            loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+        else:
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_no2_no4.csv")
+            loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+
+    if config['gen3']:
+        csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen3.csv")
+        loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+    if config['gen4']:
+        csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen4.csv")
+        loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+    if config['gen5']:
+        csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen5.csv")
+        loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+        
     # Zip lists into list of tuples
     pokemon_tuple = tuple(zip(pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2))
 
@@ -223,8 +379,16 @@ def DeckPokemon(*args, **kwargs):
         prestigelist = json.load(open("_prestigelist.json"))
     else:
         prestigelist = []
+    if os.path.exists("_everstonelist.json"):
+        everstonelist = json.load(open("_everstonelist.json"))
+    else:
+        everstonelist = []
+    if os.path.exists("_everstonepokemonlist.json"):
+        everstonepokemonlist = json.load(open("_everstonepokemonlist.json"))
+    else:
+        everstonepokemonlist = []
     # Set max level to 100
-    if Level > 100 and self.col.decks.active[0] not in prestigelist:
+    if Level > 100 and self.col.decks.active()[0] not in prestigelist:
         Level = 100.00
     # Give egg if level < 5
     if Level < 5:
@@ -241,6 +405,10 @@ def DeckPokemon(*args, **kwargs):
     # Make display name Eevee if one of the Eevees
     if name.startswith("Eevee"):
         name = "Eevee"
+    if name.startswith("Slowpoke"):
+        name = "Slowpoke"
+    if name.startswith("Tyrogue"):
+        name = "Tyrogue"
 
     # Assign new name to modifiedpokemontotal if not already assigned (making sure to assign Deckmon original name if Eevee or Egg)
     if already_assigned == False and name != "Eevee" and name != "Egg":
@@ -311,7 +479,7 @@ def DeckPokemon(*args, **kwargs):
             else:
                 msgtxt += ("\nYour %s has evolved into a %s (Level %s)! (+%s)" % (deckmon, name, int(Level), (int(Level) - int(previouslevel))))
         elif int(previouslevel) < int(Level) and name != "Egg" :
-            if self.col.decks.active[0] in prestigelist:
+            if self.col.decks.active()[0] in prestigelist:
                 if nickname:
                     msgtxt += ("\n%s is now level %s! (+%s)" % (nickname, int(Level) - 50, (int(Level) - int(previouslevel))))
                 else:
@@ -366,12 +534,48 @@ def MultiPokemon(*args, **kwargs):
         thresholdsettings = json.load(open("_pokemankisettings.json"))
     else:
         thresholdsettings = [100, 250, 500, 750, 1000]
-    pokemonlist = ['Caterpie', 'Weedle', 'Pidgey', 'Rattata', 'Zubat', 'Spearow', 'Oddish', 'Paras', 'Venonat', 'Meowth', 'Bellsprout', 'Drowzee', 'Krabby', 'Horsea', 'Magikarp', 'Ekans', 'Nidoran F', 'Nidoran M', 'Clefairy', 'Jigglypuff', 'Diglett', 'Poliwag', 'Tentacool', 'Slowpoke', 'Magnemite', 'Doduo', 'Shellder', 'Gastly', 'Exeggcute', 'Cubone', 'Goldeen', 'Staryu', 'Eevee1', 'Eevee2', 'Eevee3', 'Sandshrew', 'Vulpix', 'Psyduck', 'Mankey', 'Growlithe', 'Abra', 'Machop', 'Geodude', 'Ponyta', 'Seel', 'Onix', 'Koffing', 'Scyther', 'Ditto', 'Bulbasaur', 'Charmander', 'Squirtle', 'Pikachu', 'Grimer', 'Lickitung', 'Rhyhorn', 'Tangela', 'Electabuzz', 'Magmar', 'Pinsir', 'Omanyte', 'Kabuto', 'Dratini', "Farfetch'd", 'Voltorb', 'Hitmonlee', 'Hitmonchan', 'Chansey', 'Kangaskhan', 'Mr. Mime', 'Jynx', 'Tauros', 'Lapras', 'Porygon', 'Aerodactyl', 'Snorlax', 'Moltres', 'Zapdos', 'Articuno', 'Mewtwo', 'Mew']
-    tiers = ['D', 'D', 'D', 'E', 'E', 'E', 'D', 'E', 'E', 'D', 'D', 'D', 'E', 'E', 'B', 'D', 'D', 'D', 'E', 'E', 'E', 'D', 'E', 'E', 'D', 'E', 'D', 'B', 'C', 'D', 'E', 'D', 'B', 'B', 'B', 'E', 'D', 'E', 'E', 'B', 'B', 'B', 'B', 'C', 'E', 'D', 'E', 'C', 'F', 'A', 'A', 'A', 'D', 'E', 'F', 'B', 'F', 'C', 'C', 'C', 'D', 'D', 'B', 'F', 'E', 'C', 'C', 'F', 'C', 'F', 'F', 'C', 'C', 'F', 'C', 'C', 'S', 'S', 'S', 'S', 'S']
-    evolutionLevel1 = [7, 7, 18, 20, 22, 20, 21, 24, 31, 28, 21, 26, 28, 32, 40, 22, 16, 16, 32, 32, 26, 25, 30, 37, 30, 31, 32, 25, 36, 28, 33, 25, 36, 36, 36, 22, 32, 33, 28, 36, 16, 28, 25, 40, 34, None, 35, None, None, 16, 16, 16, 32, 38, None, 42, None, None, None, None, 40, 40, 30, None, 30, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
-    evolution1 = ['Metapod', 'Kakuna', 'Pidgeotto', 'Raticate', 'Golbat', 'Fearow', 'Gloom', 'Parasect', 'Venomoth', 'Persian', 'Weepinbell', 'Hypno', 'Kingler', 'Seadra', 'Gyarados', 'Arbok', 'Nidorina', 'Nidorino', 'Clefable', 'Wigglytuff', 'Dugtrio', 'Poliwhirl', 'Tentacruel', 'Slowbro', 'Magneton', 'Dodrio', 'Cloyster', 'Haunter', 'Exeggutor', 'Marowak', 'Seaking', 'Starmie', 'Vaporeon', 'Jolteon', 'Flareon', 'Sandslash', 'Ninetales', 'Golduck', 'Primeape', 'Arcanine', 'Kadabra', 'Machoke', 'Graveler', 'Rapidash', 'Dewgong', None, 'Weezing', None, None, 'Ivysaur', 'Charmeleon', 'Wartortle', 'Raichu', 'Muk', None, 'Rhydon', None, None, None, None, 'Omastar', 'Kabutops', 'Dragonair', None, 'Electrode', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
-    evolutionLevel2 = [10, 10, 36, None, None, None, 36, None, None, None, 36, None, None, None, None, None, 32, 32, None, None, None, 36, None, None, None, None, None, 40, None, None, None, None, None, None, None, None, None, None, None, None, 40, 40, 40, None, None, None, None, None, None, 32, 36, 36, None, None, None, None, None, None, None, None, None, None, 55, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
-    evolution2 = ['Butterfree', 'Beedrill', 'Pidgeot', None, None, None, 'Vileplume', None, None, None, 'Victreebel', None, None, None, None, None, 'Nidoqueen', 'Nidoking', None, None, None, 'Poliwrath', None, None, None, None, None, 'Gengar', None, None, None, None, None, None, None, None, None, None, None, None, 'Alakazam', 'Machamp', 'Golem', None, None, None, None, None, None, 'Venusaur', 'Charizard', 'Blastoise', None, None, None, None, None, None, None, None, None, None, 'Dragonite', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
+
+    pokemonlist = []
+    tiers = []
+    evolutionLevel1 =[]
+    evolution1 = []
+    evolutionLevel2 =[]
+    evolution2 = []
+
+    csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1.csv")
+    loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+    if config['gen2']:
+        csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen2.csv")
+        loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+        if config['gen4_evolutions']:
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_plus4.csv")
+            loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen2_plus4.csv")
+            loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+        else:
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_no4.csv")
+            loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen2_no4.csv")
+            loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+    else:
+        if config['gen4_evolutions']:
+            # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
+            # so let's just include gen 2 for these evolution lines
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_plus4.csv")
+            loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+        else:
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_no2_no4.csv")
+            loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+    if config['gen3']:
+        csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen3.csv")
+        loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+    if config['gen4']:
+        csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen4.csv")
+        loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+    if config['gen5']:
+        csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen5.csv")
+        loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+
     pokemon_tuple = tuple(zip(pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2))
 
     tierdict = {"A": [], "B": [], "C": [], "D": [], "E": [], "F": []}
@@ -396,6 +600,14 @@ def MultiPokemon(*args, **kwargs):
         prestigelist = json.load(open("_prestigelist.json"))
     else:
         prestigelist = []
+    if os.path.exists("_everstonelist.json"):
+        everstonelist = json.load(open("_everstonelist.json"))
+    else:
+        everstonelist = []
+    if os.path.exists("_everstonepokemonlist.json"):
+        everstonepokemonlist = json.load(open("_everstonepokemonlist.json"))
+    else:
+        everstonepokemonlist = []
     # Do the following (basically DeckPokemon) for each deck in results
     for item in results:
         result = item[1]
@@ -439,9 +651,10 @@ def MultiPokemon(*args, **kwargs):
                 msgbox = QMessageBox()
                 msgbox.setWindowTitle("Pokemanki")
                 msgbox.setText("Choose a starter Pokémon for the %s deck" % self.col.decks.name(item[0]))
-                msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
-                msgbox.addButton("Charmander", QMessageBox.AcceptRole)
-                msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
+
+                starters = randomStarter()
+                for starter in starters:
+                    msgbox.addButton(starter, QMessageBox.AcceptRole)
                 msgbox.exec_()
                 deckmon = msgbox.clickedButton().text()
             else:
@@ -453,6 +666,7 @@ def MultiPokemon(*args, **kwargs):
         for pokemon, tier, firstEL, firstEvol, secondEL, secondEvol in pokemon_tuple:
             if deckmon == pokemon or deckmon == firstEvol or deckmon == secondEvol:
                 details = (pokemon, firstEL, firstEvol, secondEL, secondEvol)
+        print(pokemon_tuple)
 
         name = details[0]
         firstEL = details[1]
@@ -464,14 +678,18 @@ def MultiPokemon(*args, **kwargs):
             Level = 100
         if Level < 5:
             name = "Egg"
-        if firstEL is not None:
-            firstEL = int(firstEL)
-            if Level > firstEL:
-                name = firstEvol
-        if secondEL is not None:
-            secondEL = int(secondEL)
-            if Level > secondEL:
-                name = secondEvol
+        if item[0] not in everstonelist:
+            if firstEL is not None:
+                firstEL = int(firstEL)
+                if Level > firstEL:
+                    name = firstEvol
+            if secondEL is not None:
+                secondEL = int(secondEL)
+                if Level > secondEL:
+                    name = secondEvol
+        else:
+            idx = everstonelist.index(item[0])
+            name = everstonepokemonlist[idx]
         if name.startswith("Eevee"):
             name = "Eevee"
         
