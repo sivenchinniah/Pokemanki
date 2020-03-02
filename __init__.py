@@ -9,12 +9,16 @@ import anki.stats
 import aqt.overview
 from anki.hooks import wrap
 import shutil
+import distutils.dir_util
 import inspect, os
 from aqt.qt import *
 from aqt import mw
 import json
 from datetime import date
 import random
+import csv
+
+config = mw.addonManager.getConfig(__name__)
 
 today = date.today()
 
@@ -39,6 +43,8 @@ if os.path.exists("%s/collection.media" % profilefolder):
 # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
 if os.path.exists("%s/pokemon_images" % mediafolder) == False and os.path.exists(pkmnimgfolder):
     shutil.copytree(pkmnimgfolder, "%s/pokemon_images" % mediafolder)
+elif os.path.exists(pkmnimgfolder):
+    distutils.dir_util.copy_tree(pkmnimgfolder, "%s/pokemon_images" % mediafolder)
 # Download threshold settings (or make from scratch if not already made)
 if os.path.exists("%s/pokemankisettings.json" % mediafolder):
     thresholdlist = json.load(open("%s/pokemankisettings.json" % mediafolder))
@@ -52,6 +58,18 @@ if os.path.exists("%s/prestigelist.json" % mediafolder) and not os.path.exists("
     prestigelist = json.load(open("%s/prestigelist.json" % mediafolder))
     with open("%s/_prestigelist.json" % mediafolder, "w") as f:
         json.dump(prestigelist, f)
+if os.path.exists("%s/everstonelist.json" % mediafolder) and not os.path.exists("%s/_everstonelist.json" % mediafolder):
+    everstonelist = json.load(open("%s/everstonelist.json" % mediafolder))
+    with open("%s/_everstonelist.json" % mediafolder, "w") as f:
+        json.dump(everstonelist, f)
+if os.path.exists("%s/alolanlist.json" % mediafolder) and not os.path.exists("%s/_alolanlist.json" % mediafolder):
+    alolanlist = json.load(open("%s/alolanlist.json" % mediafolder))
+    with open("%s/_alolanlist.json" % mediafolder, "w") as f:
+        json.dump(alolanlist, f)
+if os.path.exists("%s/megastonelist.json" % mediafolder) and not os.path.exists("%s/_megastonelist.json" % mediafolder):
+    megastonelist = json.load(open("%s/megastonelist.json" % mediafolder))
+    with open("%s/_megastonelist.json" % mediafolder, "w") as f:
+        json.dump(megastonelist, f)
 if os.path.exists("%s/tags.json" % mediafolder) and not os.path.exists("%s/_tags.json" % mediafolder):
     tags = json.load(open("%s/tags.json" % mediafolder))
     with open("%s/_tags.json" % mediafolder, "w") as f:
@@ -271,6 +289,317 @@ def MovetoTop():
     settingschanged.setText("Please restart Anki to see your updated settings.")
     settingschanged.exec_()
 
+def giveEverstone():
+    global mediafolder
+    if os.path.exists("%s/_decksortags.json" % mediafolder):
+        f = json.load(open("%s/_decksortags.json" % mediafolder))
+    else:
+        f = ""
+    if f:
+        if os.path.exists("%s/_tagmon.json" % mediafolder):
+            pokemon = json.load(open("%s/_tagmon.json" % mediafolder))
+    else:
+        if os.path.exists("%s/_pokemanki.json" % mediafolder):
+            pokemon = json.load(open("%s/_pokemanki.json" % mediafolder))
+    if os.path.exists("%s/_everstonelist.json" % mediafolder):
+        everstonelist = json.load(open("%s/_everstonelist.json" % mediafolder))
+    else:
+        everstonelist = []
+    if os.path.exists("%s/_everstonepokemonlist.json" % mediafolder):
+        everstonepokemonlist = json.load(open("%s/_everstonepokemonlist.json" % mediafolder))
+    else:
+        everstonepokemonlist = []
+
+    everstoneables = []
+    for item in pokemon:
+        if f:
+            cb = ("%s (Level %s) from %s" % (item[0], item[2], item[1]))
+        else:
+            cb = ("%s (Level %s) from %s" % (item[0], item[2], mw.col.decks.name(item[1])))
+        if item[1] in everstonelist:
+            continue
+        elif cb in everstoneables:
+            continue
+        else:
+            everstoneables.append(cb)
+
+
+    window = QWidget()
+    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon you would like to give an everstone to.", sorted(everstoneables), 0, False)
+    if inp and ok:
+        textlist = inp.split(" from ")
+        item = textlist[1]
+        everstone_pokemon_name = inp.split(" (Level ")[0]
+        if f:
+            everstonelist.append(item)
+            everstonepokemonlist.append(everstone_pokemon_name)
+        else:
+            everstonelist.append(mw.col.decks.id(item))
+            everstonepokemonlist.append(everstone_pokemon_name)
+        settingschanged = QMessageBox()
+        settingschanged.setWindowTitle("Pokemanki")
+        settingschanged.setText("Please restart Anki to see changes.")
+        settingschanged.exec_()
+    with open("%s/_everstonelist.json" % mediafolder, "w") as f:
+        json.dump(everstonelist, f)
+    with open("%s/_everstonepokemonlist.json" % mediafolder, "w") as f:
+        json.dump(everstonepokemonlist, f)
+
+def takeEverstone():
+    global mediafolder
+    if os.path.exists("%s/_decksortags.json" % mediafolder):
+        f = json.load(open("%s/_decksortags.json" % mediafolder))
+    else:
+        f = ""
+    if f:
+        if os.path.exists("%s/_tagmon.json" % mediafolder):
+            pokemon = json.load(open("%s/_tagmon.json" % mediafolder))
+    else:
+        if os.path.exists("%s/_pokemanki.json" % mediafolder):
+            pokemon = json.load(open("%s/_pokemanki.json" % mediafolder))
+    if os.path.exists("%s/_everstonelist.json" % mediafolder):
+        everstonelist = json.load(open("%s/_everstonelist.json" % mediafolder))
+    else:
+        everstonelist = []
+    if not everstonelist:
+        noeverstone = QMessageBox()
+        noeverstone.setWindowTitle("Pokemanki")
+        noeverstone.setText("None of your Pokémon are holding everstones.")
+        noeverstone.exec_()
+        return
+    possibleuneverstones = []
+    for thing in everstonelist:
+        for item in pokemon:
+            if item[1] == thing:
+                if f:
+                    cb = ("%s from %s" % (item[0], item[1]))
+                else:
+                    cb = ("%s from %s" % (item[0], mw.col.decks.name(item[1])))
+                if cb in possibleuneverstones:
+                    continue
+                else:
+                    possibleuneverstones.append(cb)
+        else:
+            continue
+    window = QWidget()
+    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon whose everstone you would like to take.", sorted(possibleuneverstones), 0, False)
+    if inp and ok:
+        textlist = inp.split(" from ")
+        item = textlist[1]
+        if f:
+            everstonelist.remove(item)
+            everstonepokemonlist.remove(everstone_pokemon_name)
+        else:
+            everstonelist.remove(mw.col.decks.id(item))
+            everstonepokemonlist.remove(everstone_pokemon_name)
+        settingschanged = QMessageBox()
+        settingschanged.setWindowTitle("Pokemanki")
+        settingschanged.setText("Please restart Anki to see your changes.")
+        settingschanged.exec_()
+    with open("%s/_everstonelist.json" % mediafolder, "w") as f:
+        json.dump(everstonelist, f)
+
+def giveMegastone():
+    global mediafolder
+    if os.path.exists("%s/_decksortags.json" % mediafolder):
+        f = json.load(open("%s/_decksortags.json" % mediafolder))
+    else:
+        f = ""
+    if f:
+        if os.path.exists("%s/_tagmon.json" % mediafolder):
+            pokemon = json.load(open("%s/_tagmon.json" % mediafolder))
+    else:
+        if os.path.exists("%s/_pokemanki.json" % mediafolder):
+            pokemon = json.load(open("%s/_pokemanki.json" % mediafolder))
+    if os.path.exists("%s/_megastonelist.json" % mediafolder):
+        megastonelist = json.load(open("%s/_megastonelist.json" % mediafolder))
+    else:
+        megastonelist = []
+    megastoneables = []
+    for item in pokemon:
+        if item[2] >= 70:
+            if f:
+                cb = ("%s (Level %s) from %s" % (item[0], item[2], item[1]))
+            else:
+                cb = ("%s (Level %s) from %s" % (item[0], item[2], mw.col.decks.name(item[1])))
+            if item[1] in megastonelist:
+                continue
+            elif cb in megastoneables:
+                continue
+            else:
+                megastoneables.append(cb)
+        else:
+            continue
+    window = QWidget()
+    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon you would like to give a mega stone to", sorted(megastoneables), 0, False)
+    if inp and ok:
+        textlist = inp.split(" from ")
+        item = textlist[1]
+        if f:
+            megastonelist.append(item)
+        else:
+            megastonelist.append(mw.col.decks.id(item))
+        settingschanged = QMessageBox()
+        settingschanged.setWindowTitle("Pokemanki")
+        settingschanged.setText("Please restart Anki to see your changes.")
+        settingschanged.exec_()
+    with open("%s/_megastonelist.json" % mediafolder, "w") as f:
+        json.dump(megastonelist, f)  
+
+def takeMegastone():
+    global mediafolder
+    if os.path.exists("%s/_decksortags.json" % mediafolder):
+        f = json.load(open("%s/_decksortags.json" % mediafolder))
+    else:
+        f = ""
+    if f:
+        if os.path.exists("%s/_tagmon.json" % mediafolder):
+            pokemon = json.load(open("%s/_tagmon.json" % mediafolder))
+    else:
+        if os.path.exists("%s/_pokemanki.json" % mediafolder):
+            pokemon = json.load(open("%s/_pokemanki.json" % mediafolder))
+    if os.path.exists("%s/_megastonelist.json" % mediafolder):
+        megastonelist = json.load(open("%s/_megastonelist.json" % mediafolder))
+    else:
+        megastonelist = []
+    if not megastonelist:
+        nomegastone = QMessageBox()
+        nomegastone.setWindowTitle("Pokemanki")
+        nomegastone.setText("None of your Pokémon are holding mega stones.")
+        nomegastone.exec_()
+        return
+    possibleunmegastones = []
+    for thing in megastonelist:
+        for item in pokemon:
+            if item[1] == thing:
+                if f:
+                    cb = ("%s from %s" % (item[0], item[1]))
+                else:
+                    cb = ("%s from %s" % (item[0], mw.col.decks.name(item[1])))
+                if cb in possibleunmegastones:
+                    continue
+                else:
+                    possibleunmegastones.append(cb)
+        else:
+            continue
+    window = QWidget()
+    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon whose mega stone you would like to take", sorted(possibleunmegastones), 0, False)
+    if inp and ok:
+        textlist = inp.split(" from ")
+        item = textlist[1]
+        if f:
+            megastonelist.remove(item)
+        else:
+            megastonelist.remove(mw.col.decks.id(item))
+        settingschanged = QMessageBox()
+        settingschanged.setWindowTitle("Pokemanki")
+        settingschanged.setText("Please restart Anki to see your changes.")
+        settingschanged.exec_()
+    with open("%s/_megastonelist.json" % mediafolder, "w") as f:
+        json.dump(megastonelist, f)
+
+
+def giveAlolanPassport():
+    global mediafolder
+    if os.path.exists("%s/_decksortags.json" % mediafolder):
+        f = json.load(open("%s/_decksortags.json" % mediafolder))
+    else:
+        f = ""
+    if f:
+        if os.path.exists("%s/_tagmon.json" % mediafolder):
+            pokemon = json.load(open("%s/_tagmon.json" % mediafolder))
+    else:
+        if os.path.exists("%s/_pokemanki.json" % mediafolder):
+            pokemon = json.load(open("%s/_pokemanki.json" % mediafolder))
+    if os.path.exists("%s/_alolanlist.json" % mediafolder):
+        alolanlist = json.load(open("%s/_alolanlist.json" % mediafolder))
+    else:
+        alolanlist = []
+
+    alolanables = []
+    for item in pokemon:
+        if f:
+            cb = ("%s (Level %s) from %s" % (item[0], item[2], item[1]))
+        else:
+            cb = ("%s (Level %s) from %s" % (item[0], item[2], mw.col.decks.name(item[1])))
+        if item[1] in alolanlist:
+            continue
+        elif cb in alolanables:
+            continue
+        else:
+            alolanables.append(cb)
+
+
+    window = QWidget()
+    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon you would like to give an Alolan Passport to.", sorted(alolanables), 0, False)
+    if inp and ok:
+        textlist = inp.split(" from ")
+        item = textlist[1]
+        alolan_pokemon_name = inp.split(" (Level ")[0]
+        if f:
+            alolanlist.append(item)
+        else:
+            alolanlist.append(mw.col.decks.id(item))
+        settingschanged = QMessageBox()
+        settingschanged.setWindowTitle("Pokemanki")
+        settingschanged.setText("Please restart Anki to see changes.")
+        settingschanged.exec_()
+    with open("%s/_alolanlist.json" % mediafolder, "w") as f:
+        json.dump(alolanlist, f)
+
+def takeAlolanPassport():
+    global mediafolder
+    if os.path.exists("%s/_decksortags.json" % mediafolder):
+        f = json.load(open("%s/_decksortags.json" % mediafolder))
+    else:
+        f = ""
+    if f:
+        if os.path.exists("%s/_tagmon.json" % mediafolder):
+            pokemon = json.load(open("%s/_tagmon.json" % mediafolder))
+    else:
+        if os.path.exists("%s/_pokemanki.json" % mediafolder):
+            pokemon = json.load(open("%s/_pokemanki.json" % mediafolder))
+    if os.path.exists("%s/_alolanlist.json" % mediafolder):
+        alolanlist = json.load(open("%s/_alolanlist.json" % mediafolder))
+    else:
+        alolanlist = []
+    if not alolanlist:
+        noalolan = QMessageBox()
+        noalolan.setWindowTitle("Pokemanki")
+        noalolan.setText("None of your Pokémon are holding an Alolan Passport.")
+        noalolan.exec_()
+        return
+    possibleunalolans = []
+    for thing in alolanlist:
+        for item in pokemon:
+            if item[1] == thing:
+                if f:
+                    cb = ("%s from %s" % (item[0], item[1]))
+                else:
+                    cb = ("%s from %s" % (item[0], mw.col.decks.name(item[1])))
+                if cb in possibleunalolans:
+                    continue
+                else:
+                    possibleunalolans.append(cb)
+        else:
+            continue
+    window = QWidget()
+    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon whose Alolan Passport you would like to take.", sorted(possibleunalolans), 0, False)
+    if inp and ok:
+        textlist = inp.split(" from ")
+        item = textlist[1]
+        if f:
+            alolanlist.remove(item)
+        else:
+            alolanlist.remove(mw.col.decks.id(item))
+        settingschanged = QMessageBox()
+        settingschanged.setWindowTitle("Pokemanki")
+        settingschanged.setText("Please restart Anki to see your changes.")
+        settingschanged.exec_()
+    with open("%s/_alolanlist.json" % mediafolder, "w") as f:
+        json.dump(alolanlist, f)
+
+
 
 def PrestigePokemon():
     global mediafolder
@@ -304,7 +633,7 @@ def PrestigePokemon():
         else:
             continue
     window = QWidget()
-    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon you would like to prestige (decreases level by 50, only availabe for Pokemon with level > 60)", possibleprestiges, 0, False)
+    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon you would like to prestige (decreases level by 50, only availabe for Pokemon with level > 60)", sorted(possibleprestiges), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -356,7 +685,7 @@ def UnprestigePokemon():
         else:
             continue
     window = QWidget()
-    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon you would like to unprestige", possibleunprestiges, 0, False)
+    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon you would like to unprestige", sorted(possibleunprestiges), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -369,7 +698,56 @@ def UnprestigePokemon():
         settingschanged.setText("Please restart Anki to see your unprestiged Pokémon.")
         settingschanged.exec_()
     with open("%s/_prestigelist.json" % mediafolder, "w") as f:
-        json.dump(prestigelist, f)    
+        json.dump(prestigelist, f)
+
+
+def pokemonLevelRangesFromCsv(csv_fpath):
+    pokemon_records = []
+
+    with open(csv_fpath, "r") as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter=",")
+        
+        for line in csv_reader:
+            pokemon = line["pokemon"]
+            tier = line["tier"]
+            first_ev_lv = line["first_evolution_level"]
+            if first_ev_lv.isnumeric():
+                first_ev_lv = int(first_ev_lv)
+            else:
+                first_ev_lv = None
+            first_ev = line["first_evolution"]
+            if first_ev == "NA":
+                first_ev = None
+            second_ev_lv = line["second_evolution_level"]
+            if second_ev_lv.isnumeric():
+                second_ev_lv = int(second_ev_lv)
+            else:
+                second_ev_lv = None
+            second_ev = line["second_evolution"]
+            if second_ev == "NA":
+                second_ev = None
+                        
+            pk1_lo_lv = 0
+            if first_ev_lv:
+                pk1_hi_lv = first_ev_lv
+            else:
+                pk1_hi_lv = 100
+            pokemon_records.append((pokemon, tier, pk1_lo_lv, pk1_hi_lv))
+            
+            if first_ev is not None:
+                pk2_lo_lv = pk1_hi_lv
+                if second_ev_lv:
+                    pk2_hi_lv = second_ev_lv
+                else:
+                    pk2_hi_lv = 100
+                pokemon_records.append((first_ev, tier, pk2_lo_lv, pk2_hi_lv))
+            
+            if second_ev is not None:
+                pk3_lo_lv = pk2_hi_lv
+                pk3_hi_lv = 100
+                pokemon_records.append((second_ev, tier, pk3_lo_lv, pk3_hi_lv))
+
+    return pokemon_records
 
 class Trades:
     def __init__(self):
@@ -383,7 +761,45 @@ class Trades:
         if os.path.exists("%s/collection.media" % profilefolder):
             mediafolder = "%s/collection.media" % profilefolder
         self.mediafolder = mediafolder
-        self.allpokemon = [('Caterpie', 'D', 0, 7), ('Weedle', 'D', 0, 7), ('Pidgey', 'D', 0, 18), ('Rattata', 'E', 0, 20), ('Zubat', 'E', 0, 22), ('Spearow', 'E', 0, 20), ('Oddish', 'D', 0, 21), ('Paras', 'E', 0, 24), ('Venonat', 'E', 0, 31), ('Meowth', 'D', 0, 28), ('Bellsprout', 'D', 0, 21), ('Drowzee', 'D', 0, 26), ('Krabby', 'E', 0, 28), ('Horsea', 'E', 0, 32), ('Magikarp', 'B', 0, 40), ('Ekans', 'D', 0, 22), ('Nidoran F', 'D', 0, 16), ('Nidoran M', 'D', 0, 16), ('Clefairy', 'E', 0, 32), ('Jigglypuff', 'E', 0, 32), ('Diglett', 'E', 0, 26), ('Poliwag', 'D', 0, 25), ('Tentacool', 'E', 0, 30), ('Slowpoke', 'E', 0, 37), ('Magnemite', 'D', 0, 30), ('Doduo', 'E', 0, 31), ('Shellder', 'D', 0, 32), ('Gastly', 'B', 0, 25), ('Exeggcute', 'C', 0, 36), ('Cubone', 'D', 0, 28), ('Goldeen', 'E', 0, 33), ('Staryu', 'D', 0, 25), ('Eevee1', 'B', 0, 36), ('Eevee2', 'B', 0, 36), ('Eevee3', 'B', 0, 36), ('Sandshrew', 'E', 0, 22), ('Vulpix', 'D', 0, 32), ('Psyduck', 'E', 0, 33), ('Mankey', 'E', 0, 28), ('Growlithe', 'B', 0, 36), ('Abra', 'B', 0, 16), ('Machop', 'B', 0, 28), ('Geodude', 'B', 0, 25), ('Ponyta', 'C', 0, 40), ('Seel', 'E', 0, 34), ('Onix', 'D', 0, 100), ('Koffing', 'E', 0, 35), ('Scyther', 'C', 0, 100), ('Ditto', 'F', 0, 100), ('Bulbasaur', 'A', 0, 16), ('Charmander', 'A', 0, 16), ('Squirtle', 'A', 0, 16), ('Pikachu', 'D', 0, 32), ('Grimer', 'E', 0, 38), ('Lickitung', 'F', 0, 100), ('Rhyhorn', 'B', 0, 42), ('Tangela', 'F', 0, 100), ('Electabuzz', 'C', 0, 100), ('Magmar', 'C', 0, 100), ('Pinsir', 'C', 0, 100), ('Omanyte', 'D', 0, 40), ('Kabuto', 'D', 0, 40), ('Dratini', 'B', 0, 30), ("Farfetch'd", 'F', 0, 100), ('Voltorb', 'E', 0, 30), ('Hitmonlee', 'C', 0, 100), ('Hitmonchan', 'C', 0, 100), ('Chansey', 'F', 0, 100), ('Kangaskhan', 'C', 0, 100), ('Mr. Mime', 'F', 0, 100), ('Jynx', 'F', 0, 100), ('Tauros', 'C', 0, 100), ('Lapras', 'C', 0, 100), ('Porygon', 'F', 0, 100), ('Aerodactyl', 'C', 0, 100), ('Snorlax', 'C', 0, 100), ('Metapod', 'D', 7, 10), ('Kakuna', 'D', 7, 10), ('Pidgeotto', 'D', 18, 36), ('Raticate', 'E', 20, 100), ('Golbat', 'E', 22, 100), ('Fearow', 'E', 20, 100), ('Gloom', 'D', 21, 36), ('Parasect', 'E', 24, 100), ('Venomoth', 'E', 31, 100), ('Persian', 'D', 28, 100), ('Weepinbell', 'D', 21, 36), ('Hypno', 'D', 26, 100), ('Kingler', 'E', 28, 100), ('Seadra', 'E', 32, 100), ('Gyarados', 'B', 40, 100), ('Arbok', 'D', 22, 100), ('Nidorina', 'D', 16, 32), ('Nidorino', 'D', 16, 32), ('Clefable', 'E', 32, 100), ('Wigglytuff', 'E', 32, 100), ('Dugtrio', 'E', 26, 100), ('Poliwhirl', 'D', 25, 36), ('Tentacruel', 'E', 30, 100), ('Slowbro', 'E', 37, 100), ('Magneton', 'D', 30, 100), ('Dodrio', 'E', 31, 100), ('Cloyster', 'D', 32, 100), ('Haunter', 'B', 25, 40), ('Exeggutor', 'C', 36, 100), ('Marowak', 'D', 28, 100), ('Seaking', 'E', 33, 100), ('Starmie', 'D', 25, 100), ('Vaporeon', 'B', 36, 100), ('Jolteon', 'B', 36, 100), ('Flareon', 'B', 36, 100), ('Sandslash', 'E', 22, 100), ('Ninetales', 'D', 32, 100), ('Golduck', 'E', 33, 100), ('Primeape', 'E', 28, 100), ('Arcanine', 'B', 36, 100), ('Kadabra', 'B', 16, 40), ('Machoke', 'B', 28, 40), ('Graveler', 'B', 25, 40), ('Rapidash', 'C', 40, 100), ('Dewgong', 'E', 34, 100), ('Weezing', 'E', 35, 100), ('Ivysaur', 'A', 16, 32), ('Charmeleon', 'A', 16, 36), ('Wartortle', 'A', 16, 36), ('Raichu', 'D', 32, 100), ('Muk', 'E', 38, 100), ('Rhydon', 'B', 42, 100), ('Omastar', 'D', 40, 100), ('Kabutops', 'D', 40, 100), ('Dragonair', 'B', 30, 55), ('Electrode', 'E', 30, 100), ('Butterfree', 'D', 10, 100), ('Beedrill', 'D', 10, 100), ('Pidgeot', 'D', 36, 100), ('Vileplume', 'D', 36, 100), ('Victreebel', 'D', 36, 100), ('Nidoqueen', 'D', 32, 100), ('Nidoking', 'D', 32, 100), ('Poliwrath', 'D', 36, 100), ('Gengar', 'B', 40, 100), ('Alakazam', 'B', 40, 100), ('Machamp', 'B', 40, 100), ('Golem', 'B', 40, 100), ('Venusaur', 'A', 32, 100), ('Charizard', 'A', 36, 100), ('Blastoise', 'A', 36, 100), ('Dragonite', 'B', 55, 100)]
+
+        pokemon_records = []
+        csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1.csv")
+        pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+        if config['gen2']:
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen2.csv")
+            pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+
+            if config['gen4_evolutions']:
+                csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_plus4.csv")
+                pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+                csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen2_plus4.csv")
+                pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+            else:
+                csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_no4.csv")
+                pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+                csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen2_no4.csv")
+                pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+        else:
+            if config['gen4_evolutions']:
+                # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
+                # so let's just include gen 2 for these evolution lines
+                csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_plus4.csv")
+                pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+            else:
+                csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_no2_no4.csv")
+                pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+        
+        if config['gen3']:
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen3.csv")
+            pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+        if config['gen4']:
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen4.csv")
+            pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+        if config['gen5']:
+            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen5.csv")
+            pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+
+        self.allpokemon = pokemon_records
         if os.path.exists("%s/_decksortags.json" % mediafolder):
             self.f = json.load(open("%s/_decksortags.json" % mediafolder))
         else:
@@ -463,11 +879,11 @@ class Trades:
                         possiblehaves.append(item)
             elif want[1] == "B":
                 for item in self.allpokemon:
-                    if (item[1] == "C" or item[1] == "B") and (item[2] < int(pokemon[2]) < item[3]):
+                    if (item[1] == "C" or item[1] == "B" or item[1] == "A") and (item[2] < int(pokemon[2]) < item[3]):
                         possiblehaves.append(item)
             elif want[1] == "A":
                 for item in self.allpokemon:
-                    if item[1] == "A" and (item[2] < int(pokemon[2]) < item[3]):
+                    if (item[1] == "B" or item[1] == "A") and (item[2] < int(pokemon[2]) < item[3]):
                         possiblehaves.append(item)
             if len(possiblehaves) > 1:
                 randno = random.randint(0, len(possiblehaves)-1)
@@ -493,7 +909,7 @@ class Trades:
         else:
             tradeData = [date, self.trades, "decks"]
         testData = [date, self.trades, possiblehaveslist]
-        with open("trades.json", "w") as f:
+        with open("_trades.json", "w") as f:
             json.dump(tradeData, f)
     def tradeFunction(self):
         # show a message box
@@ -1092,6 +1508,12 @@ toggleaction = QAction("Decks vs. Tags", mw)
 tagsaction = QAction("Tags", mw)
 prestigeaction = QAction("Prestige Pokémon", mw)
 unprestigeaction = QAction("Unprestige Pokémon", mw)
+everstoneaction = QAction("Give Everstone", mw)
+uneverstoneaction = QAction("Take Everstone", mw)
+megastoneaction = QAction("Give Mega Stone", mw)
+unmegastoneaction = QAction("Take Mega Stone", mw)
+alolanaction = QAction("Give Alolan Passport", mw)
+unalolanaction = QAction("Take Alolan Passport", mw)
 bottomaction = QAction("Move Pokémon to Bottom", mw)
 topaction = QAction("Move Pokémon to Top", mw)
 
@@ -1103,8 +1525,15 @@ toggleaction.triggered.connect(Toggle)
 tagsaction.triggered.connect(tags.tagMenu)
 prestigeaction.triggered.connect(PrestigePokemon)
 unprestigeaction.triggered.connect(UnprestigePokemon)
+everstoneaction.triggered.connect(giveEverstone)
+uneverstoneaction.triggered.connect(takeEverstone)
+megastoneaction.triggered.connect(giveMegastone)
+unmegastoneaction.triggered.connect(takeMegastone)
+alolanaction.triggered.connect(giveAlolanPassport)
+unalolanaction.triggered.connect(takeAlolanPassport)
 bottomaction.triggered.connect(MovetoBottom)
 topaction.triggered.connect(MovetoTop)
+
 
 # Make new Pokemanki menu under tools
 mw.testmenu = QMenu(_('&Pokemanki'), mw)
@@ -1115,6 +1544,18 @@ mw.prestigemenu = QMenu(_('&Prestige Menu'), mw)
 mw.testmenu.addMenu(mw.prestigemenu)
 mw.prestigemenu.addAction(prestigeaction)
 mw.prestigemenu.addAction(unprestigeaction)
+mw.everstonemenu = QMenu(_('&Everstone'), mw)
+mw.testmenu.addMenu(mw.everstonemenu)
+mw.everstonemenu.addAction(everstoneaction)
+mw.everstonemenu.addAction(uneverstoneaction)
+mw.megastonemenu = QMenu(_('&Mega Stone'), mw)
+mw.testmenu.addMenu(mw.megastonemenu)
+mw.megastonemenu.addAction(megastoneaction)
+mw.megastonemenu.addAction(unmegastoneaction)
+mw.alolanmenu = QMenu(_('&Alolan Passport'), mw)
+mw.testmenu.addMenu(mw.alolanmenu)
+mw.alolanmenu.addAction(alolanaction)
+mw.alolanmenu.addAction(unalolanaction)
 
 # Wrap pokemonDisplay function of display.py with the todayStats function of anki.stats.py
 addonsfolder = os.path.dirname(currentdirname)

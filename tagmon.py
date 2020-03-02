@@ -1,8 +1,15 @@
+# -*- coding: utf-8 -*-
+
+from anki.lang import _
 from aqt import *
 from aqt.qt import *
+from aqt import mw
 import json
 import random
 import os, inspect
+import shutil
+config = mw.addonManager.getConfig(__name__)
+currentdirname = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 def tagmonDisplay(*args, **kwargs):
     self = args[0]
@@ -35,11 +42,11 @@ def tagmonDisplay(*args, **kwargs):
                     "Your Pokémon")
     return result
 def _show(self, data, title, subtitle):
-    # Return empty if no data
-    if not data:
-        return ""
     # Set text equal to title text to start
     txt = self._title(_(title), _(subtitle))
+    # Return empty if no data
+    if not data:
+        return txt
     # Line text variable, apparently needed for bottom line
     text_lines = []
     # Table text
@@ -57,14 +64,14 @@ def _show(self, data, title, subtitle):
     pokemon_levels = []
     pokemon_nicknames = []
     sorteddata = sorted(data, key = lambda k: k[2], reverse = True)
-    for pokemon in sorteddata:
-        if len(pokemon) == 4:
-            pokemon_nicknames.append(pokemon[3])
+    for thing in sorteddata:
+        if len(thing) == 4:
+            pokemon_nicknames.append(thing[3])
         else:
             pokemon_nicknames.append(None)
-        pokemon_names.append(pokemon[0])
-        pokemon_tags.append(pokemon[1])
-        pokemon_levels.append(str(pokemon[2]))
+        pokemon_names.append(thing[0])
+        pokemon_tags.append(thing[1])
+        pokemon_levels.append(str(thing[2]))
     pokemon_collection = tuple(zip(pokemon_names, pokemon_tags, pokemon_levels, pokemon_nicknames))
     pokemon_progress = []
     for level in pokemon_levels:
@@ -96,7 +103,7 @@ def _show(self, data, title, subtitle):
                 elif int(float(level)) == 4:
                     text = ("%s (making sounds inside)" % nickname)
             else:
-                if int(float(level)) == 1:
+                if int(float(level)) < 2:
                     text = ("%s (needs a lot more time to hatch)" % name)
                 elif int(float(level)) == 2:
                     text = ("%s (will take some time to hatch)" % name)
@@ -116,23 +123,23 @@ def _show(self, data, title, subtitle):
                 else:
                     text = ("%s (Level %s)" % (name, int(float(level))))
         pokemon_text.append(text)
-        while table_size < (len(pokemon_text) - 2):
-            table_text += (("""<tr>
-                               <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                                <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                               <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                               </tr>""") % (pokemon_names[table_size], pokemon_tags[table_size], pokemon_names[table_size+1], pokemon_tags[table_size+1], pokemon_names[table_size+2], pokemon_tags[table_size+2]))
-            table_text += (("""<tr>
-                               <td height = 30 width = 250 align = center><b>%s</b></td>
-                               <td height = 30 width = 250 align = center><b>%s</b></td>
-                               <td height = 30 width = 250 align = center><b>%s</b></td>
-                                </tr>""") % (pokemon_text[table_size], pokemon_text[table_size+1], pokemon_text[table_size+2]))
-            table_text += (("""<tr>
-                               <td height = 30 width = 250 align = center>%s</td>
-                               <td height = 30 width = 250 align = center>%s</td>
-                               <td height = 30 width = 250 align = center>%s</td>
-                               </tr>""") % (pokemon_progress_text[table_size], pokemon_progress_text[table_size+1], pokemon_progress_text[table_size+2]))
-            table_size += 3
+    while table_size < (len(pokemon_text) - 2):
+        table_text += (("""<tr>
+                        <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
+                        <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
+                        <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
+                        </tr>""") % (pokemon_names[table_size], pokemon_tags[table_size], pokemon_names[table_size+1], pokemon_tags[table_size+1], pokemon_names[table_size+2], pokemon_tags[table_size+2]))
+        table_text += (("""<tr>
+                           <td height = 30 width = 250 align = center><b>%s</b></td>
+                           <td height = 30 width = 250 align = center><b>%s</b></td>
+                           <td height = 30 width = 250 align = center><b>%s</b></td>
+                           </tr>""") % (pokemon_text[table_size], pokemon_text[table_size+1], pokemon_text[table_size+2]))
+        table_text += (("""<tr>
+                           <td height = 30 width = 250 align = center>%s</td>
+                           <td height = 30 width = 250 align = center>%s</td>
+                           <td height = 30 width = 250 align = center>%s</td>
+                           </tr>""") % (pokemon_progress_text[table_size], pokemon_progress_text[table_size+1], pokemon_progress_text[table_size+2]))
+        table_size += 3
     if len(pokemon_text) % 3 == 0:
         pass
     elif len(pokemon_text) % 3 == 1:
@@ -181,8 +188,8 @@ def TagPokemon():
     else:
         savedtags = []
     if os.path.exists("_tagmon.json"):
-        tagmon = json.load(open('_tagmon.json'))
-        sortedtagmon = list(reversed(tagmon))
+        tagmonlist = json.load(open('_tagmon.json'))
+        sortedtagmon = list(reversed(tagmonlist))
         modifiedtagmon = []
         for item in sortedtagmon:
             for thing in modifiedtagmon:
@@ -197,12 +204,29 @@ def TagPokemon():
         thresholdsettings = json.load(open("_tagmonsettings.json"))
     else:
         thresholdsettings = [50, 125, 250, 375, 500]
-    pokemonlist = ['Caterpie', 'Weedle', 'Pidgey', 'Rattata', 'Zubat', 'Spearow', 'Oddish', 'Paras', 'Venonat', 'Meowth', 'Bellsprout', 'Drowzee', 'Krabby', 'Horsea', 'Magikarp', 'Ekans', 'Nidoran F', 'Nidoran M', 'Clefairy', 'Jigglypuff', 'Diglett', 'Poliwag', 'Tentacool', 'Slowpoke', 'Magnemite', 'Doduo', 'Shellder', 'Gastly', 'Exeggcute', 'Cubone', 'Goldeen', 'Staryu', 'Eevee1', 'Eevee2', 'Eevee3', 'Sandshrew', 'Vulpix', 'Psyduck', 'Mankey', 'Growlithe', 'Abra', 'Machop', 'Geodude', 'Ponyta', 'Seel', 'Onix', 'Koffing', 'Scyther', 'Ditto', 'Bulbasaur', 'Charmander', 'Squirtle', 'Pikachu', 'Grimer', 'Lickitung', 'Rhyhorn', 'Tangela', 'Electabuzz', 'Magmar', 'Pinsir', 'Omanyte', 'Kabuto', 'Dratini', "Farfetch'd", 'Voltorb', 'Hitmonlee', 'Hitmonchan', 'Chansey', 'Kangaskhan', 'Mr. Mime', 'Jynx', 'Tauros', 'Lapras', 'Porygon', 'Aerodactyl', 'Snorlax', 'Moltres', 'Zapdos', 'Articuno', 'Mewtwo', 'Mew']
-    tiers = ['D', 'D', 'D', 'E', 'E', 'E', 'D', 'E', 'E', 'D', 'D', 'D', 'E', 'E', 'B', 'D', 'D', 'D', 'E', 'E', 'E', 'D', 'E', 'E', 'D', 'E', 'D', 'B', 'C', 'D', 'E', 'D', 'B', 'B', 'B', 'E', 'D', 'E', 'E', 'B', 'B', 'B', 'B', 'C', 'E', 'D', 'E', 'C', 'F', 'A', 'A', 'A', 'D', 'E', 'F', 'B', 'F', 'C', 'C', 'C', 'D', 'D', 'B', 'F', 'E', 'C', 'C', 'F', 'C', 'F', 'F', 'C', 'C', 'F', 'C', 'C', 'S', 'S', 'S', 'S', 'S']
-    evolutionLevel1 = [7, 7, 18, 20, 22, 20, 21, 24, 31, 28, 21, 26, 28, 32, 40, 22, 16, 16, 32, 32, 26, 25, 30, 37, 30, 31, 32, 25, 36, 28, 33, 25, 36, 36, 36, 22, 32, 33, 28, 36, 16, 28, 25, 40, 34, None, 35, None, None, 16, 16, 16, 32, 38, None, 42, None, None, None, None, 40, 40, 30, None, 30, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
-    evolution1 = ['Metapod', 'Kakuna', 'Pidgeotto', 'Raticate', 'Golbat', 'Fearow', 'Gloom', 'Parasect', 'Venomoth', 'Persian', 'Weepinbell', 'Hypno', 'Kingler', 'Seadra', 'Gyarados', 'Arbok', 'Nidorina', 'Nidorino', 'Clefable', 'Wigglytuff', 'Dugtrio', 'Poliwhirl', 'Tentacruel', 'Slowbro', 'Magneton', 'Dodrio', 'Cloyster', 'Haunter', 'Exeggutor', 'Marowak', 'Seaking', 'Starmie', 'Vaporeon', 'Jolteon', 'Flareon', 'Sandslash', 'Ninetales', 'Golduck', 'Primeape', 'Arcanine', 'Kadabra', 'Machoke', 'Graveler', 'Rapidash', 'Dewgong', None, 'Weezing', None, None, 'Ivysaur', 'Charmeleon', 'Wartortle', 'Raichu', 'Muk', None, 'Rhydon', None, None, None, None, 'Omastar', 'Kabutops', 'Dragonair', None, 'Electrode', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
-    evolutionLevel2 = [10, 10, 36, None, None, None, 36, None, None, None, 36, None, None, None, None, None, 32, 32, None, None, None, 36, None, None, None, None, None, 40, None, None, None, None, None, None, None, None, None, None, None, None, 40, 40, 40, None, None, None, None, None, None, 32, 36, 36, None, None, None, None, None, None, None, None, None, None, 55, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
-    evolution2 = ['Butterfree', 'Beedrill', 'Pidgeot', None, None, None, 'Vileplume', None, None, None, 'Victreebel', None, None, None, None, None, 'Nidoqueen', 'Nidoking', None, None, None, 'Poliwrath', None, None, None, None, None, 'Gengar', None, None, None, None, None, None, None, None, None, None, None, None, 'Alakazam', 'Machamp', 'Golem', None, None, None, None, None, None, 'Venusaur', 'Charizard', 'Blastoise', None, None, None, None, None, None, None, None, None, None, 'Dragonite', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
+
+    pokemonlist = []
+    tiers = []
+    evolutionLevel1 =[]
+    evolution1 = []
+    evolutionLevel2 =[]
+    evolution2 = []
+    if config['generation_1']:
+        csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_plus4.csv")
+        loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+    if config['generation_2']:
+        csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen2_plus4.csv")
+        loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+    if config['generation_3']:
+        csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen3.csv")
+        loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+    if config['generation_4']:
+        csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen4.csv")
+        loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+    if config['generation_5']:
+        csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen5.csv")
+        loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+
     pokemon_tuple = tuple(zip(pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2))
     tierdict = {"A": [], "B": [], "C": [], "D": [], "E": [], "F": []}
 
@@ -344,8 +368,8 @@ def TagPokemon():
             else:
                 msgtxt += ("\nYou caught a %s (Level %s)" % (name, int(Level)))
         if already_assigned == True:
-            for thing in tagmon:
-                if thing == item[0]:
+            for thing in tagmonlist:
+                if thing[1] == item[0]:
                     if name == "Eevee" or name =="Egg":
                         if nickname:
                             if (thing[0], thing[1], Level, nickname) in modifiedtagmon:
@@ -389,7 +413,7 @@ def TagStats():
         savedtags = []
     resultlist = []
     for item in savedtags:
-        result = mw.col.db.all("select c.id, c.ivl from cards c, notes n where c.nid = n.id and n.tags LIKE '% " + item + " %'")
+        result = mw.col.db.all("select c.id, c.ivl from cards c, notes n where c.nid = n.id and n.tags LIKE '%" + item + "%'")
         resultlist.append(result)
     results = list(zip(savedtags, resultlist))
     return results
