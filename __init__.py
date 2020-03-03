@@ -392,10 +392,10 @@ def takeEverstone():
         item = textlist[1]
         if f:
             everstonelist.remove(item)
-            everstonepokemonlist.remove(everstone_pokemon_name)
+            everstonepokemonlist.remove(textlist[0])
         else:
             everstonelist.remove(mw.col.decks.id(item))
-            everstonepokemonlist.remove(everstone_pokemon_name)
+            everstonepokemonlist.remove(textlist[0])
         settingschanged = QMessageBox()
         settingschanged.setWindowTitle("Pokemanki")
         settingschanged.setText("Please restart Anki to see your changes.")
