@@ -361,6 +361,10 @@ def takeEverstone():
         everstonelist = json.load(open("%s/_everstonelist.json" % mediafolder))
     else:
         everstonelist = []
+    if os.path.exists("%s/_everstonepokemonlist.json" % mediafolder):
+        everstonepokemonlist = json.load(open("%s/_everstonepokemonlist.json" % mediafolder))
+    else:
+        everstonepokemonlist = []
     if not everstonelist:
         noeverstone = QMessageBox()
         noeverstone.setWindowTitle("Pokemanki")
