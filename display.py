@@ -87,6 +87,15 @@ def _show(self, data, title, subtitle):
         alolanlist = json.load(open("_alolanlist.json"))
     else:
         alolanlist = []
+
+    held = ""
+    special = ""
+    everstone_html = '<img src="/pokemon_images/item_Everstone.png" hspace="10">'
+    megastone_html = '<img src="/pokemon_images/item_Mega_Stone.png" hspace="10">'
+    alolan_html = '<img src="/pokemon_images/item_Alolan_Passport.png" hspace="10">'
+    currentdirname = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+    pkmnimgfolder = currentdirname + "/pokemon_images"
+
     # If single Pokemon, show centered picture with name and level below
     if type(data) == tuple:
         # Don't show level for egg
@@ -120,14 +129,6 @@ def _show(self, data, title, subtitle):
                     text = ("%s (Level %s)" % (data[3], int(data[2])))
                 else:
                     text = ("%s (Level %s)" % (data[0], int(data[2])))
-
-            held = ""
-            special = ""
-            everstone_html = '<img src="/pokemon_images/item_Everstone.png" hspace="10">'
-            megastone_html = '<img src="/pokemon_images/item_Mega_Stone.png" hspace="10">'
-            alolan_html = '<img src="/pokemon_images/item_Alolan_Passport.png" hspace="10">'
-            currentdirname = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-            pkmnimgfolder = currentdirname + "/pokemon_images"
 
             if data[1] in everstonelist:
                 held += everstone_html
