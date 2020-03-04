@@ -361,6 +361,10 @@ def takeEverstone():
         everstonelist = json.load(open("%s/_everstonelist.json" % mediafolder))
     else:
         everstonelist = []
+    if os.path.exists("%s/_everstonepokemonlist.json" % mediafolder):
+        everstonepokemonlist = json.load(open("%s/_everstonepokemonlist.json" % mediafolder))
+    else:
+        everstonepokemonlist = []
     if not everstonelist:
         noeverstone = QMessageBox()
         noeverstone.setWindowTitle("Pokemanki")
@@ -388,10 +392,10 @@ def takeEverstone():
         item = textlist[1]
         if f:
             everstonelist.remove(item)
-            everstonepokemonlist.remove(everstone_pokemon_name)
+            everstonepokemonlist.remove(textlist[0])
         else:
             everstonelist.remove(mw.col.decks.id(item))
-            everstonepokemonlist.remove(everstone_pokemon_name)
+            everstonepokemonlist.remove(textlist[0])
         settingschanged = QMessageBox()
         settingschanged.setWindowTitle("Pokemanki")
         settingschanged.setText("Please restart Anki to see your changes.")
