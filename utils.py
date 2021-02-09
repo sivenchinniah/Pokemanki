@@ -1,6 +1,8 @@
 from aqt import mw
 from pathlib import Path
 import json
+import shutil
+import distutils.dir_util
 
 # Find current directory
 addon_dir = Path(__file__).parents[0]

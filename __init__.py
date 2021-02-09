@@ -7,20 +7,15 @@ from .tagmon import tagmonDisplay
 from .tags import Tags
 from .trades import Trades
 from .utils import *
+from .pokemon import *
 
 import anki.stats
-import aqt.overview
 from anki.hooks import wrap
-import shutil
-import distutils.dir_util
-import inspect
 import os
 from aqt.qt import *
 from aqt import mw
 import json
 from datetime import date
-import random
-import csv
 
 from pathlib import Path
 

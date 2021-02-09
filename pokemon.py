@@ -1,4 +1,5 @@
 from .utils import *
+from .tags import Tags
 
 import json
 
@@ -209,11 +210,10 @@ def MovetoTop():
 def giveEverstone():
     f = get_json("_decksortags.json", None)
 
-
-if f:
-    pokemon = get_json("_tagmon.json")
-else:
-    pokemon = get_json("_pokemanki.json")
+    if f:
+        pokemon = get_json("_tagmon.json")
+    else:
+        pokemon = get_json("_pokemanki.json")
     everstonelist = get_json("_everstonelist.json", default=[])
     everstonepokemonlist = get_json("_everstonepokemonlist.json", default=[])
 
@@ -256,12 +256,10 @@ else:
 
 def takeEverstone():
     f = get_json("_decksortags.json", None)
-
-
-if f:
-    pokemon = get_json("_tagmon.json")
-else:
-    pokemon = get_json("_pokemanki.json")
+    if f:
+        pokemon = get_json("_tagmon.json")
+    else:
+        pokemon = get_json("_pokemanki.json")
     everstonelist = get_json("_everstonelist.json", [])
     everstonepokemonlist = get_json("_everstonepokemonlist.json", [])
     if not everstonelist:
@@ -392,12 +390,10 @@ def takeMegastone():
 
 def giveAlolanPassport():
     f = get_json("_decksortags.json", None)
-
-
-if f:
-    pokemon = get_json("_tagmon.json")
-else:
-    pokemon = get_json("_pokemanki.json")
+    if f:
+        pokemon = get_json("_tagmon.json")
+    else:
+        pokemon = get_json("_pokemanki.json")
     if os.path.exists("%s/_alolanlist.json" % mediafolder):
         alolanlist = json.load(open("%s/_alolanlist.json" % mediafolder))
     else:
@@ -438,12 +434,10 @@ else:
 
 def takeAlolanPassport():
     f = get_json("_decksortags.json", None)
-
-
-if f:
-    pokemon = get_json("_tagmon.json")
-else:
-    pokemon = get_json("_pokemanki.json")
+    if f:
+        pokemon = get_json("_tagmon.json")
+    else:
+        pokemon = get_json("_pokemanki.json")
     if os.path.exists("%s/_alolanlist.json" % mediafolder):
         alolanlist = json.load(open("%s/_alolanlist.json" % mediafolder))
     else:
@@ -489,12 +483,10 @@ else:
 
 def PrestigePokemon():
     f = get_json("_decksortags.json", None)
-
-
-if f:
-    pokemon = get_json("_tagmon.json")
-else:
-    pokemon = get_json("_pokemanki.json")
+    if f:
+        pokemon = get_json("_tagmon.json")
+    else:
+        pokemon = get_json("_pokemanki.json")
     if os.path.exists("%s/_prestigelist.json" % mediafolder):
         prestigelist = json.load(open("%s/_prestigelist.json" % mediafolder))
     else:
@@ -537,11 +529,10 @@ else:
 def UnprestigePokemon():
     f = get_json("_decksortags.json", None)
 
-
-if f:
-    pokemon = get_json("_tagmon.json")
-else:
-    pokemon = get_json("_pokemanki.json")
+    if f:
+        pokemon = get_json("_tagmon.json")
+    else:
+        pokemon = get_json("_pokemanki.json")
     if os.path.exists("%s/_prestigelist.json" % mediafolder):
         prestigelist = json.load(open("%s/_prestigelist.json" % mediafolder))
     else:
@@ -583,52 +574,3 @@ else:
         settingschanged.exec_()
     with open("%s/_prestigelist.json" % mediafolder, "w") as f:
         json.dump(prestigelist, f)
-
-
-def pokemonLevelRangesFromCsv(csv_fpath):
-    pokemon_records = []
-
-    with open(csv_fpath, "r") as csv_file:
-        csv_reader = csv.DictReader(csv_file, delimiter=",")
-
-        for line in csv_reader:
-            pokemon = line["pokemon"]
-            tier = line["tier"]
-            first_ev_lv = line["first_evolution_level"]
-            if first_ev_lv.isnumeric():
-                first_ev_lv = int(first_ev_lv)
-            else:
-                first_ev_lv = None
-            first_ev = line["first_evolution"]
-            if first_ev == "NA":
-                first_ev = None
-            second_ev_lv = line["second_evolution_level"]
-            if second_ev_lv.isnumeric():
-                second_ev_lv = int(second_ev_lv)
-            else:
-                second_ev_lv = None
-            second_ev = line["second_evolution"]
-            if second_ev == "NA":
-                second_ev = None
-
-            pk1_lo_lv = 0
-            if first_ev_lv:
-                pk1_hi_lv = first_ev_lv
-            else:
-                pk1_hi_lv = 100
-            pokemon_records.append((pokemon, tier, pk1_lo_lv, pk1_hi_lv))
-
-            if first_ev is not None:
-                pk2_lo_lv = pk1_hi_lv
-                if second_ev_lv:
-                    pk2_hi_lv = second_ev_lv
-                else:
-                    pk2_hi_lv = 100
-                pokemon_records.append((first_ev, tier, pk2_lo_lv, pk2_hi_lv))
-
-            if second_ev is not None:
-                pk3_lo_lv = pk2_hi_lv
-                pk3_hi_lv = 100
-                pokemon_records.append((second_ev, tier, pk3_lo_lv, pk3_hi_lv))
-
-    return pokemon_records

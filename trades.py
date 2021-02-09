@@ -1,11 +1,63 @@
+from .utils import *
+
 from aqt.qt import *
 from aqt import mw
 import os
 import json
 import inspect
-
+import random
+import csv
 
 config = mw.addonManager.getConfig(__name__)
+
+
+def pokemonLevelRangesFromCsv(csv_fpath):
+    pokemon_records = []
+
+    with open(csv_fpath, "r") as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter=",")
+
+        for line in csv_reader:
+            pokemon = line["pokemon"]
+            tier = line["tier"]
+            first_ev_lv = line["first_evolution_level"]
+            if first_ev_lv.isnumeric():
+                first_ev_lv = int(first_ev_lv)
+            else:
+                first_ev_lv = None
+            first_ev = line["first_evolution"]
+            if first_ev == "NA":
+                first_ev = None
+            second_ev_lv = line["second_evolution_level"]
+            if second_ev_lv.isnumeric():
+                second_ev_lv = int(second_ev_lv)
+            else:
+                second_ev_lv = None
+            second_ev = line["second_evolution"]
+            if second_ev == "NA":
+                second_ev = None
+
+            pk1_lo_lv = 0
+            if first_ev_lv:
+                pk1_hi_lv = first_ev_lv
+            else:
+                pk1_hi_lv = 100
+            pokemon_records.append((pokemon, tier, pk1_lo_lv, pk1_hi_lv))
+
+            if first_ev is not None:
+                pk2_lo_lv = pk1_hi_lv
+                if second_ev_lv:
+                    pk2_hi_lv = second_ev_lv
+                else:
+                    pk2_hi_lv = 100
+                pokemon_records.append((first_ev, tier, pk2_lo_lv, pk2_hi_lv))
+
+            if second_ev is not None:
+                pk3_lo_lv = pk2_hi_lv
+                pk3_hi_lv = 100
+                pokemon_records.append((second_ev, tier, pk3_lo_lv, pk3_hi_lv))
+
+    return pokemon_records
 
 
 class Trades:
@@ -13,61 +65,43 @@ class Trades:
         self.tradewindow = QDialog()
         self.dirname = os.path.dirname(os.path.abspath(
             inspect.getfile(inspect.currentframe())))
-        profilename = mw.pm.name
-        #ankifolder = os.path.dirname(os.path.dirname(self.dirname))
-        if os.path.exists("%s/%s" % (ankifolder, profilename)):
-            profilefolder = ("%s/%s" % (ankifolder, profilename))
-        # Get to collection.media folder
-        if os.path.exists("%s/collection.media" % profilefolder):
-            mediafolder = "%s/collection.media" % profilefolder
         self.mediafolder = mediafolder
 
         pokemon_records = []
-        csv_fpath = os.path.join(
-            currentdirname, "pokemon_evolutions", "pokemon_gen1.csv")
+        csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1.csv"
         pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
         if config['gen2']:
-            csv_fpath = os.path.join(
-                currentdirname, "pokemon_evolutions", "pokemon_gen2.csv")
+            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen2.csv"
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
 
             if config['gen4_evolutions']:
-                csv_fpath = os.path.join(
-                    currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_plus4.csv")
+                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_plus4.csv"
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-                csv_fpath = os.path.join(
-                    currentdirname, "pokemon_evolutions", "pokemon_gen2_plus4.csv")
+                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen2_plus4.csv"
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
             else:
-                csv_fpath = os.path.join(
-                    currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_no4.csv")
+                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_no4.csv"
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-                csv_fpath = os.path.join(
-                    currentdirname, "pokemon_evolutions", "pokemon_gen2_no4.csv")
+                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen2_no4.csv"
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
         else:
             if config['gen4_evolutions']:
                 # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
                 # so let's just include gen 2 for these evolution lines
-                csv_fpath = os.path.join(
-                    currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_plus4.csv")
+                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_plus4.csv"
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
             else:
-                csv_fpath = os.path.join(
-                    currentdirname, "pokemon_evolutions", "pokemon_gen1_no2_no4.csv")
+                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_no2_no4.csv"
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
 
         if config['gen3']:
-            csv_fpath = os.path.join(
-                currentdirname, "pokemon_evolutions", "pokemon_gen3.csv")
+            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen3.csv"
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
         if config['gen4']:
-            csv_fpath = os.path.join(
-                currentdirname, "pokemon_evolutions", "pokemon_gen4.csv")
+            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen4.csv"
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
         if config['gen5']:
-            csv_fpath = os.path.join(
-                currentdirname, "pokemon_evolutions", "pokemon_gen5.csv")
+            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen5.csv"
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
 
         self.allpokemon = pokemon_records
