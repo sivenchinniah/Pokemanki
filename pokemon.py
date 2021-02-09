@@ -207,7 +207,13 @@ def MovetoTop():
 
 
 def giveEverstone():
-    pokemon = get_pokemon()
+    f = get_json("_decksortags.json", None)
+
+
+if f:
+    pokemon = get_json("_tagmon.json")
+else:
+    pokemon = get_json("_pokemanki.json")
     everstonelist = get_json("_everstonelist.json", default=[])
     everstonepokemonlist = get_json("_everstonepokemonlist.json", default=[])
 
@@ -249,7 +255,13 @@ def giveEverstone():
 
 
 def takeEverstone():
-    pokemon = get_pokemon()
+    f = get_json("_decksortags.json", None)
+
+
+if f:
+    pokemon = get_json("_tagmon.json")
+else:
+    pokemon = get_json("_pokemanki.json")
     everstonelist = get_json("_everstonelist.json", [])
     everstonepokemonlist = get_json("_everstonepokemonlist.json", [])
     if not everstonelist:
@@ -293,7 +305,11 @@ def takeEverstone():
 
 
 def giveMegastone():
-    pokemon = get_pokemon()
+    f = get_json("_decksortags.json", None)
+    if f:
+        pokemon = get_json("_tagmon.json")
+    else:
+        pokemon = get_json("_pokemanki.json")
     megastonelist = get_json("_megastonelist.json", [])
     megastoneables = []
     for item in pokemon:
@@ -330,7 +346,11 @@ def giveMegastone():
 
 
 def takeMegastone():
-    pokemon = get_pokemon()
+    f = get_json("_decksortags.json", None)
+    if f:
+        pokemon = get_json("_tagmon.json")
+    else:
+        pokemon = get_json("_pokemanki.json")
     megastonelist = get_json("_megastonelist.json", [])
     if not megastonelist:
         nomegastone = QMessageBox()
@@ -371,7 +391,13 @@ def takeMegastone():
 
 
 def giveAlolanPassport():
-    pokemon = get_pokemon()
+    f = get_json("_decksortags.json", None)
+
+
+if f:
+    pokemon = get_json("_tagmon.json")
+else:
+    pokemon = get_json("_pokemanki.json")
     if os.path.exists("%s/_alolanlist.json" % mediafolder):
         alolanlist = json.load(open("%s/_alolanlist.json" % mediafolder))
     else:
@@ -411,7 +437,13 @@ def giveAlolanPassport():
 
 
 def takeAlolanPassport():
-    pokemon = get_pokemon()
+    f = get_json("_decksortags.json", None)
+
+
+if f:
+    pokemon = get_json("_tagmon.json")
+else:
+    pokemon = get_json("_pokemanki.json")
     if os.path.exists("%s/_alolanlist.json" % mediafolder):
         alolanlist = json.load(open("%s/_alolanlist.json" % mediafolder))
     else:
@@ -456,7 +488,13 @@ def takeAlolanPassport():
 
 
 def PrestigePokemon():
-    pokemon = get_pokemon()
+    f = get_json("_decksortags.json", None)
+
+
+if f:
+    pokemon = get_json("_tagmon.json")
+else:
+    pokemon = get_json("_pokemanki.json")
     if os.path.exists("%s/_prestigelist.json" % mediafolder):
         prestigelist = json.load(open("%s/_prestigelist.json" % mediafolder))
     else:
@@ -497,7 +535,13 @@ def PrestigePokemon():
 
 
 def UnprestigePokemon():
-    pokemon = get_pokemon()
+    f = get_json("_decksortags.json", None)
+
+
+if f:
+    pokemon = get_json("_tagmon.json")
+else:
+    pokemon = get_json("_pokemanki.json")
     if os.path.exists("%s/_prestigelist.json" % mediafolder):
         prestigelist = json.load(open("%s/_prestigelist.json" % mediafolder))
     else:
