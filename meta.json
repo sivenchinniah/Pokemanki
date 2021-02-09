@@ -1,1 +1,13 @@
-{"name": "Pokemanki for both Anki 20 and 21", "mod": 1578492321, "disabled": false, "config": {"X_or_Y_mega_evolutions": "Y", "gen2": true, "gen3": true, "gen4": false, "gen4_evolutions": true, "gen5": false}}
+{
+    "name": "Pokemanki for both Anki 20 and 21",
+    "mod": 1578492321,
+    "disabled": false,
+    "config": {
+        "X_or_Y_mega_evolutions": "Y",
+        "gen2": true,
+        "gen3": true,
+        "gen4": false,
+        "gen4_evolutions": true,
+        "gen5": false
+    }
+}
