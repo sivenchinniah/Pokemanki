@@ -4,15 +4,23 @@ import json
 import shutil
 import distutils.dir_util
 
+
 # Find current directory
 addon_dir = Path(__file__).parents[0]
 currentdirname = addon_dir
 # Assign Pokemon Image folder directory name
 pkmnimgfolder = addon_dir / "pokemon_images"
 
-profilename = mw.pm.name
-profilefolder = Path(mw.pm.profileFolder())
-mediafolder = Path(mw.col.media.dir())
+profilename = None
+profilefolder = None
+mediafolder = None
+
+
+def set_global_on_startup():
+    global profilename, profilefolder, mediafolder
+    profilename = mw.pm.name
+    profilefolder = Path(mw.pm.profileFolder())
+    mediafolder = Path(mw.col.media.dir())
 
 
 def copy_directory(dir_addon: str, dir_anki: str):
