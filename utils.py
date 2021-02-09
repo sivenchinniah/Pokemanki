@@ -11,29 +11,22 @@ currentdirname = addon_dir
 # Assign Pokemon Image folder directory name
 pkmnimgfolder = addon_dir / "pokemon_images"
 
-profilename = None
-profilefolder = None
-mediafolder = None
+profilename = mw.pm.name
+profilefolder = Path(mw.pm.profileFolder())
+mediafolder = Path(mw.col.media.dir())
 
 
-def set_global_on_startup():
-    global profilename, profilefolder, mediafolder
-    profilename = mw.pm.name
-    profilefolder = Path(mw.pm.profileFolder())
-    mediafolder = Path(mw.col.media.dir())
-
-
-def copy_directory(dir_addon: str, dir_anki: str):
+def copy_directory(dir_addon: str, dir_anki: str = None):
     if not dir_anki:
         dir_anki = dir_addon
     fromdir = addon_dir / dir_addon
     todir = mediafolder / dir_anki
     if not fromdir.is_dir():
         return
-    if todir.is_dir():
-        shutil.copytree(fromdir, todir)
+    if not todir.is_dir():
+        shutil.copytree(str(fromdir), str(todir))
     else:
-        distutils.dir_util.copy_tree(fromdir, todir)
+        distutils.dir_util.copy_tree(str(fromdir), str(todir))
 
 
 def set_default(path: str, default=None):
