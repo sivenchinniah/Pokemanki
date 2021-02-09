@@ -7,6 +7,7 @@ import json
 import inspect
 import random
 import csv
+from datetime import date as dt
 
 config = mw.addonManager.getConfig(__name__)
 
@@ -214,8 +215,7 @@ class Trades:
                 self.trades.append((have, want))
             possiblehaveslist.append(possiblehaves)
             i += 1
-        global today
-        date = today.strftime("%d/%m/%Y")
+        date = dt.today().strftime("%d/%m/%Y")
         if f:
             tradeData = [date, self.trades, "tags"]
         else:
@@ -229,8 +229,7 @@ class Trades:
         f = self.f
         if os.path.exists("_trades.json"):
             tradeData = json.load(open("_trades.json"))
-            global today
-            date = today.strftime("%d/%m/%Y")
+            date = dt.today().strftime("%d/%m/%Y")
             if date == tradeData[0] and len(tradeData) == 3:
                 if f == tradeData[2]:
                     self.trades = tradeData[1]

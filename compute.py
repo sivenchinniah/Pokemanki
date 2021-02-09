@@ -1,3 +1,5 @@
+from .utils import *
+
 from anki.utils import ids2str
 import json
 import os.path
@@ -162,11 +164,9 @@ def MultiStats(*args, **kwargs):
 
 
 def FirstPokemon():
-    global mediafolder
     deckmonlist = []
     deckmon = ""
-    if os.path.exists("_pokemanki.json"):
-        deckmonlist = json.load(open("_pokemanki.json"))
+    deckmonlist = get_json("_pokemanki.json")
     if deckmonlist:
         return
     alldecks = mw.col.decks.allIds()
@@ -212,8 +212,7 @@ def FirstPokemon():
             else:
                 Level = 0
             deckmondata = [(deckmon, deck, Level)]
-            with open("_pokemanki.json", "w") as f:
-                json.dump(deckmondata, f)
+            write_json("_pokemanki.json", deckmondata)
             firstpokemon = QMessageBox()
             firstpokemon.setWindowTitle("Pokemanki")
             if Level < 5:
@@ -235,9 +234,9 @@ def DeckPokemon(*args, **kwargs):
 
     FirstPokemon()
     # Get existing pokemon from pokemanki.json
-    if os.path.exists("_pokemanki.json"):
+    if media_exists("_pokemanki.json"):
 
-        pokemontotal = json.load(open('_pokemanki.json'))
+        pokemontotal = get_json('_pokemanki.json')
         # Sort list by deck id, reverse sorted to make sure that most recent additions come first
         sortedpokemontotal = list(reversed(pokemontotal))
         # Assign most recent Pokemon result for each deck id to modifiedpokemontotal
@@ -255,10 +254,8 @@ def DeckPokemon(*args, **kwargs):
         return
 
     # Download threshold settings if they exist, otherwise make from scratch
-    if os.path.exists("_pokemankisettings.json"):
-        thresholdsettings = json.load(open("_pokemankisettings.json"))
-    else:
-        thresholdsettings = [100, 250, 500, 750, 1000]
+    thresholdsettings = get_json("_pokemankisettings.json",
+                                 default=[100, 250, 500, 750, 1000])
 
     # Lists containing Pokemon, tiers, first evolution level, first evolution, second evolution level, and second evolution
 
@@ -411,18 +408,9 @@ def DeckPokemon(*args, **kwargs):
     firstEvol = details[2]
     secondEL = details[3]
     secondEvol = details[4]
-    if os.path.exists("_prestigelist.json"):
-        prestigelist = json.load(open("_prestigelist.json"))
-    else:
-        prestigelist = []
-    if os.path.exists("_everstonelist.json"):
-        everstonelist = json.load(open("_everstonelist.json"))
-    else:
-        everstonelist = []
-    if os.path.exists("_everstonepokemonlist.json"):
-        everstonepokemonlist = json.load(open("_everstonepokemonlist.json"))
-    else:
-        everstonepokemonlist = []
+    prestigelist = get_json("_prestigelist.json", [])
+    everstonelist = get_json("_everstonelist.json", [])
+    everstonepokemonlist = get_json("_everstonepokemonlist.json", [])
     # Set max level to 100
     if Level > 100 and self.col.decks.active()[0] not in prestigelist:
         Level = 100.00
@@ -483,8 +471,7 @@ def DeckPokemon(*args, **kwargs):
                         else:
                             modifiedpokemontotal.append((name, item[1], Level))
     # Save new Pokemon data
-    with open("_pokemanki.json", "w") as f:
-        json.dump(modifiedpokemontotal, f)
+    write_json("_pokemanki.json", modifiedpokemontotal)
 
     # Generate message box
     msgtxt = "Hello Pokémon Trainer!"
@@ -563,8 +550,8 @@ def MultiPokemon(*args, **kwargs):
 
     # Same deal as above
     FirstPokemon()
-    if os.path.exists("_pokemanki.json"):
-        pokemontotal = json.load(open('_pokemanki.json'))
+    if media_exists("_pokemanki.json"):
+        pokemontotal = load_json("_pokemanki.json")
         sortedpokemontotal = list(reversed(pokemontotal))
         modifiedpokemontotal = []
         for item in sortedpokemontotal:
@@ -576,11 +563,8 @@ def MultiPokemon(*args, **kwargs):
                     modifiedpokemontotal.append(item)
     else:
         return
-
-    if os.path.exists("_pokemankisettings.json"):
-        thresholdsettings = json.load(open("_pokemankisettings.json"))
-    else:
-        thresholdsettings = [100, 250, 500, 750, 1000]
+    thresholdsettings = get_json("_pokemankisettings.json", [
+                                 100, 250, 500, 750, 1000])
 
     pokemonlist = []
     tiers = []
@@ -666,18 +650,9 @@ def MultiPokemon(*args, **kwargs):
     # If no results, return
     if len(results) == 0:
         return
-    if os.path.exists("_prestigelist.json"):
-        prestigelist = json.load(open("_prestigelist.json"))
-    else:
-        prestigelist = []
-    if os.path.exists("_everstonelist.json"):
-        everstonelist = json.load(open("_everstonelist.json"))
-    else:
-        everstonelist = []
-    if os.path.exists("_everstonepokemonlist.json"):
-        everstonepokemonlist = json.load(open("_everstonepokemonlist.json"))
-    else:
-        everstonepokemonlist = []
+    prestigelist = get_json("_prestigelist.json", [])
+    everstonelist = get_json("_everstonelist.json", [])
+    everstonepokemonlist = get_json("_everstonepokemonlist.json", [])
     # Do the following (basically DeckPokemon) for each deck in results
     for item in results:
         result = item[1]
@@ -857,8 +832,7 @@ def MultiPokemon(*args, **kwargs):
         multiData.append(displayData)
 
     # After iterating through each deck, store data into pokemanki.json
-    with open("_pokemanki.json", "w") as f:
-        json.dump(modifiedpokemontotal, f)
+    write_json("_pokemanki.json", modifiedpokemontotal)
     # Only display message if changes
     if msgtxt != "Hello Pokémon Trainer!":
         msgbox2 = QMessageBox()

@@ -1,13 +1,13 @@
 import inspect
 import os
-import math
 from .compute import DeckPokemon, MultiPokemon
 from anki.lang import _
-import json
 from collections import namedtuple
 from aqt import mw
 import shutil
 import random
+
+from .utils import *
 
 config = mw.addonManager.getConfig(__name__)
 
@@ -18,18 +18,9 @@ def pokemonDisplay(*args, **kwargs):
     self = args[0]
     old = kwargs['_old']
     profilename = mw.pm.name
-    # Find current directory
-    currentdirname = os.path.dirname(os.path.abspath(
-        inspect.getfile(inspect.currentframe())))
     # Assign Pokemon Image and Progress Bar folder directory names
-    pkmnimgfolder = currentdirname + "/pokemon_images"
-    progressbarfolder = currentdirname + "/progress_bars"
-    ankifolder = os.path.dirname(os.path.dirname(currentdirname))
-    if os.path.exists("%s/%s" % (ankifolder, profilename)):
-        profilefolder = ("%s/%s" % (ankifolder, profilename))
-    # Get to collection.media folder
-    if os.path.exists("%s/collection.media" % profilefolder):
-        mediafolder = "%s/collection.media" % profilefolder
+    pkmnimgfolder = currentdirname / "pokemon_images"
+    progressbarfolder = currentdirname / "progress_bars"
     # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
     if os.path.exists("%s/pokemon_images" % mediafolder) == False and os.path.exists(pkmnimgfolder):
         shutil.copytree(pkmnimgfolder, "%s/pokemon_images" % mediafolder)
@@ -76,22 +67,10 @@ def _show(self, data, title, subtitle):
     text_lines = []
     # Table text
     table_text = ""
-    if os.path.exists("_prestigelist.json"):
-        prestigelist = json.load(open("_prestigelist.json"))
-    else:
-        prestigelist = []
-    if os.path.exists("_everstonelist.json"):
-        everstonelist = json.load(open("_everstonelist.json"))
-    else:
-        everstonelist = []
-    if os.path.exists("_megastonelist.json"):
-        megastonelist = json.load(open("_megastonelist.json"))
-    else:
-        megastonelist = []
-    if os.path.exists("_alolanlist.json"):
-        alolanlist = json.load(open("_alolanlist.json"))
-    else:
-        alolanlist = []
+    prestigelist = get_json("_prestigelist.json", [])
+    everstonelist = get_json("_everstonelist.json", [])
+    megastonelist = get_json("_megastonelist.json", [])
+    alolanlist = get_json("_alolanlist.json", [])
 
     held = ""
     special = ""

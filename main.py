@@ -12,11 +12,8 @@ import os
 from aqt.qt import *
 from aqt import mw
 import json
-from datetime import date
 
 config = mw.addonManager.getConfig(__name__)
-
-today = date.today()
 
 
 # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
@@ -87,14 +84,9 @@ mw.alolanmenu.addAction(unalolanaction)
 
 # Wrap pokemonDisplay function of display.py with the todayStats function of anki.stats.py
 addonsfolder = os.path.dirname(currentdirname)
-if os.path.exists("%s/_decksortags.json" % mediafolder):
-    f = json.load(open("%s/_decksortags.json" % mediafolder))
-else:
-    f = ""
-if os.path.exists("%s/_toporbottom.json" % mediafolder):
-    g = json.load(open("%s/_toporbottom.json" % mediafolder))
-else:
-    g = ""
+f = get_json("_decksortags.json", "")
+g = get_json("_toporbottom.json", "")
+
 if f:
     mw.testmenu.addAction(tagsaction)
     if g:

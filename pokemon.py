@@ -11,7 +11,7 @@ from aqt.qt import *
 def Nickname():
     f = get_json("_decksortags.json", "")
     if (mediafolder / "_tagmon.json").exists():
-        deckmonlist = json.load(open(mediafolder / "_tagmon.json"))
+        deckmonlist = get_json("_tagmon.json")
     else:
         nopokemon = QMessageBox()
         nopokemon.setWindowTitle("Pokemanki")
@@ -94,11 +94,9 @@ def Nickname():
         else:
             modifieddeckmonlist.append(item)
     if f:
-        with open(mediafolder / "_tagmon.json", "w") as f:
-            json.dump(modifieddeckmonlist, f)
+        write_json("_pokemanki.json", modifieddeckmonlist)
     else:
-        with open(mediafolder / "_pokemanki.json", "w") as f:
-            json.dump(modifieddeckmonlist, f)
+        write_json("_pokemanki.json", modifieddeckmonlist)
 
 
 def Toggle():
@@ -108,8 +106,7 @@ def Toggle():
         window, "Pokemanki", "Choose how you would like Pokemanki to assign you Pokémon.", items, 0, False)
     if ok and inp:
         if inp == "Tags":
-            with open(("%s/_decksortags.json" % mediafolder), "w") as f:
-                json.dump(inp, f)
+            write_json("_decksortags.json", inp)
             tags = Tags()
             tags.tagMenu()
             settingschanged = QMessageBox()
@@ -118,8 +115,7 @@ def Toggle():
                 "Please restart Anki to see your updated Pokémon.")
             settingschanged.exec_()
         else:
-            with open(("%s/_decksortags.json" % mediafolder), "w") as f:
-                json.dump("", f)
+            write_json("_decksortags.json", "")
             settingschanged = QMessageBox()
             settingschanged.setWindowTitle("Pokemanki")
             settingschanged.setText(
@@ -138,7 +134,7 @@ def ThresholdSettings():
         sumlist.append(len(mw.col.decks.cids(deck)))
     recommended = .797 * max(sumlist)
     # Refresh threshold settings
-    thresholdlist = json.load(open("%s/_pokemankisettings.json" % mediafolder))
+    thresholdlist = get_json("_pokemankisettings.json")
     # Make settings window (input dialog)
     window = QWidget()
     inp, ok = QInputDialog.getInt(window, "Pokemanki", (
@@ -154,8 +150,7 @@ def ThresholdSettings():
         elif inp != thresholdlist[4]:
             newthresholdlist = [
                 int(0.1*inp), int(0.25*inp), int(0.5*inp), int(0.75*inp), int(inp)]
-            with open(("%s/_pokemankisettings.json" % mediafolder), "w") as f:
-                json.dump(newthresholdlist, f)
+            write_json("_pokemankisettings.json", newthresholdlist)
             # Message box confirming change
             settingschanged = QMessageBox()
             settingschanged.setWindowTitle("Pokemanki")
@@ -187,8 +182,7 @@ def ResetPokemon():
 
 
 def MovetoBottom():
-    with open("%s/_toporbottom.json" % mediafolder, "w") as f:
-        json.dump("bottom", f)
+    write_json("_toporbottom.json", "bottom")
     settingschanged = QMessageBox()
     settingschanged.setWindowTitle("Pokemanki")
     settingschanged.setText(
@@ -197,9 +191,7 @@ def MovetoBottom():
 
 
 def MovetoTop():
-
-    with open("%s/_toporbottom.json" % mediafolder, "w") as f:
-        json.dump("", f)
+    write_json("_toporbottom.json", "")
     settingschanged = QMessageBox()
     settingschanged.setWindowTitle("Pokemanki")
     settingschanged.setText(
@@ -248,10 +240,8 @@ def giveEverstone():
         settingschanged.setWindowTitle("Pokemanki")
         settingschanged.setText("Please restart Anki to see changes.")
         settingschanged.exec_()
-    with open("%s/_everstonelist.json" % mediafolder, "w") as f:
-        json.dump(everstonelist, f)
-    with open("%s/_everstonepokemonlist.json" % mediafolder, "w") as f:
-        json.dump(everstonepokemonlist, f)
+    write_json("_everstonelist.json", everstonelist)
+    write_json("_everstonepokemonlist.json", everstonepokemonlist)
 
 
 def takeEverstone():
@@ -298,8 +288,7 @@ def takeEverstone():
         settingschanged.setWindowTitle("Pokemanki")
         settingschanged.setText("Please restart Anki to see your changes.")
         settingschanged.exec_()
-    with open("%s/_everstonelist.json" % mediafolder, "w") as f:
-        json.dump(everstonelist, f)
+    write_json("_everstonelist.json", everstonelist)
 
 
 def giveMegastone():
@@ -339,8 +328,7 @@ def giveMegastone():
         settingschanged.setWindowTitle("Pokemanki")
         settingschanged.setText("Please restart Anki to see your changes.")
         settingschanged.exec_()
-    with open("%s/_megastonelist.json" % mediafolder, "w") as f:
-        json.dump(megastonelist, f)
+    write_json("_megastonelist.json", megastonelist)
 
 
 def takeMegastone():
@@ -384,8 +372,7 @@ def takeMegastone():
         settingschanged.setWindowTitle("Pokemanki")
         settingschanged.setText("Please restart Anki to see your changes.")
         settingschanged.exec_()
-    with open("%s/_megastonelist.json" % mediafolder, "w") as f:
-        json.dump(megastonelist, f)
+    write_json("_megastonelist.json", megastonelist)
 
 
 def giveAlolanPassport():
@@ -394,10 +381,7 @@ def giveAlolanPassport():
         pokemon = get_json("_tagmon.json")
     else:
         pokemon = get_json("_pokemanki.json")
-    if os.path.exists("%s/_alolanlist.json" % mediafolder):
-        alolanlist = json.load(open("%s/_alolanlist.json" % mediafolder))
-    else:
-        alolanlist = []
+    alolanlist = get_json("_alolanlist.json", [])
 
     alolanables = []
     for item in pokemon:
@@ -428,8 +412,7 @@ def giveAlolanPassport():
         settingschanged.setWindowTitle("Pokemanki")
         settingschanged.setText("Please restart Anki to see changes.")
         settingschanged.exec_()
-    with open("%s/_alolanlist.json" % mediafolder, "w") as f:
-        json.dump(alolanlist, f)
+    write_json("_alolanlist.json", alolanlist)
 
 
 def takeAlolanPassport():
@@ -438,10 +421,7 @@ def takeAlolanPassport():
         pokemon = get_json("_tagmon.json")
     else:
         pokemon = get_json("_pokemanki.json")
-    if os.path.exists("%s/_alolanlist.json" % mediafolder):
-        alolanlist = json.load(open("%s/_alolanlist.json" % mediafolder))
-    else:
-        alolanlist = []
+    alolanlist = get_json("_alolanlist.json", [])
     if not alolanlist:
         noalolan = QMessageBox()
         noalolan.setWindowTitle("Pokemanki")
@@ -477,8 +457,7 @@ def takeAlolanPassport():
         settingschanged.setWindowTitle("Pokemanki")
         settingschanged.setText("Please restart Anki to see your changes.")
         settingschanged.exec_()
-    with open("%s/_alolanlist.json" % mediafolder, "w") as f:
-        json.dump(alolanlist, f)
+    write_json("_alolanlist.json", alolanlist)
 
 
 def PrestigePokemon():
@@ -487,10 +466,7 @@ def PrestigePokemon():
         pokemon = get_json("_tagmon.json")
     else:
         pokemon = get_json("_pokemanki.json")
-    if os.path.exists("%s/_prestigelist.json" % mediafolder):
-        prestigelist = json.load(open("%s/_prestigelist.json" % mediafolder))
-    else:
-        prestigelist = []
+    prestigelist = get_json("_prestigelist.json", [])
     possibleprestiges = []
     for item in pokemon:
         if item[2] >= 60:
@@ -522,8 +498,7 @@ def PrestigePokemon():
         settingschanged.setText(
             "Please restart Anki to see your prestiged Pokémon.")
         settingschanged.exec_()
-    with open("%s/_prestigelist.json" % mediafolder, "w") as f:
-        json.dump(prestigelist, f)
+    write_json("_prestigelist.json", prestigelist)
 
 
 def UnprestigePokemon():
@@ -533,10 +508,7 @@ def UnprestigePokemon():
         pokemon = get_json("_tagmon.json")
     else:
         pokemon = get_json("_pokemanki.json")
-    if os.path.exists("%s/_prestigelist.json" % mediafolder):
-        prestigelist = json.load(open("%s/_prestigelist.json" % mediafolder))
-    else:
-        prestigelist = []
+    prestigelist = get_json("_prestigelist.json", [])
     if not prestigelist:
         noprestige = QMessageBox()
         noprestige.setWindowTitle("Pokemanki")
@@ -572,5 +544,4 @@ def UnprestigePokemon():
         settingschanged.setText(
             "Please restart Anki to see your unprestiged Pokémon.")
         settingschanged.exec_()
-    with open("%s/_prestigelist.json" % mediafolder, "w") as f:
-        json.dump(prestigelist, f)
+    write_json("_prestigelist.json", prestigelist)

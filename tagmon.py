@@ -9,27 +9,20 @@ import random
 import os
 import inspect
 import shutil
+
+from .utils import *
+from .compute import loadPokemonGenerations
+
+
 config = mw.addonManager.getConfig(__name__)
-currentdirname = os.path.dirname(os.path.abspath(
-    inspect.getfile(inspect.currentframe())))
 
 
 def tagmonDisplay(*args, **kwargs):
     self = args[0]
     old = kwargs['_old']
-    profilename = mw.pm.name
-    # Find current directory
-    currentdirname = os.path.dirname(os.path.abspath(
-        inspect.getfile(inspect.currentframe())))
     # Assign Pokemon Image and Progress Bar folder directory names
-    pkmnimgfolder = currentdirname + "/pokemon_images"
-    progressbarfolder = currentdirname + "/progress_bars"
-    ankifolder = os.path.dirname(os.path.dirname(currentdirname))
-    if os.path.exists("%s/%s" % (ankifolder, profilename)):
-        profilefolder = ("%s/%s" % (ankifolder, profilename))
-    # Get to collection.media folder
-    if os.path.exists("%s/collection.media" % profilefolder):
-        mediafolder = "%s/collection.media" % profilefolder
+    pkmnimgfolder = currentdirname / "pokemon_images"
+    progressbarfolder = currentdirname / "progress_bars"
     # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
     if os.path.exists("%s/pokemon_images" % mediafolder) == False and os.path.exists(pkmnimgfolder):
         shutil.copytree(pkmnimgfolder, "%s/pokemon_images" % mediafolder)
@@ -56,14 +49,6 @@ def _show(self, data, title, subtitle):
     # Line text variable, apparently needed for bottom line
     text_lines = []
     # Table text
-    table_text = ""
-    profilename = mw.pm.name
-    ankifolder = os.path.dirname(os.path.dirname(os.path.dirname(
-        os.path.abspath(inspect.getfile(inspect.currentframe())))))
-    if os.path.exists("%s/%s" % (ankifolder, profilename)):
-        profilefolder = ("%s/%s" % (ankifolder, profilename))
-    if os.path.exists("%s/collection.media" % profilefolder):
-        mediafolder = "%s/collection.media" % profilefolder
     table_text = ""
     _num_pokemon = len(data)
     pokemon_names = []
