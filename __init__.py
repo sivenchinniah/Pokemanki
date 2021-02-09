@@ -18,16 +18,19 @@ from datetime import date
 import random
 import csv
 
+from pathlib import Path
+
 config = mw.addonManager.getConfig(__name__)
 
 today = date.today()
 
 # Find current directory
-currentdirname = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+addon_dir = Path(__file__).parents[0]
+currentdirname = addon_dir
 # Assign Pokemon Image folder directory name
-pkmnimgfolder = currentdirname + "/pokemon_images"
+pkmnimgfolder = addon_dir  / "pokemon_images"
 # Get to Anki2 folder
-ankifolder = os.path.dirname(os.path.dirname(currentdirname))
+# ankifolder = os.path.dirname(os.path.dirname(currentdirname))
 # Get to profile folder
 if not mw.pm.name:
     profs = mw.pm.profiles()
@@ -35,65 +38,32 @@ if not mw.pm.name:
 if not mw.pm.name:
     mw.showProfileManager()
 profilename = mw.pm.name
-if os.path.exists("%s/%s" % (ankifolder, profilename)):
-    profilefolder = ("%s/%s" % (ankifolder, profilename))
-# Get to collection.media folder
-if os.path.exists("%s/collection.media" % profilefolder):
-    mediafolder = "%s/collection.media" % profilefolder
+profilefolder = Path(mw.pm.profileFolder())
+mediafolder = Path(mw.col.media.dir())
+
+def copy_directory(dir_addon: str, dir_anki: str):
+    if not dir_anki:
+        dir_anki = dir_addon
+    fromdir = addon_dir / dir_addon
+    todir = mediafolder / dir_anki
+    if not fromdir.is_dir():
+        return
+    if todir.is_dir():
+        shutil.copytree(fromdir, todir)
+    else:
+        distutils.dir_util.copy_tree(fromdir, todir)
+
+def set_default(path: str, default = None):
+    if not (mediafolder / path).is_file():
+        with open(mediafolder / path, "w") as f:
+            json.dump(default, f)
+
 # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
-if os.path.exists("%s/pokemon_images" % mediafolder) == False and os.path.exists(pkmnimgfolder):
-    shutil.copytree(pkmnimgfolder, "%s/pokemon_images" % mediafolder)
-elif os.path.exists(pkmnimgfolder):
-    distutils.dir_util.copy_tree(pkmnimgfolder, "%s/pokemon_images" % mediafolder)
+copy_directory("pokemon_images")
+
 # Download threshold settings (or make from scratch if not already made)
-if os.path.exists("%s/pokemankisettings.json" % mediafolder):
-    thresholdlist = json.load(open("%s/pokemankisettings.json" % mediafolder))
-    with open("%s/_pokemankisettings.json" % mediafolder, "w") as f:
-        json.dump(thresholdlist, f)
-else:
-    thresholdlist = [100, 250, 500, 750, 1000]
-    with open(("%s/_pokemankisettings.json" % mediafolder), "w") as f:
-        json.dump(thresholdlist, f)
-if os.path.exists("%s/prestigelist.json" % mediafolder) and not os.path.exists("%s/_prestigelist.json" % mediafolder):
-    prestigelist = json.load(open("%s/prestigelist.json" % mediafolder))
-    with open("%s/_prestigelist.json" % mediafolder, "w") as f:
-        json.dump(prestigelist, f)
-if os.path.exists("%s/everstonelist.json" % mediafolder) and not os.path.exists("%s/_everstonelist.json" % mediafolder):
-    everstonelist = json.load(open("%s/everstonelist.json" % mediafolder))
-    with open("%s/_everstonelist.json" % mediafolder, "w") as f:
-        json.dump(everstonelist, f)
-if os.path.exists("%s/alolanlist.json" % mediafolder) and not os.path.exists("%s/_alolanlist.json" % mediafolder):
-    alolanlist = json.load(open("%s/alolanlist.json" % mediafolder))
-    with open("%s/_alolanlist.json" % mediafolder, "w") as f:
-        json.dump(alolanlist, f)
-if os.path.exists("%s/megastonelist.json" % mediafolder) and not os.path.exists("%s/_megastonelist.json" % mediafolder):
-    megastonelist = json.load(open("%s/megastonelist.json" % mediafolder))
-    with open("%s/_megastonelist.json" % mediafolder, "w") as f:
-        json.dump(megastonelist, f)
-if os.path.exists("%s/tags.json" % mediafolder) and not os.path.exists("%s/_tags.json" % mediafolder):
-    tags = json.load(open("%s/tags.json" % mediafolder))
-    with open("%s/_tags.json" % mediafolder, "w") as f:
-        json.dump(tags, f)
-if os.path.exists("%s/decksortags.json" % mediafolder) and not os.path.exists("%s/_decksortags.json" % mediafolder):
-    decksortags = json.load(open("%s/decksortags.json" % mediafolder))
-    with open("%s/_decksortags.json" % mediafolder, "w") as f:
-        json.dump(decksortags, f)
-if os.path.exists("%s/tagmon.json" % mediafolder) and not os.path.exists("%s/_tagmon.json" % mediafolder):
-    tagmon = json.load(open("%s/tagmon.json" % mediafolder))
-    with open("%s/_tagmon.json" % mediafolder, "w") as f:
-        json.dump(tagmon, f)
-if os.path.exists("%s/pokemanki.json" % mediafolder) and not os.path.exists("%s/_pokemanki.json" % mediafolder):
-    pokemanki = json.load(open("%s/pokemanki.json" % mediafolder))
-    with open("%s/_pokemanki.json" % mediafolder, "w") as f:
-        json.dump(pokemanki, f)
-if os.path.exists("%s/toporbottom.json" % mediafolder) and not os.path.exists("%s/_toporbottom.json" % mediafolder):
-    toporbottom = json.load(open("%s/toporbottom.json" % mediafolder))
-    with open("%s/_toporbottom.json" % mediafolder, "w") as f:
-        json.dump(toporbottom, f)
-if os.path.exists("%s/trades.json" % mediafolder) and not os.path.exists("%s/_trades.json" % mediafolder):
-    trades = json.load(open("%s/trades.json" % mediafolder))
-    with open("%s/_trades.json" % mediafolder, "w") as f:
-        json.dump(trades, f)
+set_default("_pokemankisettings.json", default = [100, 250, 500, 750, 1000])
+
 
 # Nickname Settings
 def Nickname():
@@ -758,7 +728,7 @@ class Trades:
         self.tradewindow = QDialog()
         self.dirname = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         profilename = mw.pm.name
-        ankifolder = os.path.dirname(os.path.dirname(self.dirname))
+        #ankifolder = os.path.dirname(os.path.dirname(self.dirname))
         if os.path.exists("%s/%s" % (ankifolder, profilename)):
             profilefolder = ("%s/%s" % (ankifolder, profilename))
         # Get to collection.media folder
