@@ -4,13 +4,15 @@
 
 from .display import pokemonDisplay
 from .tagmon import tagmonDisplay
+from .tags import Tags
 
 import anki.stats
 import aqt.overview
 from anki.hooks import wrap
 import shutil
 import distutils.dir_util
-import inspect, os
+import inspect
+import os
 from aqt.qt import *
 from aqt import mw
 import json
@@ -28,7 +30,7 @@ today = date.today()
 addon_dir = Path(__file__).parents[0]
 currentdirname = addon_dir
 # Assign Pokemon Image folder directory name
-pkmnimgfolder = addon_dir  / "pokemon_images"
+pkmnimgfolder = addon_dir / "pokemon_images"
 # Get to Anki2 folder
 # ankifolder = os.path.dirname(os.path.dirname(currentdirname))
 # Get to profile folder
@@ -40,6 +42,7 @@ if not mw.pm.name:
 profilename = mw.pm.name
 profilefolder = Path(mw.pm.profileFolder())
 mediafolder = Path(mw.col.media.dir())
+
 
 def copy_directory(dir_addon: str, dir_anki: str):
     if not dir_anki:
@@ -53,16 +56,18 @@ def copy_directory(dir_addon: str, dir_anki: str):
     else:
         distutils.dir_util.copy_tree(fromdir, todir)
 
-def set_default(path: str, default = None):
+
+def set_default(path: str, default=None):
     if not (mediafolder / path).is_file():
         with open(mediafolder / path, "w") as f:
             json.dump(default, f)
+
 
 # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
 copy_directory("pokemon_images")
 
 # Download threshold settings (or make from scratch if not already made)
-set_default("_pokemankisettings.json", default = [100, 250, 500, 750, 1000])
+set_default("_pokemankisettings.json", default=[100, 250, 500, 750, 1000])
 
 
 # Nickname Settings
@@ -78,16 +83,18 @@ def Nickname():
         else:
             nopokemon = QMessageBox()
             nopokemon.setWindowTitle("Pokemanki")
-            nopokemon.setText("Please open the Stats window to get your Pokémon.")
+            nopokemon.setText(
+                "Please open the Stats window to get your Pokémon.")
             nopokemon.exec_()
-            return    
+            return
     else:
         if os.path.exists("%s/_pokemanki.json" % mediafolder):
             deckmonlist = json.load(open("%s/_pokemanki.json" % mediafolder))
         else:
             nopokemon = QMessageBox()
             nopokemon.setWindowTitle("Pokemanki")
-            nopokemon.setText("Please open the Stats window to get your Pokémon.")
+            nopokemon.setText(
+                "Please open the Stats window to get your Pokémon.")
             nopokemon.exec_()
             return
     displaylist = []
@@ -97,20 +104,25 @@ def Nickname():
             if item[2] < 5:
                 displaytext = "%s - Egg from %s" % (item[3], deckname)
             elif item[0].startswith("Eevee"):
-                displaytext = "%s - Eevee (Level %s) from %s" % (item[3], int(item[2]), deckname)
+                displaytext = "%s - Eevee (Level %s) from %s" % (
+                    item[3], int(item[2]), deckname)
             else:
-                displaytext = "%s - %s (Level %s) from %s" % (item[3], item[0], int(item[2]), deckname)
+                displaytext = "%s - %s (Level %s) from %s" % (
+                    item[3], item[0], int(item[2]), deckname)
         else:
             if item[2] < 5:
                 displaytext = "Egg from %s" % (deckname)
             elif item[0].startswith("Eevee"):
-                displaytext = "Eevee (Level %s) from %s" % (int(item[2]), deckname)
+                displaytext = "Eevee (Level %s) from %s" % (
+                    int(item[2]), deckname)
             else:
-                displaytext = "%s (Level %s) from %s" % (item[0], int(item[2]), deckname)
+                displaytext = "%s (Level %s) from %s" % (
+                    item[0], int(item[2]), deckname)
         displaylist.append(displaytext)
     totallist = list(zip(deckmonlist, displaylist))
     nicknamewindow = QWidget()
-    inp, ok = QInputDialog.getItem(nicknamewindow, "Pokemanki", "Choose a Pokémon who you would like to give a new nickname", displaylist, 0, False)
+    inp, ok = QInputDialog.getItem(
+        nicknamewindow, "Pokemanki", "Choose a Pokémon who you would like to give a new nickname", displaylist, 0, False)
     deckmon = []
     nickname = ""
     if ok and inp:
@@ -122,7 +134,8 @@ def Nickname():
         return
     if len(deckmon) == 4:
         nickname = deckmon[3]
-    inp, ok = QInputDialog.getText(nicknamewindow, "Pokemanki", ("Enter a new nickname for %s (leave blank to remove nickname)" % displaytext))
+    inp, ok = QInputDialog.getText(nicknamewindow, "Pokemanki", (
+        "Enter a new nickname for %s (leave blank to remove nickname)" % displaytext))
     if ok:
         if inp:
             nickname = inp
@@ -130,11 +143,14 @@ def Nickname():
             newnickname = QMessageBox()
             newnickname.setWindowTitle("Pokemanki")
             if int(deckmon[2]) < 5:
-                newnickname.setText("New nickname given to Egg - %s" % (nickname))
+                newnickname.setText(
+                    "New nickname given to Egg - %s" % (nickname))
             elif deckmon[0].startswith("Eevee"):
-                newnickname.setText("New nickname given to Eevee - %s" % (nickname))
+                newnickname.setText(
+                    "New nickname given to Eevee - %s" % (nickname))
             else:
-                newnickname.setText("New nickname given to %s - %s" % (deckmon[0], nickname))
+                newnickname.setText(
+                    "New nickname given to %s - %s" % (deckmon[0], nickname))
             newnickname.exec_()
         else:
             deckmon = [deckmon[0], deckmon[1], deckmon[2]]
@@ -145,7 +161,8 @@ def Nickname():
             elif deckmon[0].startswith("Eevee"):
                 nicknameremoved.setText("Nickname removed from Eevee")
             else:
-                nicknameremoved.setText("Nickname removed from %s" % deckmon[0])
+                nicknameremoved.setText(
+                    "Nickname removed from %s" % deckmon[0])
             nicknameremoved.exec_()
     modifieddeckmonlist = []
     for item in deckmonlist:
@@ -160,11 +177,13 @@ def Nickname():
         with open(("%s/_pokemanki.json" % mediafolder), "w") as f:
             json.dump(modifieddeckmonlist, f)
 
+
 def Toggle():
     global mediafolder
     window = QWidget()
     items = ("Decks (Default)", "Tags")
-    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Choose how you would like Pokemanki to assign you Pokémon.", items, 0, False)
+    inp, ok = QInputDialog.getItem(
+        window, "Pokemanki", "Choose how you would like Pokemanki to assign you Pokémon.", items, 0, False)
     if ok and inp:
         if inp == "Tags":
             with open(("%s/_decksortags.json" % mediafolder), "w") as f:
@@ -173,17 +192,21 @@ def Toggle():
             tags.tagMenu()
             settingschanged = QMessageBox()
             settingschanged.setWindowTitle("Pokemanki")
-            settingschanged.setText("Please restart Anki to see your updated Pokémon.")
+            settingschanged.setText(
+                "Please restart Anki to see your updated Pokémon.")
             settingschanged.exec_()
         else:
             with open(("%s/_decksortags.json" % mediafolder), "w") as f:
                 json.dump("", f)
             settingschanged = QMessageBox()
             settingschanged.setWindowTitle("Pokemanki")
-            settingschanged.setText("Please restart Anki to see your updated Pokémon.")
+            settingschanged.setText(
+                "Please restart Anki to see your updated Pokémon.")
             settingschanged.exec_()
 
 # Threshold Settings
+
+
 def ThresholdSettings():
     global thresholdlist
     global mediafolder
@@ -197,7 +220,8 @@ def ThresholdSettings():
     thresholdlist = json.load(open("%s/_pokemankisettings.json" % mediafolder))
     # Make settings window (input dialog)
     window = QWidget()
-    inp, ok = QInputDialog.getInt(window, "Pokemanki", ("Change number of cards needed in a deck to get a starter Pokémon (recommended %d)" % recommended), value = thresholdlist[4])
+    inp, ok = QInputDialog.getInt(window, "Pokemanki", (
+        "Change number of cards needed in a deck to get a starter Pokémon (recommended %d)" % recommended), value=thresholdlist[4])
     if ok:
         # Make sure threshold is at least 10
         if inp < 10:
@@ -207,7 +231,8 @@ def ThresholdSettings():
             error.exec_()
         # Change settings and save them if the threshold is changed
         elif inp != thresholdlist[4]:
-            newthresholdlist = [int(0.1*inp), int(0.25*inp), int(0.5*inp), int(0.75*inp), int(inp)]
+            newthresholdlist = [
+                int(0.1*inp), int(0.25*inp), int(0.5*inp), int(0.75*inp), int(inp)]
             with open(("%s/_pokemankisettings.json" % mediafolder), "w") as f:
                 json.dump(newthresholdlist, f)
             # Message box confirming change
@@ -219,6 +244,8 @@ def ThresholdSettings():
     window.show()
 
 # Reset Pokemon
+
+
 def ResetPokemon():
     global mediafolder
     # Make message box
@@ -241,14 +268,17 @@ def ResetPokemon():
         resetdone.setText("Pokemon reset")
         resetdone.exec_()
 
+
 def MovetoBottom():
     global mediafolder
     with open("%s/_toporbottom.json" % mediafolder, "w") as f:
         json.dump("bottom", f)
     settingschanged = QMessageBox()
     settingschanged.setWindowTitle("Pokemanki")
-    settingschanged.setText("Please restart Anki to see your updated settings.")
+    settingschanged.setText(
+        "Please restart Anki to see your updated settings.")
     settingschanged.exec_()
+
 
 def MovetoTop():
     global mediafolder
@@ -256,8 +286,10 @@ def MovetoTop():
         json.dump("", f)
     settingschanged = QMessageBox()
     settingschanged.setWindowTitle("Pokemanki")
-    settingschanged.setText("Please restart Anki to see your updated settings.")
+    settingschanged.setText(
+        "Please restart Anki to see your updated settings.")
     settingschanged.exec_()
+
 
 def giveEverstone():
     global mediafolder
@@ -276,7 +308,8 @@ def giveEverstone():
     else:
         everstonelist = []
     if os.path.exists("%s/_everstonepokemonlist.json" % mediafolder):
-        everstonepokemonlist = json.load(open("%s/_everstonepokemonlist.json" % mediafolder))
+        everstonepokemonlist = json.load(
+            open("%s/_everstonepokemonlist.json" % mediafolder))
     else:
         everstonepokemonlist = []
 
@@ -285,7 +318,8 @@ def giveEverstone():
         if f:
             cb = ("%s (Level %s) from %s" % (item[0], item[2], item[1]))
         else:
-            cb = ("%s (Level %s) from %s" % (item[0], item[2], mw.col.decks.name(item[1])))
+            cb = ("%s (Level %s) from %s" %
+                  (item[0], item[2], mw.col.decks.name(item[1])))
         if item[1] in everstonelist:
             continue
         elif cb in everstoneables:
@@ -293,9 +327,9 @@ def giveEverstone():
         else:
             everstoneables.append(cb)
 
-
     window = QWidget()
-    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon you would like to give an everstone to.", sorted(everstoneables), 0, False)
+    inp, ok = QInputDialog.getItem(
+        window, "Pokemanki", "Select a Pokemon you would like to give an everstone to.", sorted(everstoneables), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -315,6 +349,7 @@ def giveEverstone():
     with open("%s/_everstonepokemonlist.json" % mediafolder, "w") as f:
         json.dump(everstonepokemonlist, f)
 
+
 def takeEverstone():
     global mediafolder
     if os.path.exists("%s/_decksortags.json" % mediafolder):
@@ -332,7 +367,8 @@ def takeEverstone():
     else:
         everstonelist = []
     if os.path.exists("%s/_everstonepokemonlist.json" % mediafolder):
-        everstonepokemonlist = json.load(open("%s/_everstonepokemonlist.json" % mediafolder))
+        everstonepokemonlist = json.load(
+            open("%s/_everstonepokemonlist.json" % mediafolder))
     else:
         everstonepokemonlist = []
     if not everstonelist:
@@ -356,7 +392,8 @@ def takeEverstone():
         else:
             continue
     window = QWidget()
-    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon whose everstone you would like to take.", sorted(possibleuneverstones), 0, False)
+    inp, ok = QInputDialog.getItem(
+        window, "Pokemanki", "Select a Pokemon whose everstone you would like to take.", sorted(possibleuneverstones), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -372,6 +409,7 @@ def takeEverstone():
         settingschanged.exec_()
     with open("%s/_everstonelist.json" % mediafolder, "w") as f:
         json.dump(everstonelist, f)
+
 
 def giveMegastone():
     global mediafolder
@@ -395,7 +433,8 @@ def giveMegastone():
             if f:
                 cb = ("%s (Level %s) from %s" % (item[0], item[2], item[1]))
             else:
-                cb = ("%s (Level %s) from %s" % (item[0], item[2], mw.col.decks.name(item[1])))
+                cb = ("%s (Level %s) from %s" %
+                      (item[0], item[2], mw.col.decks.name(item[1])))
             if item[1] in megastonelist:
                 continue
             elif cb in megastoneables:
@@ -405,7 +444,8 @@ def giveMegastone():
         else:
             continue
     window = QWidget()
-    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon you would like to give a mega stone to", sorted(megastoneables), 0, False)
+    inp, ok = QInputDialog.getItem(
+        window, "Pokemanki", "Select a Pokemon you would like to give a mega stone to", sorted(megastoneables), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -418,7 +458,8 @@ def giveMegastone():
         settingschanged.setText("Please restart Anki to see your changes.")
         settingschanged.exec_()
     with open("%s/_megastonelist.json" % mediafolder, "w") as f:
-        json.dump(megastonelist, f)  
+        json.dump(megastonelist, f)
+
 
 def takeMegastone():
     global mediafolder
@@ -457,7 +498,8 @@ def takeMegastone():
         else:
             continue
     window = QWidget()
-    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon whose mega stone you would like to take", sorted(possibleunmegastones), 0, False)
+    inp, ok = QInputDialog.getItem(
+        window, "Pokemanki", "Select a Pokemon whose mega stone you would like to take", sorted(possibleunmegastones), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -495,7 +537,8 @@ def giveAlolanPassport():
         if f:
             cb = ("%s (Level %s) from %s" % (item[0], item[2], item[1]))
         else:
-            cb = ("%s (Level %s) from %s" % (item[0], item[2], mw.col.decks.name(item[1])))
+            cb = ("%s (Level %s) from %s" %
+                  (item[0], item[2], mw.col.decks.name(item[1])))
         if item[1] in alolanlist:
             continue
         elif cb in alolanables:
@@ -503,9 +546,9 @@ def giveAlolanPassport():
         else:
             alolanables.append(cb)
 
-
     window = QWidget()
-    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon you would like to give an Alolan Passport to.", sorted(alolanables), 0, False)
+    inp, ok = QInputDialog.getItem(
+        window, "Pokemanki", "Select a Pokemon you would like to give an Alolan Passport to.", sorted(alolanables), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -520,6 +563,7 @@ def giveAlolanPassport():
         settingschanged.exec_()
     with open("%s/_alolanlist.json" % mediafolder, "w") as f:
         json.dump(alolanlist, f)
+
 
 def takeAlolanPassport():
     global mediafolder
@@ -540,7 +584,8 @@ def takeAlolanPassport():
     if not alolanlist:
         noalolan = QMessageBox()
         noalolan.setWindowTitle("Pokemanki")
-        noalolan.setText("None of your Pokémon are holding an Alolan Passport.")
+        noalolan.setText(
+            "None of your Pokémon are holding an Alolan Passport.")
         noalolan.exec_()
         return
     possibleunalolans = []
@@ -558,7 +603,8 @@ def takeAlolanPassport():
         else:
             continue
     window = QWidget()
-    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon whose Alolan Passport you would like to take.", sorted(possibleunalolans), 0, False)
+    inp, ok = QInputDialog.getItem(
+        window, "Pokemanki", "Select a Pokemon whose Alolan Passport you would like to take.", sorted(possibleunalolans), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -572,7 +618,6 @@ def takeAlolanPassport():
         settingschanged.exec_()
     with open("%s/_alolanlist.json" % mediafolder, "w") as f:
         json.dump(alolanlist, f)
-
 
 
 def PrestigePokemon():
@@ -597,7 +642,8 @@ def PrestigePokemon():
             if f:
                 cb = ("%s (Level %s) from %s" % (item[0], item[2], item[1]))
             else:
-                cb = ("%s (Level %s) from %s" % (item[0], item[2], mw.col.decks.name(item[1])))
+                cb = ("%s (Level %s) from %s" %
+                      (item[0], item[2], mw.col.decks.name(item[1])))
             if item[1] in prestigelist:
                 continue
             elif cb in possibleprestiges:
@@ -607,7 +653,8 @@ def PrestigePokemon():
         else:
             continue
     window = QWidget()
-    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon you would like to prestige (decreases level by 50, only availabe for Pokemon with level > 60)", sorted(possibleprestiges), 0, False)
+    inp, ok = QInputDialog.getItem(
+        window, "Pokemanki", "Select a Pokemon you would like to prestige (decreases level by 50, only availabe for Pokemon with level > 60)", sorted(possibleprestiges), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -617,10 +664,12 @@ def PrestigePokemon():
             prestigelist.append(mw.col.decks.id(item))
         settingschanged = QMessageBox()
         settingschanged.setWindowTitle("Pokemanki")
-        settingschanged.setText("Please restart Anki to see your prestiged Pokémon.")
+        settingschanged.setText(
+            "Please restart Anki to see your prestiged Pokémon.")
         settingschanged.exec_()
     with open("%s/_prestigelist.json" % mediafolder, "w") as f:
         json.dump(prestigelist, f)
+
 
 def UnprestigePokemon():
     global mediafolder
@@ -659,7 +708,8 @@ def UnprestigePokemon():
         else:
             continue
     window = QWidget()
-    inp, ok = QInputDialog.getItem(window, "Pokemanki", "Select a Pokemon you would like to unprestige", sorted(possibleunprestiges), 0, False)
+    inp, ok = QInputDialog.getItem(
+        window, "Pokemanki", "Select a Pokemon you would like to unprestige", sorted(possibleunprestiges), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -669,7 +719,8 @@ def UnprestigePokemon():
             prestigelist.remove(mw.col.decks.id(item))
         settingschanged = QMessageBox()
         settingschanged.setWindowTitle("Pokemanki")
-        settingschanged.setText("Please restart Anki to see your unprestiged Pokémon.")
+        settingschanged.setText(
+            "Please restart Anki to see your unprestiged Pokémon.")
         settingschanged.exec_()
     with open("%s/_prestigelist.json" % mediafolder, "w") as f:
         json.dump(prestigelist, f)
@@ -680,7 +731,7 @@ def pokemonLevelRangesFromCsv(csv_fpath):
 
     with open(csv_fpath, "r") as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=",")
-        
+
         for line in csv_reader:
             pokemon = line["pokemon"]
             tier = line["tier"]
@@ -700,14 +751,14 @@ def pokemonLevelRangesFromCsv(csv_fpath):
             second_ev = line["second_evolution"]
             if second_ev == "NA":
                 second_ev = None
-                        
+
             pk1_lo_lv = 0
             if first_ev_lv:
                 pk1_hi_lv = first_ev_lv
             else:
                 pk1_hi_lv = 100
             pokemon_records.append((pokemon, tier, pk1_lo_lv, pk1_hi_lv))
-            
+
             if first_ev is not None:
                 pk2_lo_lv = pk1_hi_lv
                 if second_ev_lv:
@@ -715,7 +766,7 @@ def pokemonLevelRangesFromCsv(csv_fpath):
                 else:
                     pk2_hi_lv = 100
                 pokemon_records.append((first_ev, tier, pk2_lo_lv, pk2_hi_lv))
-            
+
             if second_ev is not None:
                 pk3_lo_lv = pk2_hi_lv
                 pk3_hi_lv = 100
@@ -723,10 +774,12 @@ def pokemonLevelRangesFromCsv(csv_fpath):
 
     return pokemon_records
 
+
 class Trades:
     def __init__(self):
         self.tradewindow = QDialog()
-        self.dirname = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        self.dirname = os.path.dirname(os.path.abspath(
+            inspect.getfile(inspect.currentframe())))
         profilename = mw.pm.name
         #ankifolder = os.path.dirname(os.path.dirname(self.dirname))
         if os.path.exists("%s/%s" % (ankifolder, profilename)):
@@ -737,40 +790,51 @@ class Trades:
         self.mediafolder = mediafolder
 
         pokemon_records = []
-        csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1.csv")
+        csv_fpath = os.path.join(
+            currentdirname, "pokemon_evolutions", "pokemon_gen1.csv")
         pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
         if config['gen2']:
-            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen2.csv")
+            csv_fpath = os.path.join(
+                currentdirname, "pokemon_evolutions", "pokemon_gen2.csv")
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
 
             if config['gen4_evolutions']:
-                csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_plus4.csv")
+                csv_fpath = os.path.join(
+                    currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_plus4.csv")
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-                csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen2_plus4.csv")
+                csv_fpath = os.path.join(
+                    currentdirname, "pokemon_evolutions", "pokemon_gen2_plus4.csv")
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
             else:
-                csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_no4.csv")
+                csv_fpath = os.path.join(
+                    currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_no4.csv")
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-                csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen2_no4.csv")
+                csv_fpath = os.path.join(
+                    currentdirname, "pokemon_evolutions", "pokemon_gen2_no4.csv")
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
         else:
             if config['gen4_evolutions']:
                 # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
                 # so let's just include gen 2 for these evolution lines
-                csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_plus4.csv")
+                csv_fpath = os.path.join(
+                    currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_plus4.csv")
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
             else:
-                csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen1_no2_no4.csv")
+                csv_fpath = os.path.join(
+                    currentdirname, "pokemon_evolutions", "pokemon_gen1_no2_no4.csv")
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-        
+
         if config['gen3']:
-            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen3.csv")
+            csv_fpath = os.path.join(
+                currentdirname, "pokemon_evolutions", "pokemon_gen3.csv")
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
         if config['gen4']:
-            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen4.csv")
+            csv_fpath = os.path.join(
+                currentdirname, "pokemon_evolutions", "pokemon_gen4.csv")
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
         if config['gen5']:
-            csv_fpath = os.path.join(currentdirname, "pokemon_evolutions", "pokemon_gen5.csv")
+            csv_fpath = os.path.join(
+                currentdirname, "pokemon_evolutions", "pokemon_gen5.csv")
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
 
         self.allpokemon = pokemon_records
@@ -778,14 +842,15 @@ class Trades:
             self.f = json.load(open("%s/_decksortags.json" % mediafolder))
         else:
             self.f = ""
-        
+
     def newTrades(self):
         self.trades = []
         i = 0
         f = self.f
         if f:
             if os.path.exists("%s/_tagmon.json" % self.mediafolder):
-                deckmonlist = json.load(open("%s/_tagmon.json" % self.mediafolder))
+                deckmonlist = json.load(
+                    open("%s/_tagmon.json" % self.mediafolder))
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 noeggslist = []
                 for item in sorteddeckmonlist:
@@ -802,12 +867,14 @@ class Trades:
             else:
                 nopokemon = QMessageBox()
                 nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText("Please open the Stats window to get your Pokémon.")
+                nopokemon.setText(
+                    "Please open the Stats window to get your Pokémon.")
                 nopokemon.exec_()
                 return
         else:
             if os.path.exists("%s/_pokemanki.json" % self.mediafolder):
-                deckmonlist = json.load(open("%s/_pokemanki.json" % self.mediafolder))
+                deckmonlist = json.load(
+                    open("%s/_pokemanki.json" % self.mediafolder))
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 noeggslist = []
                 for item in sorteddeckmonlist:
@@ -824,7 +891,8 @@ class Trades:
             else:
                 nopokemon = QMessageBox()
                 nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText("Please open the Stats window to get your Pokémon.")
+                nopokemon.setText(
+                    "Please open the Stats window to get your Pokémon.")
                 nopokemon.exec_()
                 return
         possiblehaveslist = []
@@ -867,11 +935,14 @@ class Trades:
             else:
                 continue
             if have[0].startswith("Eevee") and want[0].startswith("Eevee"):
-                self.trades.append((("Eevee", have[1], have[2], have[3]), ("Eevee", want[1], want[2], want[3])))
+                self.trades.append(
+                    (("Eevee", have[1], have[2], have[3]), ("Eevee", want[1], want[2], want[3])))
             elif have[0].startswith("Eevee"):
-                self.trades.append((("Eevee", have[1], have[2], have[3]), want))
+                self.trades.append(
+                    (("Eevee", have[1], have[2], have[3]), want))
             elif want[0].startswith("Eevee"):
-                self.trades.append((have, ("Eevee", want[1], want[2], want[3])))
+                self.trades.append(
+                    (have, ("Eevee", want[1], want[2], want[3])))
             else:
                 self.trades.append((have, want))
             possiblehaveslist.append(possiblehaves)
@@ -885,6 +956,7 @@ class Trades:
         testData = [date, self.trades, possiblehaveslist]
         with open("_trades.json", "w") as f:
             json.dump(tradeData, f)
+
     def tradeFunction(self):
         # show a message box
         f = self.f
@@ -976,7 +1048,8 @@ class Trades:
         f = self.f
         if f:
             if os.path.exists("%s/_tagmon.json" % self.mediafolder):
-                deckmonlist = json.load(open("%s/_tagmon.json" % self.mediafolder))
+                deckmonlist = json.load(
+                    open("%s/_tagmon.json" % self.mediafolder))
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
                 for item in sorteddeckmonlist:
@@ -989,12 +1062,14 @@ class Trades:
             else:
                 nopokemon = QMessageBox()
                 nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText("Please open the Stats window to get your Pokémon.")
+                nopokemon.setText(
+                    "Please open the Stats window to get your Pokémon.")
                 nopokemon.exec_()
                 return
         else:
             if os.path.exists("%s/_pokemanki.json" % self.mediafolder):
-                deckmonlist = json.load(open("%s/_pokemanki.json" % self.mediafolder))
+                deckmonlist = json.load(
+                    open("%s/_pokemanki.json" % self.mediafolder))
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
                 for item in sorteddeckmonlist:
@@ -1007,7 +1082,8 @@ class Trades:
             else:
                 nopokemon = QMessageBox()
                 nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText("Please open the Stats window to get your Pokémon.")
+                nopokemon.setText(
+                    "Please open the Stats window to get your Pokémon.")
                 nopokemon.exec_()
                 return
         for item in deckmonlist:
@@ -1016,7 +1092,8 @@ class Trades:
         if possiblefits == []:
             novalidpokemon = QMessageBox()
             novalidpokemon.setWindowTitle("Pokemanki")
-            novalidpokemon.setText("Sorry, you do not have the Pokemon needed to complete this trade.")
+            novalidpokemon.setText(
+                "Sorry, you do not have the Pokemon needed to complete this trade.")
             novalidpokemon.exec_()
             return
         displaylist = []
@@ -1024,18 +1101,23 @@ class Trades:
             deckname = mw.col.decks.name(item[1])
             if len(item) == 4:
                 if item[0].startswith("Eevee"):
-                    displaytext = "%s - Eevee (Level %s) from %s" % (item[3], int(item[2]), deckname)
+                    displaytext = "%s - Eevee (Level %s) from %s" % (
+                        item[3], int(item[2]), deckname)
                 else:
-                    displaytext = "%s - %s (Level %s) from %s" % (item[3], item[0], int(item[2]), deckname)
+                    displaytext = "%s - %s (Level %s) from %s" % (
+                        item[3], item[0], int(item[2]), deckname)
             else:
                 if item[0].startswith("Eevee"):
-                    displaytext = "Eevee (Level %s) from %s" % (int(item[2]), deckname)
+                    displaytext = "Eevee (Level %s) from %s" % (
+                        int(item[2]), deckname)
                 else:
-                    displaytext = "%s (Level %s) from %s" % (item[0], int(item[2]), deckname)
+                    displaytext = "%s (Level %s) from %s" % (
+                        item[0], int(item[2]), deckname)
             displaylist.append(displaytext)
         totallist = list(zip(possiblefits, displaylist))
         possiblepokemon = QWidget()
-        inp, ok = QInputDialog.getItem(possiblepokemon, "Pokemanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
+        inp, ok = QInputDialog.getItem(
+            possiblepokemon, "Pokemanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
         tradepokemon = []
         if ok and inp:
             for thing in totallist:
@@ -1046,7 +1128,8 @@ class Trades:
             return
         confirmation = QMessageBox()
         confirmation.setWindowTitle("Pokemanki")
-        confirmation.setText("Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
+        confirmation.setText(
+            "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
         confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirmation.setDefaultButton(QMessageBox.No)
         result = confirmation.exec_()
@@ -1067,7 +1150,8 @@ class Trades:
             self.tradewindow.done(QDialog.Accepted)
             tradedone = QMessageBox()
             tradedone.setWindowTitle("Pokemanki")
-            tradedone.setText("You have traded your %s for a %s" % (displaytext, have[0]))
+            tradedone.setText("You have traded your %s for a %s" %
+                              (displaytext, have[0]))
             tradedone.exec_()
 
     def trade2(self):
@@ -1077,7 +1161,8 @@ class Trades:
         f = self.f
         if f:
             if os.path.exists("%s/_tagmon.json" % self.mediafolder):
-                deckmonlist = json.load(open("%s/_tagmon.json" % self.mediafolder))
+                deckmonlist = json.load(
+                    open("%s/_tagmon.json" % self.mediafolder))
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
                 for item in sorteddeckmonlist:
@@ -1090,12 +1175,14 @@ class Trades:
             else:
                 nopokemon = QMessageBox()
                 nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText("Please open the Stats window to get your Pokémon.")
+                nopokemon.setText(
+                    "Please open the Stats window to get your Pokémon.")
                 nopokemon.exec_()
                 return
         else:
             if os.path.exists("%s/_pokemanki.json" % self.mediafolder):
-                deckmonlist = json.load(open("%s/_pokemanki.json" % self.mediafolder))
+                deckmonlist = json.load(
+                    open("%s/_pokemanki.json" % self.mediafolder))
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
                 for item in sorteddeckmonlist:
@@ -1108,7 +1195,8 @@ class Trades:
             else:
                 nopokemon = QMessageBox()
                 nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText("Please open the Stats window to get your Pokémon.")
+                nopokemon.setText(
+                    "Please open the Stats window to get your Pokémon.")
                 nopokemon.exec_()
                 return
         for item in deckmonlist:
@@ -1117,7 +1205,8 @@ class Trades:
         if possiblefits == []:
             novalidpokemon = QMessageBox()
             novalidpokemon.setWindowTitle("Pokemanki")
-            novalidpokemon.setText("Sorry, you do not have the Pokémon needed to complete this trade.")
+            novalidpokemon.setText(
+                "Sorry, you do not have the Pokémon needed to complete this trade.")
             novalidpokemon.exec_()
             return
         displaylist = []
@@ -1125,18 +1214,23 @@ class Trades:
             deckname = mw.col.decks.name(item[1])
             if len(item) == 4:
                 if item[0].startswith("Eevee"):
-                    displaytext = "%s - Eevee (Level %s) from %s" % (item[3], int(item[2]), deckname)
+                    displaytext = "%s - Eevee (Level %s) from %s" % (
+                        item[3], int(item[2]), deckname)
                 else:
-                    displaytext = "%s - %s (Level %s) from %s" % (item[3], item[0], int(item[2]), deckname)
+                    displaytext = "%s - %s (Level %s) from %s" % (
+                        item[3], item[0], int(item[2]), deckname)
             else:
                 if item[0].startswith("Eevee"):
-                    displaytext = "Eevee (Level %s) from %s" % (int(item[2]), deckname)
+                    displaytext = "Eevee (Level %s) from %s" % (
+                        int(item[2]), deckname)
                 else:
-                    displaytext = "%s (Level %s) from %s" % (item[0], int(item[2]), deckname)
+                    displaytext = "%s (Level %s) from %s" % (
+                        item[0], int(item[2]), deckname)
             displaylist.append(displaytext)
         totallist = list(zip(possiblefits, displaylist))
         possiblepokemon = QWidget()
-        inp, ok = QInputDialog.getItem(possiblepokemon, "Pokemanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
+        inp, ok = QInputDialog.getItem(
+            possiblepokemon, "Pokemanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
         tradepokemon = []
         if ok and inp:
             for thing in totallist:
@@ -1147,7 +1241,8 @@ class Trades:
             return
         confirmation = QMessageBox()
         confirmation.setWindowTitle("Pokemanki")
-        confirmation.setText("Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
+        confirmation.setText(
+            "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
         confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirmation.setDefaultButton(QMessageBox.No)
         result = confirmation.exec_()
@@ -1168,7 +1263,8 @@ class Trades:
             self.tradewindow.done(QDialog.Accepted)
             tradedone = QMessageBox()
             tradedone.setWindowTitle("Pokemanki")
-            tradedone.setText("You have traded your %s for a %s" % (displaytext, have[0]))
+            tradedone.setText("You have traded your %s for a %s" %
+                              (displaytext, have[0]))
             tradedone.exec_()
 
     def trade3(self):
@@ -1178,7 +1274,8 @@ class Trades:
         f = self.f
         if f:
             if os.path.exists("%s/_tagmon.json" % self.mediafolder):
-                deckmonlist = json.load(open("%s/_tagmon.json" % self.mediafolder))
+                deckmonlist = json.load(
+                    open("%s/_tagmon.json" % self.mediafolder))
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
                 for item in sorteddeckmonlist:
@@ -1191,12 +1288,14 @@ class Trades:
             else:
                 nopokemon = QMessageBox()
                 nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText("Please open the Stats window to get your Pokémon.")
+                nopokemon.setText(
+                    "Please open the Stats window to get your Pokémon.")
                 nopokemon.exec_()
                 return
         else:
             if os.path.exists("%s/_pokemanki.json" % self.mediafolder):
-                deckmonlist = json.load(open("%s/_pokemanki.json" % self.mediafolder))
+                deckmonlist = json.load(
+                    open("%s/_pokemanki.json" % self.mediafolder))
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
                 for item in sorteddeckmonlist:
@@ -1209,7 +1308,8 @@ class Trades:
             else:
                 nopokemon = QMessageBox()
                 nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText("Please open the Stats window to get your Pokémon.")
+                nopokemon.setText(
+                    "Please open the Stats window to get your Pokémon.")
                 nopokemon.exec_()
                 return
         for item in deckmonlist:
@@ -1218,7 +1318,8 @@ class Trades:
         if possiblefits == []:
             novalidpokemon = QMessageBox()
             novalidpokemon.setWindowTitle("Pokemanki")
-            novalidpokemon.setText("Sorry, you do not have the Pokemon needed to complete this trade.")
+            novalidpokemon.setText(
+                "Sorry, you do not have the Pokemon needed to complete this trade.")
             novalidpokemon.exec_()
             return
         displaylist = []
@@ -1226,18 +1327,23 @@ class Trades:
             deckname = mw.col.decks.name(item[1])
             if len(item) == 4:
                 if item[0].startswith("Eevee"):
-                    displaytext = "%s - Eevee (Level %s) from %s" % (item[3], int(item[2]), deckname)
+                    displaytext = "%s - Eevee (Level %s) from %s" % (
+                        item[3], int(item[2]), deckname)
                 else:
-                    displaytext = "%s - %s (Level %s) from %s" % (item[3], item[0], int(item[2]), deckname)
+                    displaytext = "%s - %s (Level %s) from %s" % (
+                        item[3], item[0], int(item[2]), deckname)
             else:
                 if item[0].startswith("Eevee"):
-                    displaytext = "Eevee (Level %s) from %s" % (int(item[2]), deckname)
+                    displaytext = "Eevee (Level %s) from %s" % (
+                        int(item[2]), deckname)
                 else:
-                    displaytext = "%s (Level %s) from %s" % (item[0], int(item[2]), deckname)
+                    displaytext = "%s (Level %s) from %s" % (
+                        item[0], int(item[2]), deckname)
             displaylist.append(displaytext)
         totallist = list(zip(possiblefits, displaylist))
         possiblepokemon = QWidget()
-        inp, ok = QInputDialog.getItem(possiblepokemon, "Pokemanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
+        inp, ok = QInputDialog.getItem(
+            possiblepokemon, "Pokemanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
         tradepokemon = []
         if ok and inp:
             for thing in totallist:
@@ -1248,7 +1354,8 @@ class Trades:
             return
         confirmation = QMessageBox()
         confirmation.setWindowTitle("Pokemanki")
-        confirmation.setText("Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
+        confirmation.setText(
+            "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
         confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirmation.setDefaultButton(QMessageBox.No)
         result = confirmation.exec_()
@@ -1269,207 +1376,13 @@ class Trades:
             self.tradewindow.done(QDialog.Accepted)
             tradedone = QMessageBox()
             tradedone.setWindowTitle("Pokemanki")
-            tradedone.setText("You have traded your %s for a %s" % (displaytext, have[0]))
+            tradedone.setText("You have traded your %s for a %s" %
+                              (displaytext, have[0]))
             tradedone.exec_()
+
 
 tradeclass = Trades()
 
-class Tags:
-    def __init__(self):
-        self.parentwindow = QDialog()
-        self.alltags = []
-    def tagMenu(self):
-        if os.path.exists("_tags.json"):
-            self.savedtags = json.load(open("_tags.json"))
-        else:
-            self.savedtags = []
-        rawtags = mw.col.tags.all()
-        alltags = self.alltags
-        for item in rawtags:
-            taglist = item.split("::")
-            alltags.append(taglist)
-        tagdict = {}
-        for item in alltags:
-            if len(item) == 1:
-                if item[0] in tagdict:
-                    continue
-                else:
-                    tagdict[item[0]] = {}
-            elif len(item) == 2:
-                if item[0] in tagdict:
-                    if item[1] in tagdict[item[0]]:
-                        continue
-                    else:
-                        tagdict[item[0]][item[1]] = {}
-                else:
-                    tagdict[item[0]] = {}
-                    tagdict[item[0]][item[1]] = {}
-            elif len(item) == 3:
-                if item[0] in tagdict:
-                    if item[1] in tagdict[item[0]]:
-                        if item[2] in tagdict[item[0]][item[1]]:
-                            continue
-                        else:
-                            tagdict[item[0]][item[1]][item[2]] = {}
-                    else:
-                        tagdict[item[0]][item[1]] = {}
-                        tagdict[item[0]][item[1]][item[2]] = {}
-                else:
-                    tagdict[item[0]] = {}
-                    tagdict[item[0]][item[1]] = {}
-                    tagdict[item[0]][item[1]][item[2]] = {}
-            elif len(item) == 4:
-                if item[0] in tagdict:
-                    if item[1] in tagdict[item[0]]:
-                        if item[2] in tagdict[item[0]][item[1]]:
-                            if item[3] in tagdict[item[0]][item[1]][item[2]]:
-                                continue
-                            else:
-                                tagdict[item[0]][item[1]][item[2]][item[3]] = {}
-                        else:
-                            tagdict[item[0]][item[1]][item[2]] = {}
-                            tagdict[item[0]][item[1]][item[2]][item[3]] = {}
-                    else:
-                        tagdict[item[0]][item[1]] = {}
-                        tagdict[item[0]][item[1]][item[2]] = {}
-                        tagdict[item[0]][item[1]][item[2]][item[3]] = {}
-                else:
-                    tagdict[item[0]] = {}
-                    tagdict[item[0]][item[1]] = {}
-                    tagdict[item[0]][item[1]][item[2]] = {}
-                    tagdict[item[0]][item[1]][item[2]][item[3]] = {}
-        taglist = []
-        for i in tagdict:
-            if not tagdict[i]:
-                taglist.append([i, []])
-            else:
-                childlist = []
-                for j in tagdict[i]:
-                    if not tagdict[i][j]:
-                        childlist.append([j, []])
-                    else:
-                        grandchildlist = []
-                        for k in tagdict[i][j]:
-                            if not tagdict[i][j][k]:
-                                grandchildlist.append([k, []])
-                            else:
-                                greatgrandchildlist = []
-                                for l in tagdict[i][j][k]:
-                                    greatgrandchildlist.append([l, []])
-                                greatgrandchildlist = sorted(greatgrandchildlist, key = lambda x: x[0].lower())
-                                grandchildlist.append([k, greatgrandchildlist])
-                        grandchildlist = sorted(grandchildlist, key = lambda x: x[0].lower())
-                        childlist.append([j, grandchildlist])
-                childlist = sorted(childlist, key = lambda x: x[0].lower())
-                taglist.append([i, childlist])
-        taglist = sorted(taglist, key = lambda x: x[0].lower())
-        parentwindow = self.parentwindow
-        parentwindow.setMinimumWidth(255)
-        parentwindow.setMinimumHeight(192)
-        lbl = QLabel("Please select the tags for which you would like Pokemon assigned.", parentwindow)
-        lbl.move(5, 5)
-        widget = QWidget(parentwindow)
-        widget.resize(255, 192)
-        widget.move(0, 20)
-        tree = QTreeWidget(widget)
-        tree.setColumnCount(1)
-        tree.setHeaderLabels(["Tags"])
-        headerItem = QTreeWidgetItem()
-        item = QTreeWidgetItem()
-        parentlist = self.parentlist = []
-        for i in taglist:
-            if not i[1]:
-                parent = QTreeWidgetItem(tree)
-                parent.setText(0, i[0])
-                parent.setFlags(parent.flags() | Qt.ItemIsUserCheckable)
-                if i[0] in self.savedtags:
-                    parent.setCheckState(0, Qt.Checked)
-                else:
-                    parent.setCheckState(0, Qt.Unchecked)
-                parentlist.append([parent, []])
-            else:
-                parent = QTreeWidgetItem(tree)
-                parent.setText(0, i[0])
-                parent.setFlags(parent.flags() | Qt.ItemIsUserCheckable)
-                if i[0] in self.savedtags:
-                    parent.setCheckState(0, Qt.Checked)
-                else:
-                    parent.setCheckState(0, Qt.Unchecked)
-                childlist = []
-                for j in i[1]:
-                    if not j[1]:
-                        child = QTreeWidgetItem(parent)
-                        child.setFlags(child.flags() | Qt.ItemIsUserCheckable)
-                        child.setText(0, j[0])
-                        if i[0] + "::" + j[0] in self.savedtags:
-                            child.setCheckState(0, Qt.Checked)
-                        else:
-                            child.setCheckState(0, Qt.Unchecked)
-                        childlist.append([child, []])
-                    else:
-                        child = QTreeWidgetItem(parent)
-                        child.setFlags(child.flags() | Qt.ItemIsUserCheckable)
-                        child.setText(0, j[0])
-                        if i[0] + "::" + j[0] in self.savedtags:
-                            child.setCheckState(0, Qt.Checked)
-                        else:
-                            child.setCheckState(0, Qt.Unchecked)
-                        grandchildlist = []
-                        for k in j[1]:
-                            if not k[1]:
-                                grandchild = QTreeWidgetItem(child)
-                                grandchild.setFlags(grandchild.flags() | Qt.ItemIsUserCheckable)
-                                grandchild.setText(0, k[0])
-                                if i[0] + "::" + j[0] + "::" + k[0] in self.savedtags:
-                                    grandchild.setCheckState(0, Qt.Checked)
-                                else:
-                                    grandchild.setCheckState(0, Qt.Unchecked)
-                                grandchildlist.append([grandchild, []])
-                            else:
-                                grandchild = QTreeWidgetItem(child)
-                                grandchild.setFlags(grandchild.flags() | Qt.ItemIsUserCheckable)
-                                grandchild.setText(0, k[0])
-                                if i[0] + "::" + j[0] + "::" + k[0] in self.savedtags:
-                                    grandchild.setCheckState(0, Qt.Checked)
-                                else:
-                                    grandchild.setCheckState(0, Qt.Unchecked)
-                                greatgrandchildlist = []
-                                for l in k[1]:
-                                    greatgrandchild = QTreeWidgetItem(grandchild)
-                                    greatgrandchild.setFlags(greatgrandchild.flags() | Qt.ItemIsUserCheckable)
-                                    greatgrandchild.setText(0, l[0])
-                                    if i[0] + "::" + j[0] + "::" + k[0] + "::" + l[0] in self.savedtags:
-                                        greatgrandchild.setCheckState(0, Qt.Checked)
-                                    else:
-                                        greatgrandchild.setCheckState(0, Qt.Unchecked)
-                                    greatgrandchildlist.append([greatgrandchild, []])
-                                grandchildlist.append([grandchild, greatgrandchildlist])
-                        childlist.append([child, grandchildlist])
-                parentlist.append([parent, childlist])
-        btn = QPushButton("OK", parentwindow)
-        btn.move(100, 220)
-        btn.clicked.connect(self.tagAssign)
-        parentwindow.exec_()
-    def tagAssign(self):
-        checked = self.checked = []
-        for item in self.parentlist:
-            if item[0].checkState(0) == Qt.Checked:
-                checked.append(item[0].text(0))
-            if item[1]:
-                for jtem in item[1]:
-                    if jtem[0].checkState(0) == Qt.Checked:
-                        checked.append(item[0].text(0) + "::" + jtem[0].text(0))
-                    if jtem[1]:
-                        for ktem in jtem[1]:
-                            if ktem[0].checkState(0) == Qt.Checked:
-                                checked.append(item[0].text(0) + "::" + jtem[0].text(0) + "::" + ktem[0].text(0))
-                            if ktem[1]:
-                                for ltem in ktem[1]:
-                                    if ltem[0].checkState(0) == Qt.Checked:
-                                        checked.append(item[0].text(0) + "::" + jtem[0].text(0) + "::" + ktem[0].text(0) + "::" + ltem[0].text(0))
-        with open("_tags.json", "w") as f:
-            json.dump(checked, f)
-        self.parentwindow.done(QDialog.Accepted)
 
 tags = Tags()
 
