@@ -11,8 +11,6 @@ import inspect
 import os
 
 config = mw.addonManager.getConfig(__name__)
-currentdirname = os.path.dirname(os.path.abspath(
-    inspect.getfile(inspect.currentframe())))
 
 
 def cardIdsFromDeckIds(queryDb, deckIds):
@@ -260,7 +258,6 @@ def DeckPokemon():
     evolution1 = []
     evolutionLevel2 = []
     evolution2 = []
-
 
     def load_pokemon_gen(csv_path):
         csv_fpath = currentdirname / "pokemon_evolutions" / csv_path
