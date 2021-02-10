@@ -77,8 +77,9 @@ def _show(data, title, subtitle):
 
     # If single Pokemon, show centered picture with name and level below
     if type(data) == tuple:
+        name = data[0]
         # Don't show level for egg
-        if data[0] == "Egg":
+        if name == "Egg":
             if len(data) == 4:
                 if int(data[2]) == 1:
                     text = ("%s (needs a lot more time to hatch)" % data[3])
