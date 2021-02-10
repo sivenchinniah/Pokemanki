@@ -197,10 +197,8 @@ def TagPokemon():
                     modifiedtagmon.append(item)
     else:
         modifiedtagmon = []
-    if os.path.exists("_tagmonsettings.json"):
-        thresholdsettings = json.load(open("_tagmonsettings.json"))
-    else:
-        thresholdsettings = [50, 125, 250, 375, 500]
+    thresholdsettings = get_json("_tagmonsettings.json", [
+                                 50, 125, 250, 375, 500])
 
     pokemonlist = []
     tiers = []
@@ -255,10 +253,7 @@ def TagPokemon():
     results = TagStats()
     if len(results) == 0:
         return
-    if os.path.exists("_prestigelist.json"):
-        prestigelist = json.load(open("_prestigelist.json"))
-    else:
-        prestigelist = []
+    prestigelist = get_json("_prestigelist.json", [])
     for item in results:
         result = item[1]
         sumivl = 0
