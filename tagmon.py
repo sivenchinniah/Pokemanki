@@ -38,7 +38,7 @@ def tagmonDisplay():
     return result
 
 
-def _show(self, data, title, subtitle):
+def _show(data, title, subtitle):
     # Set text equal to title text to start
     txt = "<h1>{}</h1>{}".format(title, subtitle)
     # Return empty if no data
