@@ -27,10 +27,6 @@ def tagmonDisplay():
         shutil.copytree(pkmnimgfolder, "%s/pokemon_images" % mediafolder)
     if os.path.exists("%s/progress_bars" % mediafolder) == False and os.path.exists(progressbarfolder):
         shutil.copytree(progressbarfolder, "%s/progress_bars" % mediafolder)
-    if os.path.exists("_tags.json"):
-        savedtags = json.load(open("_tags.json"))
-    else:
-        savedtags = []
     tagmon = TagPokemon()
     result = ""
     if tagmon:
@@ -80,10 +76,7 @@ def _show(data, title, subtitle):
                 pokemon_progress_text.append("")
     pokemon_text = []
     table_size = 0
-    if os.path.exists("_prestigelist.json"):
-        prestigelist = json.load(open("_prestigelist.json"))
-    else:
-        prestigelist = []
+    prestigelist = get_json("_prestigelist.json", [])
     for name, tag, level, nickname in pokemon_collection:
         if int(float(level)) < 5:
             if nickname:
@@ -180,12 +173,9 @@ def _show(data, title, subtitle):
 
 
 def TagPokemon():
-    if os.path.exists("_tags.json"):
-        savedtags = json.load(open("_tags.json"))
-    else:
-        savedtags = []
-    if os.path.exists("_tagmon.json"):
-        tagmonlist = json.load(open('_tagmon.json'))
+    savedtags = get_json("_tags.json", [])
+    tagmonlist = get_json('_tagmon.json', [])
+    if tagmonlist:
         sortedtagmon = list(reversed(tagmonlist))
         modifiedtagmon = []
         for item in sortedtagmon:
@@ -414,8 +404,7 @@ def TagPokemon():
         multiData.append(displayData)
 
     # After iterating through each deck, store data into pokemanki.json
-    with open("_tagmon.json", "w") as f:
-        json.dump(modifiedtagmon, f)
+    write_json("_tagmon.json", modifiedtagmon)
     # Only display message if changes
     if msgtxt != "Hello Pokémon Trainer!":
         msgbox2 = QMessageBox()
@@ -427,10 +416,7 @@ def TagPokemon():
 
 
 def TagStats():
-    if os.path.exists("_tags.json"):
-        savedtags = json.load(open("_tags.json"))
-    else:
-        savedtags = []
+    savedtags = get_json("_tags.json", [])
     resultlist = []
     for item in savedtags:
         result = mw.col.db.all(

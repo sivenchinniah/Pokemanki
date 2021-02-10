@@ -106,10 +106,7 @@ class Trades:
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
 
         self.allpokemon = pokemon_records
-        if os.path.exists("%s/_decksortags.json" % mediafolder):
-            self.f = json.load(open("%s/_decksortags.json" % mediafolder))
-        else:
-            self.f = ""
+        self.f = get_json("_decksortags.json", "")
 
     def newTrades(self):
         self.trades = []
@@ -117,8 +114,7 @@ class Trades:
         f = self.f
         if f:
             if os.path.exists("%s/_tagmon.json" % self.mediafolder):
-                deckmonlist = json.load(
-                    open("%s/_tagmon.json" % self.mediafolder))
+                deckmonlist = load_json("_tagmon.json", [])
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 noeggslist = []
                 for item in sorteddeckmonlist:
@@ -140,9 +136,8 @@ class Trades:
                 nopokemon.exec_()
                 return
         else:
-            if os.path.exists("%s/_pokemanki.json" % self.mediafolder):
-                deckmonlist = json.load(
-                    open("%s/_pokemanki.json" % self.mediafolder))
+            deckmonlist = get_json("_pokemanki.json", None)
+            if deckmonlist:
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 noeggslist = []
                 for item in sorteddeckmonlist:
@@ -221,14 +216,13 @@ class Trades:
         else:
             tradeData = [date, self.trades, "decks"]
         testData = [date, self.trades, possiblehaveslist]
-        with open("_trades.json", "w") as f:
-            json.dump(tradeData, f)
+        write_json("_trades.json", tradeData)
 
     def tradeFunction(self):
         # show a message box
         f = self.f
-        if os.path.exists("_trades.json"):
-            tradeData = json.load(open("_trades.json"))
+        tradeData = get_json("_trades.json", None)
+        if tradeData:
             date = dt.today().strftime("%d/%m/%Y")
             if date == tradeData[0] and len(tradeData) == 3:
                 if f == tradeData[2]:
@@ -237,13 +231,13 @@ class Trades:
                     self.trades = tradeData[1]
                 else:
                     self.newTrades()
-                    tradeData = json.load(open("_trades.json"))
+                    tradeData = get_json("_trades.json")
             else:
                 self.newTrades()
-                tradeData = json.load(open("_trades.json"))
+                tradeData = get_json("_trades.json")
         else:
             self.newTrades()
-            tradeData = json.load(open("_trades.json"))
+            tradeData = get_json("_trades.json")
         tradewindow = self.tradewindow
         tradewindow.setWindowTitle("Pokemanki")
         tradewindow.setWindowModality(Qt.ApplicationModal)
@@ -313,9 +307,8 @@ class Trades:
         possiblefits = []
         f = self.f
         if f:
-            if os.path.exists("%s/_tagmon.json" % self.mediafolder):
-                deckmonlist = json.load(
-                    open("%s/_tagmon.json" % self.mediafolder))
+            deckmonlist = get_json("_tagmon.json")
+            if deckmonlist:
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
                 for item in sorteddeckmonlist:
@@ -333,9 +326,8 @@ class Trades:
                 nopokemon.exec_()
                 return
         else:
-            if os.path.exists("%s/_pokemanki.json" % self.mediafolder):
-                deckmonlist = json.load(
-                    open("%s/_pokemanki.json" % self.mediafolder))
+            deckmonlist = get_json("_pokemanki.json", None)
+            if deckmonlist:
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
                 for item in sorteddeckmonlist:
@@ -411,8 +403,7 @@ class Trades:
                     modifieddeckmonlist.append(newpokemon)
                 else:
                     modifieddeckmonlist.append(item)
-            with open(("%s/_pokemanki.json" % self.mediafolder), "w") as f:
-                json.dump(modifieddeckmonlist, f)
+            write_json("_pokemanki.json", modifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
             tradedone = QMessageBox()
             tradedone.setWindowTitle("Pokemanki")
@@ -426,9 +417,8 @@ class Trades:
         possiblefits = []
         f = self.f
         if f:
-            if os.path.exists("%s/_tagmon.json" % self.mediafolder):
-                deckmonlist = json.load(
-                    open("%s/_tagmon.json" % self.mediafolder))
+            deckmonlist = get_json("_tagmon.json")
+            if deckmonlist:
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
                 for item in sorteddeckmonlist:
@@ -446,9 +436,8 @@ class Trades:
                 nopokemon.exec_()
                 return
         else:
-            if os.path.exists("%s/_pokemanki.json" % self.mediafolder):
-                deckmonlist = json.load(
-                    open("%s/_pokemanki.json" % self.mediafolder))
+            deckmonlist = get_json("_pokemanki.json", None)
+            if deckmonlist:
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
                 for item in sorteddeckmonlist:
@@ -524,8 +513,7 @@ class Trades:
                     modifieddeckmonlist.append(newpokemon)
                 else:
                     modifieddeckmonlist.append(item)
-            with open(("%s/_pokemanki.json" % self.mediafolder), "w") as f:
-                json.dump(modifieddeckmonlist, f)
+            write_json("_pokemanki.json", modifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
             tradedone = QMessageBox()
             tradedone.setWindowTitle("Pokemanki")
@@ -539,9 +527,8 @@ class Trades:
         possiblefits = []
         f = self.f
         if f:
-            if os.path.exists("%s/_tagmon.json" % self.mediafolder):
-                deckmonlist = json.load(
-                    open("%s/_tagmon.json" % self.mediafolder))
+            deckmonlist = get_json("_tagmon.json", None)
+            if deckmonlist:
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
                 for item in sorteddeckmonlist:
@@ -559,9 +546,8 @@ class Trades:
                 nopokemon.exec_()
                 return
         else:
-            if os.path.exists("%s/_pokemanki.json" % self.mediafolder):
-                deckmonlist = json.load(
-                    open("%s/_pokemanki.json" % self.mediafolder))
+            deckmonlist = get_json("_pokemanki.json", None)
+            if deckmonlist:
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
                 for item in sorteddeckmonlist:
@@ -637,8 +623,7 @@ class Trades:
                     modifieddeckmonlist.append(newpokemon)
                 else:
                     modifieddeckmonlist.append(item)
-            with open(("%s/_pokemanki.json" % self.mediafolder), "w") as f:
-                json.dump(modifieddeckmonlist, f)
+            write_json("_pokemanki.json", modifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
             tradedone = QMessageBox()
             tradedone.setWindowTitle("Pokemanki")

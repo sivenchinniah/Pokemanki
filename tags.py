@@ -3,6 +3,8 @@ import json
 from aqt.qt import *
 from aqt import mw
 
+from .utils import *
+
 
 class Tags:
     def __init__(self):
@@ -10,10 +12,7 @@ class Tags:
         self.alltags = []
 
     def tagMenu(self):
-        if os.path.exists("_tags.json"):
-            self.savedtags = json.load(open("_tags.json"))
-        else:
-            self.savedtags = []
+        self.savedtags = get_json("_tags.json", [])
         rawtags = mw.col.tags.all()
         alltags = self.alltags
         for item in rawtags:
@@ -214,6 +213,6 @@ class Tags:
                                     if ltem[0].checkState(0) == Qt.Checked:
                                         checked.append(item[0].text(
                                             0) + "::" + jtem[0].text(0) + "::" + ktem[0].text(0) + "::" + ltem[0].text(0))
-        with open("_tags.json", "w") as f:
-            json.dump(checked, f)
+
+        write_json("_tags.json", checked)
         self.parentwindow.done(QDialog.Accepted)
