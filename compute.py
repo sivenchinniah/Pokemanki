@@ -74,6 +74,36 @@ def loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolu
     return
 
 
+def load_pokemon_gen_all(pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2):
+    def load_pokemon_gen(csv_name):
+        csv_fpath = currentdirname / "pokemon_evolutions" / csv_name
+        loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
+                               evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+
+    load_pokemon_gen("pokemon_gen1.csv")
+    if config['gen2']:
+        load_pokemon_gen("pokemon_gen2.csv")
+        if config['gen4_evolutions']:
+            load_pokemon_gen("pokemon_gen1_plus2_plus4.csv")
+            load_pokemon_gen("pokemon_gen2_plus4.csv")
+        else:
+            load_pokemon_gen("pokemon_gen1_plus2_no4.csv")
+            load_pokemon_gen("pokemon_gen2_no4.csv")
+    else:
+        if config['gen4_evolutions']:
+            # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
+            # so let's just include gen 2 for these evolution lines
+            load_pokemon_gen("pokemon_gen1_plus2_plus4.csv")
+        else:
+            load_pokemon_gen("pokemon_gen1_no2_no4.csv")
+    if config['gen3']:
+        load_pokemon_gen("pokemon_gen3.csv")
+    if config['gen4']:
+        load_pokemon_gen("pokemon_gen4.csv")
+    if config['gen5']:
+        load_pokemon_gen("pokemon_gen5.csv")
+
+
 def randomStarter():
     available_generations = [1]
     if config['gen2']:
@@ -258,37 +288,8 @@ def DeckPokemon():
     evolution1 = []
     evolutionLevel2 = []
     evolution2 = []
-
-    def load_pokemon_gen(csv_path):
-        csv_fpath = currentdirname / "pokemon_evolutions" / csv_path
-        loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
-                               evolutionLevel1, evolution1, evolutionLevel2, evolution2)
-    load_pokemon_gen("pokemon_gen1.csv")
-    if config['gen2']:
-        load_pokemon_gen("pokemon_gen2.csv")
-        if config['gen4_evolutions']:
-            load_pokemon_gen("pokemon_gen1_plus2_plus4.csv")
-            load_pokemon_gen("pokemon_gen2_plus4.csv")
-        else:
-            load_pokemon_gen("pokemon_gen1_plus2_no4.csv")
-            load_pokemon_gen("pokemon_gen2_no4.csv")
-
-    else:
-        if config['gen4_evolutions']:
-            # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
-            # so let's just include gen 2 for these evolution lines
-            load_pokemon_gen("pokemon_gen1_plus2_plus4.csv")
-        else:
-            load_pokemon_gen("pokemon_gen1_no2_no4.csv")
-
-    if config['gen3']:
-        load_pokemon_gen("pokemon_gen3.csv")
-
-    if config['gen4']:
-        load_pokemon_gen("pokemon_gen4.csv")
-
-    if config['gen5']:
-        load_pokemon_gen("pokemon_gen5.csv")
+    load_pokemon_gen_all(pokemonlist, tiers, evolutionLevel1,
+                         evolution1, evolutionLevel2, evolution2)
 
     # Zip lists into list of tuples
     pokemon_tuple = tuple(
@@ -536,36 +537,8 @@ def MultiPokemon():
     evolutionLevel2 = []
     evolution2 = []
 
-    def load_pokemon_gen(csv_path):
-        csv_fpath = currentdirname / "pokemon_evolutions" / csv_path
-        loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
-                               evolutionLevel1, evolution1, evolutionLevel2, evolution2)
-    load_pokemon_gen("pokemon_gen1.csv")
-    if config['gen2']:
-        load_pokemon_gen("pokemon_gen2.csv")
-        if config['gen4_evolutions']:
-            load_pokemon_gen("pokemon_gen1_plus2_plus4.csv")
-            load_pokemon_gen("pokemon_gen2_plus4.csv")
-        else:
-            load_pokemon_gen("pokemon_gen1_plus2_no4.csv")
-            load_pokemon_gen("pokemon_gen2_no4.csv")
-
-    else:
-        if config['gen4_evolutions']:
-            # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
-            # so let's just include gen 2 for these evolution lines
-            load_pokemon_gen("pokemon_gen1_plus2_plus4.csv")
-        else:
-            load_pokemon_gen("pokemon_gen1_no2_no4.csv")
-
-    if config['gen3']:
-        load_pokemon_gen("pokemon_gen3.csv")
-
-    if config['gen4']:
-        load_pokemon_gen("pokemon_gen4.csv")
-
-    if config['gen5']:
-        load_pokemon_gen("pokemon_gen5.csv")
+    load_pokemon_gen_all(pokemonlist, tiers, evolutionLevel1,
+                         evolution1, evolutionLevel2, evolution2)
 
     pokemon_tuple = tuple(
         zip(pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2))

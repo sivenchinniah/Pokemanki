@@ -238,67 +238,62 @@ def _show(data, title, subtitle):
             pokemon_held_items.append(held)
             pokemon_is_special.append(special)
 
-            while table_size < (len(pokemon_text) - 2):
+            def get(array, index):
+                if index < len(array):
+                    return array[index]
+                else:
+                    return ""
+
+            def format_table_image(index):
+                image_name = ""
+                title = ""
+                if index < len(pokemon_names) and index < len(pokemon_is_special) and index < len(pokemon_decks):
+                    image_name = pokemon_names[index] + \
+                        pokemon_is_special[index]
+                    title = mw.col.decks.name(pokemon_decks[index])
+
+                return table_image_html(image_name, title)
+
+            def format_table_text(index):
+                bolded = ""
+                subtext = ""
+                if index < len(pokemon_text):
+                    bolded = pokemon_text[index]
+                    subtext = pokemon_held_items[index]
+
+                return table_text_html(bolded, subtext, True)
+
+            def format_table_progress(index):
+                text = ""
+                if index < len(pokemon_progress_text):
+                    text = pokemon_progress_text[index]
+
+                return table_text_html(text)
+
+            while table_size < len(pokemon_text):
                 #   style="position:absolute; top: 1000; right: 1000"
-                table_text += (("""<tr>
-                                   <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                                   <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                                   <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                                   </tr>""") % (pokemon_names[table_size] + pokemon_is_special[table_size], mw.col.decks.name(pokemon_decks[table_size]),
-                                                pokemon_names[table_size+1] + pokemon_is_special[table_size+1], mw.col.decks.name(
-                                                    pokemon_decks[table_size+1]),
-                                                pokemon_names[table_size+2] + pokemon_is_special[table_size+2], mw.col.decks.name(pokemon_decks[table_size+2])))
-                table_text += (("""<tr>
-                                   <td height = 30 width = 250 align = center><b>%s</b>%s</td>
-                                   <td height = 30 width = 250 align = center><b>%s</b>%s</td>
-                                   <td height = 30 width = 250 align = center><b>%s</b>%s</td>
-                                   </tr>""") % (pokemon_text[table_size], pokemon_held_items[table_size],
-                                                pokemon_text[table_size +
-                                                             1], pokemon_held_items[table_size+1],
-                                                pokemon_text[table_size+2], pokemon_held_items[table_size+2]))
-                table_text += (("""<tr>
-                                   <td height = 30 width = 250 align = center>%s</td>
-                                   <td height = 30 width = 250 align = center>%s</td>
-                                   <td height = 30 width = 250 align = center>%s</td>
-                                   </tr>""") % (pokemon_progress_text[table_size], pokemon_progress_text[table_size+1], pokemon_progress_text[table_size+2]))
+                table_text += (
+                    "<tr>",
+                    format_table_image(table_size),
+                    format_table_image(table_size + 1),
+                    format_table_image(table_size + 2),
+                    "</tr>"
+                ).join("\n")
+                table_text += (
+                    "<tr>",
+                    format_table_text(table_size),
+                    format_table_text(table_size + 1),
+                    format_table_text(table_size + 2),
+                    "</tr>"
+                ).join("\n")
+                table_text += (
+                    "<tr>",
+                    format_table_progress(table_size),
+                    format_table_progress(table_size + 1),
+                    format_table_progress(table_size + 2),
+                    "</tr>"
+                ).join("\n")
                 table_size += 3
-        # Dealing with incomplete rows
-        if len(pokemon_text) % 3 == 0:
-            pass
-        elif len(pokemon_text) % 3 == 1:
-            table_text += (("""<tr>
-                               <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                               <td height = 250 width = 250 align = center></td>
-                               <td height = 250 width = 250 align = center></td>
-                               </tr>""") % (pokemon_names[table_size] + pokemon_is_special[table_size], mw.col.decks.name(pokemon_decks[table_size])))
-            table_text += (("""<tr>
-                               <td height = 30 width = 250 align = center><b>%s</b>%s</td>
-                               <td height = 30 width = 250 align = center></td>
-                               <td height = 30 width = 250 align = center></td>
-                               </tr>""") % (pokemon_text[table_size], pokemon_held_items[table_size]))
-            table_text += (("""<tr>
-                               <td height = 30 width = 250 align = center>%s</td>
-                               <td height = 30 width = 250 align = center></td>
-                               <td height = 30 width = 250 align = center></td>
-                               </tr>""") % (pokemon_progress_text[table_size]))
-        elif len(pokemon_text) % 3 == 2:
-            table_text += (("""<tr>
-                               <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                               <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                               <td height = 250 width = 250 align = center></td>
-                               </tr>""") % (pokemon_names[table_size] + pokemon_is_special[table_size], mw.col.decks.name(pokemon_decks[table_size]),
-                                            pokemon_names[table_size+1] + pokemon_is_special[table_size+1], mw.col.decks.name(pokemon_decks[table_size+1])))
-            table_text += (("""<tr>
-                               <td height = 30 width = 250 align = center><b>%s</b>%s</td>
-                               <td height = 30 width = 250 align = center><b>%s</b>%s</td>
-                               <td height = 30 width = 250 align = center></td>
-                               </tr>""") % (pokemon_text[table_size], pokemon_held_items[table_size],
-                                            pokemon_text[table_size+1], pokemon_held_items[table_size+1]))
-            table_text += (("""<tr>
-                               <td height = 30 width = 250 align = center>%s</td>
-                               <td height = 30 width = 250 align = center>%s</td>
-                               <td height = 30 width = 250 align = center></td>
-                               </tr>""") % (pokemon_progress_text[table_size], pokemon_progress_text[table_size+1]))
         # Assign table_text to txt
         txt += "<table width = 750>" + table_text + "</table>"
         # Make bottom line using function from stats.py and assign to text_lines

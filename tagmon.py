@@ -12,7 +12,7 @@ import shutil
 from typing import List
 
 from .utils import *
-from .compute import loadPokemonGenerations
+from .compute import load_pokemon_gen_all
 
 
 config = mw.addonManager.getConfig(__name__)
@@ -111,57 +111,37 @@ def _show(data, title, subtitle):
                 else:
                     text = ("%s (Level %s)" % (name, int(float(level))))
         pokemon_text.append(text)
-    while table_size < (len(pokemon_text) - 2):
-        table_text += (("""<tr>
-                        <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                        <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                        <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                        </tr>""") % (pokemon_names[table_size], pokemon_tags[table_size], pokemon_names[table_size+1], pokemon_tags[table_size+1], pokemon_names[table_size+2], pokemon_tags[table_size+2]))
-        table_text += (("""<tr>
-                           <td height = 30 width = 250 align = center><b>%s</b></td>
-                           <td height = 30 width = 250 align = center><b>%s</b></td>
-                           <td height = 30 width = 250 align = center><b>%s</b></td>
-                           </tr>""") % (pokemon_text[table_size], pokemon_text[table_size+1], pokemon_text[table_size+2]))
-        table_text += (("""<tr>
-                           <td height = 30 width = 250 align = center>%s</td>
-                           <td height = 30 width = 250 align = center>%s</td>
-                           <td height = 30 width = 250 align = center>%s</td>
-                           </tr>""") % (pokemon_progress_text[table_size], pokemon_progress_text[table_size+1], pokemon_progress_text[table_size+2]))
+
+    def get(array, index):
+        if index < len(array):
+            return array[index]
+        else:
+            return ""
+
+    while table_size < len(pokemon_text):
+        table_text += (
+            "<tr>",
+            table_image_html(get(pokemon_names, table_size)),
+            table_image_html(get(pokemon_names, table_size + 1)),
+            table_image_html(get(pokemon_names, table_size + 2)),
+            "</tr>"
+        ).join("\n")
+        table_text += (
+            "<tr>",
+            table_text_html(get(pokemon_text, table_size), "", True),
+            table_text_html(get(pokemon_text, table_size + 1), "", True),
+            table_text_html(get(pokemon_text, table_size + 2), "", True),
+            "</tr>"
+        ).join("\n")
+        table_text += (
+            "<tr>",
+            table_text_html(get(pokemon_progress_text, table_size)),
+            table_text_html(get(pokemon_progress_text, table_size + 1)),
+            table_text_html(get(pokemon_progress_text, table_size + 2)),
+            "</tr>"
+        ).join("\n")
         table_size += 3
-    if len(pokemon_text) % 3 == 0:
-        pass
-    elif len(pokemon_text) % 3 == 1:
-        table_text += (("""<tr>
-                            <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                           <td height = 250 width = 250 align = center></td>
-                           <td height = 250 width = 250 align = center></td>
-                           </tr>""") % (pokemon_names[table_size], pokemon_tags[table_size]))
-        table_text += (("""<tr>
-                           <td height = 30 width = 250 align = center><b>%s</b></td>
-                           <td height = 30 width = 250 align = center></td>
-                           <td height = 30 width = 250 align = center></td>
-                           </tr>""") % (pokemon_text[table_size]))
-        table_text += (("""<tr>
-                           <td height = 30 width = 250 align = center>%s</td>
-                            <td height = 30 width = 250 align = center></td>
-                           <td height = 30 width = 250 align = center></td>
-                           </tr>""") % (pokemon_progress_text[table_size]))
-    elif len(pokemon_text) % 3 == 2:
-        table_text += (("""<tr>
-                            <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                           <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                           <td height = 250 width = 250 align = center></td>
-                           </tr>""") % (pokemon_names[table_size], pokemon_tags[table_size], pokemon_names[table_size+1], pokemon_tags[table_size+1]))
-        table_text += (("""<tr>
-                           <td height = 30 width = 250 align = center><b>%s</b></td>
-                           <td height = 30 width = 250 align = center><b>%s</b></td>
-                            <td height = 30 width = 250 align = center></td>
-                           </tr>""") % (pokemon_text[table_size], pokemon_text[table_size+1]))
-        table_text += (("""<tr>
-                           <td height = 30 width = 250 align = center>%s</td>
-                           <td height = 30 width = 250 align = center>%s</td>
-                            <td height = 30 width = 250 align = center></td>
-                           </tr>""") % (pokemon_progress_text[table_size], pokemon_progress_text[table_size+1]))
+
         # Assign table_text to txt
     txt += "<table width = 750>" + table_text + "</table>"
     # Make bottom line using function from stats.py and assign to text_lines
@@ -196,37 +176,8 @@ def TagPokemon():
     evolution1 = []
     evolutionLevel2 = []
     evolution2 = []
-
-    def load_pokemon_gen(csv_path):
-        csv_fpath = currentdirname / "pokemon_evolutions" / csv_path
-        loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
-                               evolutionLevel1, evolution1, evolutionLevel2, evolution2)
-    load_pokemon_gen("pokemon_gen1.csv")
-    if config['gen2']:
-        load_pokemon_gen("pokemon_gen2.csv")
-        if config['gen4_evolutions']:
-            load_pokemon_gen("pokemon_gen1_plus2_plus4.csv")
-            load_pokemon_gen("pokemon_gen2_plus4.csv")
-        else:
-            load_pokemon_gen("pokemon_gen1_plus2_no4.csv")
-            load_pokemon_gen("pokemon_gen2_no4.csv")
-
-    else:
-        if config['gen4_evolutions']:
-            # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
-            # so let's just include gen 2 for these evolution lines
-            load_pokemon_gen("pokemon_gen1_plus2_plus4.csv")
-        else:
-            load_pokemon_gen("pokemon_gen1_no2_no4.csv")
-
-    if config['gen3']:
-        load_pokemon_gen("pokemon_gen3.csv")
-
-    if config['gen4']:
-        load_pokemon_gen("pokemon_gen4.csv")
-
-    if config['gen5']:
-        load_pokemon_gen("pokemon_gen5.csv")
+    load_pokemon_gen_all(pokemonlist, tiers, evolutionLevel1,
+                         evolution1, evolutionLevel2, evolution2)
 
     pokemon_tuple = tuple(
         zip(pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2))

@@ -86,3 +86,20 @@ def line(
 
 def lineTbl(i: List[str]) -> str:
     return "<table width=400>" + "".join(i) + "</table>"
+
+
+def table_image_html(image_name, title=None):
+    if title is None:
+        title = image_name
+    image_el = ""
+    if image_name:
+        image_el = '<img src="/pokemon_images/{}.png" title="{}">'.format(
+            image_name, title)
+    return '<td height=250 width=250 align=center>{}</td>'.format(image_el)
+
+
+def table_text_html(main_text, sub_text="", bold=False):
+    bolded = "{}".format(main_text)
+    if bold:
+        bolded = "<b>{}</b>{}".format(main_text, sub_text)
+    return '<td height=30 width=250 align=center></td>'.format(bolded)
