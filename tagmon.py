@@ -119,27 +119,27 @@ def _show(data, title, subtitle):
             return ""
 
     while table_size < len(pokemon_text):
-        table_text += (
+        table_text += "\n".join((
             "<tr>",
             table_image_html(get(pokemon_names, table_size)),
             table_image_html(get(pokemon_names, table_size + 1)),
             table_image_html(get(pokemon_names, table_size + 2)),
             "</tr>"
-        ).join("\n")
-        table_text += (
+        ))
+        table_text += "\n".join((
             "<tr>",
             table_text_html(get(pokemon_text, table_size), "", True),
             table_text_html(get(pokemon_text, table_size + 1), "", True),
             table_text_html(get(pokemon_text, table_size + 2), "", True),
             "</tr>"
-        ).join("\n")
-        table_text += (
+        ))
+        table_text += "\n".join((
             "<tr>",
             table_text_html(get(pokemon_progress_text, table_size)),
             table_text_html(get(pokemon_progress_text, table_size + 1)),
             table_text_html(get(pokemon_progress_text, table_size + 2)),
             "</tr>"
-        ).join("\n")
+        ))
         table_size += 3
 
         # Assign table_text to txt

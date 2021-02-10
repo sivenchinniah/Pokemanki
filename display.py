@@ -272,27 +272,27 @@ def _show(data, title, subtitle):
 
             while table_size < len(pokemon_text):
                 #   style="position:absolute; top: 1000; right: 1000"
-                table_text += (
+                table_text += "\n".join((
                     "<tr>",
                     format_table_image(table_size),
                     format_table_image(table_size + 1),
                     format_table_image(table_size + 2),
                     "</tr>"
-                ).join("\n")
-                table_text += (
+                ))
+                table_text += "\n".join((
                     "<tr>",
                     format_table_text(table_size),
                     format_table_text(table_size + 1),
                     format_table_text(table_size + 2),
                     "</tr>"
-                ).join("\n")
-                table_text += (
+                ))
+                table_text += "\n".join((
                     "<tr>",
                     format_table_progress(table_size),
                     format_table_progress(table_size + 1),
                     format_table_progress(table_size + 2),
                     "</tr>"
-                ).join("\n")
+                ))
                 table_size += 3
         # Assign table_text to txt
         txt += "<table width = 750>" + table_text + "</table>"
