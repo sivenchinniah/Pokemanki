@@ -1,7 +1,7 @@
 from .utils import *
 from .tags import Tags
 
-import json
+import os
 
 from aqt.qt import *
 
@@ -168,14 +168,25 @@ def ResetPokemon():
     # Make message box
     resetwindow = QMessageBox()
     resetwindow.setWindowTitle("Pokemanki")
-    resetwindow.setText("Are you sure you want to reset your Pokémon?")
+    resetwindow.setText("\n".join((
+        "Are you sure you want to reset your Pokémon?",
+        "This will reset everything including everstone, settings stored in collection.media, etc."
+    )))
     resetwindow.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
     resetwindow.setDefaultButton(QMessageBox.No)
     resetresult = resetwindow.exec_()
     # Clear pokemanki.json if Yes
     if resetresult == QMessageBox.Yes:
-        write_json("_pokemanki.json", [])
-        write_json("_tagmon.json", [])
+        reset_files = [
+            "_pokemanki.json", "_tagmon.json",
+            "_alolanlist.json", "_everstonelist.json", "_everstonepokemonlist.json", "_megastonelist.json",
+            "_pokemankisettings.json", "_prestigelist.json", "_tagmon.json", "_tags.json", "_trades.json"
+        ]
+        for file in reset_files:
+            f = media(file)
+            if f.exists():
+                os.remove(f)
+        # TODO reset everstone? and other stuff?
         # Message box confirming reset
         resetdone = QMessageBox()
         resetdone.setWindowTitle("Pokemanki")
