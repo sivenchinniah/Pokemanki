@@ -10,8 +10,10 @@ from aqt.qt import *
 
 def Nickname():
     f = get_json("_decksortags.json", "")
-    if (mediafolder / "_tagmon.json").exists():
+    if f and (mediafolder / "_tagmon.json").exists():
         deckmonlist = get_json("_tagmon.json")
+    elif not f and (mediafolder / "_pokemanki.json").exists():
+        deckmonlist = get_json("_pokemanki.json")
     else:
         nopokemon = QMessageBox()
         nopokemon.setWindowTitle("Pokemanki")
@@ -182,7 +184,6 @@ def ResetPokemon():
 
 
 def MovetoBottom():
-    write_json("_toporbottom.json", "bottom")
     settingschanged = QMessageBox()
     settingschanged.setWindowTitle("Pokemanki")
     settingschanged.setText(
@@ -191,7 +192,6 @@ def MovetoBottom():
 
 
 def MovetoTop():
-    write_json("_toporbottom.json", "")
     settingschanged = QMessageBox()
     settingschanged.setWindowTitle("Pokemanki")
     settingschanged.setText(

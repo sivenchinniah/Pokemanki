@@ -85,7 +85,6 @@ mw.alolanmenu.addAction(unalolanaction)
 # Wrap pokemonDisplay function of display.py with the todayStats function of anki.stats.py
 addonsfolder = os.path.dirname(currentdirname)
 f = get_json("_decksortags.json", "")
-g = get_json("_toporbottom.json", "")
 
 if f:
     mw.testmenu.addAction(tagsaction)
@@ -95,10 +94,6 @@ else:
     mw.testmenu.addAction(tradeaction)
     display_func = pokemonDisplay
 
-if g:
-    mw.testmenu.addAction(topaction)
-else:
-    mw.testmenu.addAction(bottomaction)
 mw.testmenu.addAction(resetaction)
 
 
