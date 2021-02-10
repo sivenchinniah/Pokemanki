@@ -9,6 +9,7 @@ import random
 import os
 import inspect
 import shutil
+from typing import List
 
 from .utils import *
 from .compute import loadPokemonGenerations
@@ -17,9 +18,7 @@ from .compute import loadPokemonGenerations
 config = mw.addonManager.getConfig(__name__)
 
 
-def tagmonDisplay(*args, **kwargs):
-    self = args[0]
-    old = kwargs['_old']
+def tagmonDisplay():
     # Assign Pokemon Image and Progress Bar folder directory names
     pkmnimgfolder = currentdirname / "pokemon_images"
     progressbarfolder = currentdirname / "progress_bars"
@@ -33,16 +32,15 @@ def tagmonDisplay(*args, **kwargs):
     else:
         savedtags = []
     tagmon = TagPokemon()
-    result = old(self)
+    result = ""
     if tagmon:
-        result += _show(self, tagmon, "Pokémon",
-                        "Your Pokémon")
+        result = _show(tagmon, "Pokémon", "Your Pokémon")
     return result
 
 
 def _show(self, data, title, subtitle):
     # Set text equal to title text to start
-    txt = self._title(_(title), _(subtitle))
+    txt = "<h1>{}</h1>{}".format(title, subtitle)
     # Return empty if no data
     if not data:
         return txt
@@ -174,10 +172,10 @@ def _show(self, data, title, subtitle):
         # Assign table_text to txt
     txt += "<table width = 750>" + table_text + "</table>"
     # Make bottom line using function from stats.py and assign to text_lines
-    self._line(
+    line(
         text_lines,
-        _("<b>Total</b>"),
-        _("</b>%s Pokémon<b>") % _num_pokemon)
+        "<b>Total</b>",
+        "</b>%s Pokémon<b>" % _num_pokemon)
     return txt
 
 

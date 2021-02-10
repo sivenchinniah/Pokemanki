@@ -89,33 +89,44 @@ g = get_json("_toporbottom.json", "")
 
 if f:
     mw.testmenu.addAction(tagsaction)
-    if g:
-        mw.testmenu.addAction(topaction)
-        anki.stats.CollectionStats.easeGraph = \
-            wrap(anki.stats.CollectionStats.easeGraph, tagmonDisplay, pos="")
-    elif os.path.exists("%s/923360400" % addonsfolder):
-        mw.testmenu.addAction(bottomaction)
-        anki.stats.CollectionStats.dueGraph = \
-            wrap(anki.stats.CollectionStats.dueGraph, tagmonDisplay, pos="")
-    else:
-        mw.testmenu.addAction(bottomaction)
-        anki.stats.CollectionStats.todayStats = \
-            wrap(anki.stats.CollectionStats.todayStats, tagmonDisplay, pos="")
+    display_func = tagmonDisplay
 else:
     mw.testmenu.addAction(thresholdaction)
     mw.testmenu.addAction(tradeaction)
-    if g:
-        mw.testmenu.addAction(topaction)
-        anki.stats.CollectionStats.easeGraph = \
-            wrap(anki.stats.CollectionStats.easeGraph, pokemonDisplay, pos="")
-    elif os.path.exists("%s/923360400" % addonsfolder):
-        mw.testmenu.addAction(bottomaction)
-        anki.stats.CollectionStats.dueGraph = \
-            wrap(anki.stats.CollectionStats.dueGraph, pokemonDisplay, pos="")
-    else:
-        mw.testmenu.addAction(bottomaction)
-        anki.stats.CollectionStats.todayStats = \
-            wrap(anki.stats.CollectionStats.todayStats,
-                 pokemonDisplay, pos="")
+    display_func = pokemonDisplay
 
+if g:
+    mw.testmenu.addAction(topaction)
+else:
+    mw.testmenu.addAction(bottomaction)
 mw.testmenu.addAction(resetaction)
+
+
+def _onStatsOpen(statsDialog):
+    display = display_func().replace("`", '"')
+    js = """
+    addPokemanki = function(){{
+        console.log("run")
+        divEl = document.createElement("div");
+        divEl.className = "pokemanki";
+        divEl.innerHTML = `{}`;
+        mainEl = document.getElementById('main');
+        mainEl.parentElement.insertBefore(divEl, mainEl);
+    }}
+    if(document.readyState === 'complete'){{
+        addPokemanki();
+    }}
+    else{{
+        window.addEventListener('load', addPokemanki);
+    }}
+    """.format(display)
+    statsDialog.form.web.eval(js)
+
+
+def onStatsOpen(statsDialog):
+
+    statsDialog.form.web.loadFinished.connect(
+        lambda _: _onStatsOpen(statsDialog))
+
+
+gui_hooks.stats_dialog_will_show.append(onStatsOpen)

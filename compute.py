@@ -102,17 +102,15 @@ def randomStarter():
 # Retrieve id and ivl for each card in a single deck
 
 
-def DeckStats(*args, **kwargs):
-    self = args[0]
-    old = kwargs['_old']
+def DeckStats():
     # result = self.col.db.all("""select id, ivl from cards where did in %s""" %
     #             ids2str(self.col.decks.active()))
-    activeDeckIds = self.col.decks.active()
-    cardIds = cardIdsFromDeckIds(self.col.db, activeDeckIds)
+    activeDeckIds = mw.col.decks.active()
+    cardIds = cardIdsFromDeckIds(mw.col.db, activeDeckIds)
 
     result = []
     for cid in cardIds:
-        ivl = cardInterval(self.col.db, cid)
+        ivl = cardInterval(mw.col.db, cid)
         result.append((cid, ivl))
 
     return result
@@ -120,28 +118,26 @@ def DeckStats(*args, **kwargs):
 # Retrieve id and ivl for each subdeck that does not have subdecks itself
 
 
-def MultiStats(*args, **kwargs):
-    self = args[0]
-    old = kwargs['_old']
+def MultiStats():
     # Get list of subdecks
-    if self.wholeCollection:
+    if mw.col.stats().wholeCollection:
         # Get results for all subdecks in collection
-        alldecks = self.col.decks.allIds()
+        alldecks = mw.col.decks.allIds()
         # Determine which subdecks do not have their own subdecks
         nograndchildren = []
         for item in alldecks:
-            if len(self.col.decks.children(int(item))) == 0 and item != "1":
+            if len(mw.col.decks.children(int(item))) == 0 and item != "1":
                 nograndchildren.append(int(item))
     else:
         # Get results only for all subdecks of selected deck
-        children = self.col.decks.children(self.col.decks.active()[0])
+        children = mw.col.decks.children(mw.col.decks.active()[0])
         childlist = []
         for item in children:
             childlist.append(item[1])
         # Determine which subdecks do not have their own subdecks
         nograndchildren = []
         for item in childlist:
-            if len(self.col.decks.children(item)) == 0:
+            if len(mw.col.decks.children(item)) == 0:
                 nograndchildren.append(item)
     resultlist = []
     # Find results for each card in these decks
@@ -149,11 +145,11 @@ def MultiStats(*args, **kwargs):
         # result = self.col.db.all("""select id, ivl from cards where did == %s""" % item)
 
         # cardIds = self.col.db.all("""select id from cards where did == %s""" % item)
-        cardIds = cardIdsFromDeckIds(self.col.db, [item])
+        cardIds = cardIdsFromDeckIds(mw.col.db, [item])
 
         result = []
         for cid in cardIds:
-            ivl = cardInterval(self.col.db, cid)
+            ivl = cardInterval(mw.col.db, cid)
             result.append((cid, ivl))
 
         resultlist.append(result)
@@ -212,6 +208,7 @@ def FirstPokemon():
             else:
                 Level = 0
             deckmondata = [(deckmon, deck, Level)]
+            print(deckmondata)
             write_json("_pokemanki.json", deckmondata)
             firstpokemon = QMessageBox()
             firstpokemon.setWindowTitle("Pokemanki")
@@ -228,9 +225,7 @@ def FirstPokemon():
 # Assign Pokemon and levels for single deck
 
 
-def DeckPokemon(*args, **kwargs):
-    self = args[0]
-    old = kwargs['_old']
+def DeckPokemon():
 
     FirstPokemon()
     # Get existing pokemon from pokemanki.json
@@ -247,7 +242,7 @@ def DeckPokemon(*args, **kwargs):
                 if item[1] == thing[1]:
                     break
             else:
-                if str(item[1]) in self.col.decks.allIds():
+                if str(item[1]) in mw.col.decks.allIds():
                     modifiedpokemontotal.append(item)
     # If no pokemanki.json, make empty pokemontotal and modifiedpokemontotal lists
     else:
@@ -336,7 +331,7 @@ def DeckPokemon(*args, **kwargs):
             tierdict[tier].append(pokemon)
 
     # Get results from DeckStats
-    result = DeckStats(*args, **kwargs)
+    result = DeckStats()
     # If no results, return
     if len(result) == 0:
         return
@@ -371,7 +366,7 @@ def DeckPokemon(*args, **kwargs):
     nickname = ""
     # Assign Deckmon from modifiedpokemontotal if already assigned
     for item in modifiedpokemontotal:
-        if item[1] == self.col.decks.active()[0]:
+        if item[1] == mw.col.decks.active()[0]:
             deckmon = item[0]
             already_assigned = True
             previouslevel = item[2]
@@ -384,7 +379,7 @@ def DeckPokemon(*args, **kwargs):
             msgbox = QMessageBox()
             msgbox.setWindowTitle("Pokemanki")
             msgbox.setText("Choose a starter Pokémon for the %s deck" %
-                           self.col.decks.name(self.col.decks.active()[0]))
+                           mw.col.decks.name(mw.col.decks.active()[0]))
             msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
             msgbox.addButton("Charmander", QMessageBox.AcceptRole)
             msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
@@ -412,7 +407,7 @@ def DeckPokemon(*args, **kwargs):
     everstonelist = get_json("_everstonelist.json", [])
     everstonepokemonlist = get_json("_everstonepokemonlist.json", [])
     # Set max level to 100
-    if Level > 100 and self.col.decks.active()[0] not in prestigelist:
+    if Level > 100 and mw.col.decks.active()[0] not in prestigelist:
         Level = 100.00
     # Give egg if level < 5
     if Level < 5:
@@ -436,15 +431,15 @@ def DeckPokemon(*args, **kwargs):
 
     # Assign new name to modifiedpokemontotal if not already assigned (making sure to assign Deckmon original name if Eevee or Egg)
     if already_assigned == False and name != "Eevee" and name != "Egg":
-        deckmonData = (name, self.col.decks.active()[0], Level)
+        deckmonData = (name, mw.col.decks.active()[0], Level)
         modifiedpokemontotal.append(deckmonData)
     elif already_assigned == False:
-        deckmonData = (deckmon, self.col.decks.active()[0], Level)
+        deckmonData = (deckmon, mw.col.decks.active()[0], Level)
         modifiedpokemontotal.append(deckmonData)
     # If already assigned, assign new level/name to modifiedpokemontotal if new level/name
     if already_assigned == True:
         for item in pokemontotal:
-            if item[1] == self.col.decks.active()[0]:
+            if item[1] == mw.col.decks.active()[0]:
                 if name == "Eevee" or name == "Egg":
                     if nickname:
                         if (item[0], item[1], Level, nickname) in modifiedpokemontotal:
@@ -508,7 +503,7 @@ def DeckPokemon(*args, **kwargs):
                 msgtxt += ("\nYour %s has evolved into a %s (Level %s)! (+%s)" %
                            (deckmon, name, int(Level), (int(Level) - int(previouslevel))))
         elif int(previouslevel) < int(Level) and name != "Egg":
-            if self.col.decks.active()[0] in prestigelist:
+            if mw.col.decks.active()[0] in prestigelist:
                 if nickname:
                     msgtxt += ("\n%s is now level %s! (+%s)" % (nickname,
                                                                 int(Level) - 50, (int(Level) - int(previouslevel))))
@@ -537,21 +532,19 @@ def DeckPokemon(*args, **kwargs):
 
     # Set displayData for pokemonDisplay function in display.py
     if nickname:
-        displayData = (name, self.col.decks.active()[0], Level, nickname)
+        displayData = (name, mw.col.decks.active()[0], Level, nickname)
     else:
-        displayData = (name, self.col.decks.active()[0], Level)
+        displayData = (name, mw.col.decks.active()[0], Level)
     # Return displayData
     return displayData
 
 
-def MultiPokemon(*args, **kwargs):
-    self = args[0]
-    old = kwargs['_old']
+def MultiPokemon():
 
     # Same deal as above
     FirstPokemon()
     if media_exists("_pokemanki.json"):
-        pokemontotal = load_json("_pokemanki.json")
+        pokemontotal = get_json("_pokemanki.json")
         sortedpokemontotal = list(reversed(pokemontotal))
         modifiedpokemontotal = []
         for item in sortedpokemontotal:
@@ -559,7 +552,7 @@ def MultiPokemon(*args, **kwargs):
                 if item[1] == thing[1]:
                     break
             else:
-                if str(item[1]) in self.col.decks.allIds():
+                if str(item[1]) in mw.col.decks.allIds():
                     modifiedpokemontotal.append(item)
     else:
         return
@@ -643,10 +636,10 @@ def MultiPokemon(*args, **kwargs):
     # Assign empty list to multiData (to be returned at end)
     multiData = []
     # Get multideck results
-    if self.wholeCollection:
-        results = MultiStats(*args, **kwargs)
+    if mw.col.stats().wholeCollection:
+        results = MultiStats()
     else:
-        results = MultiStats(*args, **kwargs)
+        results = MultiStats()
     # If no results, return
     if len(results) == 0:
         return
@@ -696,7 +689,7 @@ def MultiPokemon(*args, **kwargs):
                 msgbox = QMessageBox()
                 msgbox.setWindowTitle("Pokemanki")
                 msgbox.setText("Choose a starter Pokémon for the %s deck" %
-                               self.col.decks.name(item[0]))
+                               mw.col.decks.name(item[0]))
 
                 starters = randomStarter()
                 for starter in starters:

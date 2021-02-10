@@ -1,4 +1,3 @@
-import inspect
 import os
 from .compute import DeckPokemon, MultiPokemon
 from anki.lang import _
@@ -14,10 +13,7 @@ config = mw.addonManager.getConfig(__name__)
 # Display function that gets wrapped into anki.stats.py
 
 
-def pokemonDisplay(*args, **kwargs):
-    self = args[0]
-    old = kwargs['_old']
-    profilename = mw.pm.name
+def pokemonDisplay():
     # Assign Pokemon Image and Progress Bar folder directory names
     pkmnimgfolder = currentdirname / "pokemon_images"
     progressbarfolder = currentdirname / "progress_bars"
@@ -30,39 +26,39 @@ def pokemonDisplay(*args, **kwargs):
     deckmon = ()
     multideckmon = []
     # Get id of active deck
-    did = self.col.decks.active()
+    did = mw.col.decks.active()
     # See if "Whole Collection" is selected - if so, get all assigned Pokemon and assign to multideckmon
-    if self.wholeCollection:
-        multideckmon = MultiPokemon(*args, **kwargs)
+    if mw.col.stats().wholeCollection:
+        multideckmon = MultiPokemon()
     # If "Whole Collection" not selected, show Pokemon for either single deck or all subdecks and store into multideckmon/deckmon
     elif len(did) > 1:
-        multideckmon = MultiPokemon(*args, **kwargs)
+        multideckmon = MultiPokemon()
     else:
-        deckmon = DeckPokemon(*args, **kwargs)
+        deckmon = DeckPokemon()
 
     # Get old result and add new tables with Pokemon
-    result = old(self)
+    result = ""
     if deckmon:
-        result += _show(self,
-                        deckmon,
-                        "Pokémon",
-                        "Your Pokémon")
+        result += _show(
+            deckmon,
+            "Pokémon",
+            "Your Pokémon")
     elif multideckmon:
-        result += _show(self,
-                        multideckmon,
-                        "Pokémon",
-                        "Your Pokémon")
+        result += _show(
+            multideckmon,
+            "Pokémon",
+            "Your Pokémon")
     # Return result
     return result
 
 
-def _show(self, data, title, subtitle):
+def _show(data, title, subtitle):
 
     # Return empty if no data
     if not data:
         return ""
     # Set text equal to title text to start
-    txt = self._title(_(title), _(subtitle))
+    txt = txt = "<h1>{}</h1>{}".format(title, subtitle)
     # Line text variable, apparently needed for bottom line
     text_lines = []
     # Table text
@@ -77,9 +73,7 @@ def _show(self, data, title, subtitle):
     everstone_html = '<img src="/pokemon_images/item_Everstone.png" hspace="10">'
     megastone_html = '<img src="/pokemon_images/item_Mega_Stone.png" hspace="10">'
     alolan_html = '<img src="/pokemon_images/item_Alolan_Passport.png" hspace="10">'
-    currentdirname = os.path.dirname(os.path.abspath(
-        inspect.getfile(inspect.currentframe())))
-    pkmnimgfolder = currentdirname + "/pokemon_images"
+    pkmnimgfolder = currentdirname / "pokemon_images"
 
     # If single Pokemon, show centered picture with name and level below
     if type(data) == tuple:
@@ -117,6 +111,7 @@ def _show(self, data, title, subtitle):
 
             if data[1] in everstonelist:
                 held += everstone_html
+                # FIX: name is never declared!
                 if name == "Pikachu":
                     special += "_Ash" + str(random.randint(1, 5))
             if data[1] in megastonelist:
@@ -132,7 +127,7 @@ def _show(self, data, title, subtitle):
                     special += "_Alolan"
 
         table_text += (("""<tr>
-                        <td height = 300 width = 300 align = center><img src="/pokemon_images/%s.png" title=%s></td>""") % (data[0] + special, self.col.decks.name(data[1])))
+                        <td height = 300 width = 300 align = center><img src="/pokemon_images/%s.png" title=%s></td>""") % (data[0] + special, mw.col.decks.name(data[1])))
         table_text += (("""<tr>
                            <td height = 30 width = 250 align = center><b>%s</b>%s</td>
                            </tr>""") % (text, held))
@@ -220,9 +215,7 @@ def _show(self, data, title, subtitle):
                 everstone_html = '<img src="/pokemon_images/item_Everstone.png" hspace="10">'
                 megastone_html = '<img src="/pokemon_images/item_Mega_Stone.png" hspace="10">'
                 alolan_html = '<img src="/pokemon_images/item_Alolan_Passport.png" hspace="10">'
-                currentdirname = os.path.dirname(os.path.abspath(
-                    inspect.getfile(inspect.currentframe())))
-                pkmnimgfolder = currentdirname + "/pokemon_images"
+                pkmnimgfolder = currentdirname / "pokemon_images"
 
                 if deck in everstonelist:
                     held += everstone_html
@@ -250,10 +243,10 @@ def _show(self, data, title, subtitle):
                                    <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
                                    <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
                                    <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
-                                   </tr>""") % (pokemon_names[table_size] + pokemon_is_special[table_size], self.col.decks.name(pokemon_decks[table_size]),
-                                                pokemon_names[table_size+1] + pokemon_is_special[table_size+1], self.col.decks.name(
+                                   </tr>""") % (pokemon_names[table_size] + pokemon_is_special[table_size], mw.col.decks.name(pokemon_decks[table_size]),
+                                                pokemon_names[table_size+1] + pokemon_is_special[table_size+1], mw.col.decks.name(
                                                     pokemon_decks[table_size+1]),
-                                                pokemon_names[table_size+2] + pokemon_is_special[table_size+2], self.col.decks.name(pokemon_decks[table_size+2])))
+                                                pokemon_names[table_size+2] + pokemon_is_special[table_size+2], mw.col.decks.name(pokemon_decks[table_size+2])))
                 table_text += (("""<tr>
                                    <td height = 30 width = 250 align = center><b>%s</b>%s</td>
                                    <td height = 30 width = 250 align = center><b>%s</b>%s</td>
@@ -276,7 +269,7 @@ def _show(self, data, title, subtitle):
                                <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
                                <td height = 250 width = 250 align = center></td>
                                <td height = 250 width = 250 align = center></td>
-                               </tr>""") % (pokemon_names[table_size] + pokemon_is_special[table_size], self.col.decks.name(pokemon_decks[table_size])))
+                               </tr>""") % (pokemon_names[table_size] + pokemon_is_special[table_size], mw.col.decks.name(pokemon_decks[table_size])))
             table_text += (("""<tr>
                                <td height = 30 width = 250 align = center><b>%s</b>%s</td>
                                <td height = 30 width = 250 align = center></td>
@@ -292,8 +285,8 @@ def _show(self, data, title, subtitle):
                                <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
                                <td height = 250 width = 250 align = center><img src="/pokemon_images/%s.png" title="%s"></td>
                                <td height = 250 width = 250 align = center></td>
-                               </tr>""") % (pokemon_names[table_size] + pokemon_is_special[table_size], self.col.decks.name(pokemon_decks[table_size]),
-                                            pokemon_names[table_size+1] + pokemon_is_special[table_size+1], self.col.decks.name(pokemon_decks[table_size+1])))
+                               </tr>""") % (pokemon_names[table_size] + pokemon_is_special[table_size], mw.col.decks.name(pokemon_decks[table_size]),
+                                            pokemon_names[table_size+1] + pokemon_is_special[table_size+1], mw.col.decks.name(pokemon_decks[table_size+1])))
             table_text += (("""<tr>
                                <td height = 30 width = 250 align = center><b>%s</b>%s</td>
                                <td height = 30 width = 250 align = center><b>%s</b>%s</td>
@@ -308,11 +301,11 @@ def _show(self, data, title, subtitle):
         # Assign table_text to txt
         txt += "<table width = 750>" + table_text + "</table>"
         # Make bottom line using function from stats.py and assign to text_lines
-        self._line(
+        line(
             text_lines,
-            _("<b>Total</b>"),
-            _("</b>%s Pokémon<b>") % _num_pokemon)
+            "<b>Total</b>",
+            "</b>%s Pokémon<b>" % _num_pokemon)
         # Make table from bottom line and assign to txt
-        txt += self._lineTbl(text_lines)
+        txt += lineTbl(text_lines)
     # Return txt
     return txt

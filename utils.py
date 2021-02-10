@@ -3,6 +3,7 @@ from pathlib import Path
 import json
 import shutil
 import distutils.dir_util
+from typing import List, Union
 
 
 # Find current directory
@@ -45,7 +46,7 @@ def get_json(file_name: str, default=None):
 
 def write_json(file_name: str, value={}):
     file_path = mediafolder / file_name
-    with open(file_path) as f:
+    with open(file_path, "w") as f:
         json.dump(value, f)
 
 
@@ -64,3 +65,24 @@ def get_pokemon():
     else:
         pokemon = get_json("_pokemanki.json")
     return pokemon
+
+
+def line(
+    i: List[str], a: str, b: Union[int, str], bold: bool = True
+) -> None:
+    # T: Symbols separating first and second column in a statistics table. Eg in "Total:    3 reviews".
+    colon = ":"
+    if bold:
+        i.append(
+            ("<tr><td width=200 align=right>%s%s</td><td><b>%s</b></td></tr>")
+            % (a, colon, b)
+        )
+    else:
+        i.append(
+            ("<tr><td width=200 align=right>%s%s</td><td>%s</td></tr>")
+            % (a, colon, b)
+        )
+
+
+def lineTbl(i: List[str]) -> str:
+    return "<table width=400>" + "".join(i) + "</table>"
