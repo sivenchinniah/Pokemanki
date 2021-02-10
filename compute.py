@@ -261,64 +261,37 @@ def DeckPokemon():
     evolutionLevel2 = []
     evolution2 = []
 
-    csv_fpath = os.path.join(
-        currentdirname, "pokemon_evolutions", "pokemon_gen1.csv")
-    loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
-                           evolutionLevel1, evolution1, evolutionLevel2, evolution2)
 
-    if config['gen2']:
-        csv_fpath = os.path.join(
-            currentdirname, "pokemon_evolutions", "pokemon_gen2.csv")
+    def load_pokemon_gen(csv_path):
+        csv_fpath = currentdirname / "pokemon_evolutions" / csv_path
         loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
                                evolutionLevel1, evolution1, evolutionLevel2, evolution2)
-
+    load_pokemon_gen("pokemon_gen1.csv")
+    if config['gen2']:
+        load_pokemon_gen("pokemon_gen2.csv")
         if config['gen4_evolutions']:
-            csv_fpath = os.path.join(
-                currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_plus4.csv")
-            loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
-                                   evolutionLevel1, evolution1, evolutionLevel2, evolution2)
-            csv_fpath = os.path.join(
-                currentdirname, "pokemon_evolutions", "pokemon_gen2_plus4.csv")
-            loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
-                                   evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+            load_pokemon_gen("pokemon_gen1_plus2_plus4.csv")
+            load_pokemon_gen("pokemon_gen2_plus4.csv")
         else:
-            csv_fpath = os.path.join(
-                currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_no4.csv")
-            loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
-                                   evolutionLevel1, evolution1, evolutionLevel2, evolution2)
-            csv_fpath = os.path.join(
-                currentdirname, "pokemon_evolutions", "pokemon_gen2_no4.csv")
-            loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
-                                   evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+            load_pokemon_gen("pokemon_gen1_plus2_no4.csv")
+            load_pokemon_gen("pokemon_gen2_no4.csv")
+
     else:
         if config['gen4_evolutions']:
             # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
             # so let's just include gen 2 for these evolution lines
-            csv_fpath = os.path.join(
-                currentdirname, "pokemon_evolutions", "pokemon_gen1_plus2_plus4.csv")
-            loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
-                                   evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+            load_pokemon_gen("pokemon_gen1_plus2_plus4.csv")
         else:
-            csv_fpath = os.path.join(
-                currentdirname, "pokemon_evolutions", "pokemon_gen1_no2_no4.csv")
-            loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
-                                   evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+            load_pokemon_gen("pokemon_gen1_no2_no4.csv")
 
     if config['gen3']:
-        csv_fpath = os.path.join(
-            currentdirname, "pokemon_evolutions", "pokemon_gen3.csv")
-        loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
-                               evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+        load_pokemon_gen("pokemon_gen3.csv")
+
     if config['gen4']:
-        csv_fpath = os.path.join(
-            currentdirname, "pokemon_evolutions", "pokemon_gen4.csv")
-        loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
-                               evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+        load_pokemon_gen("pokemon_gen4.csv")
+
     if config['gen5']:
-        csv_fpath = os.path.join(
-            currentdirname, "pokemon_evolutions", "pokemon_gen5.csv")
-        loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
-                               evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+        load_pokemon_gen("pokemon_gen5.csv")
 
     # Zip lists into list of tuples
     pokemon_tuple = tuple(
