@@ -102,4 +102,4 @@ def table_text_html(main_text, sub_text="", bold=False):
     bolded = "{}".format(main_text)
     if bold:
         bolded = "<b>{}</b>{}".format(main_text, sub_text)
-    return '<td height=30 width=250 align=center></td>'.format(bolded)
+    return '<td height=30 width=250 align=center>{}</td>'.format(bolded)
