@@ -37,6 +37,8 @@ def pokemonDisplayText(name, id, level, nickname):
     alolan_html = '<img src="/pokemon_images/item_Alolan_Passport.png" hspace="10">'
     pkmnimgfolder = currentdirname / "pokemon_images"
 
+    level = int(float(level))  # float string such as "1.2"
+
     displayname = name
     if nickname:
         displayname = nickname
@@ -45,9 +47,9 @@ def pokemonDisplayText(name, id, level, nickname):
     else:
         if id in prestigelist:
             text = ("%s (Level %s) - Prestiged" %
-                    (displayname, int(level - 50)))
+                    (displayname, level - 50))
         else:
-            text = ("%s (Level %s)" % (displayname, int(level)))
+            text = ("%s (Level %s)" % (displayname, level))
         if id in everstonelist:
             held += everstone_html
             # FIX: name is never declared!
