@@ -153,20 +153,9 @@ def _show(data, title, subtitle):
 
 
 def TagPokemon():
-    savedtags = get_json("_tags.json", [])
     tagmonlist = get_json('_tagmon.json', [])
-    if tagmonlist:
-        sortedtagmon = list(reversed(tagmonlist))
-        modifiedtagmon = []
-        for item in sortedtagmon:
-            for thing in modifiedtagmon:
-                if item[1] == thing[1]:
-                    break
-            else:
-                if item[1] in savedtags:
-                    modifiedtagmon.append(item)
-    else:
-        modifiedtagmon = []
+    modifiedtagmon = []
+
     thresholdsettings = get_json("_tagmonsettings.json", [
                                  50, 125, 250, 375, 500])
 
