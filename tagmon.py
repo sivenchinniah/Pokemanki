@@ -13,6 +13,7 @@ from typing import List
 
 from .utils import *
 from .compute import load_pokemon_gen_all
+from .stats import TagStats
 
 
 config = mw.addonManager.getConfig(__name__)
@@ -353,14 +354,3 @@ def TagPokemon():
         msgbox2.exec_()
     # Return multiData
     return multiData
-
-
-def TagStats():
-    savedtags = get_json("_tags.json", [])
-    resultlist = []
-    for item in savedtags:
-        result = mw.col.db.all(
-            "select c.id, c.ivl from cards c, notes n where c.nid = n.id and n.tags LIKE '%" + item + "%'")
-        resultlist.append(result)
-    results = list(zip(savedtags, resultlist))
-    return results
