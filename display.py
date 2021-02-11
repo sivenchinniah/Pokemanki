@@ -192,56 +192,56 @@ def _show(data, title, subtitle):
             print(pokemon_is_special)
             print(pokemon_decks)
 
-            def format_table_image(index):
-                image_name = ""
-                title = ""
-                if index < len(pokemon_names) and index < len(pokemon_is_special) and index < len(pokemon_decks):
-                    image_name = pokemon_names[index] + \
-                        pokemon_is_special[index]
-                    title = mw.col.decks.name(pokemon_decks[index])
-                print(image_name)
-                return table_image_html(image_name, title)
+        def format_table_image(index):
+            image_name = ""
+            title = ""
+            if index < len(pokemon_names) and index < len(pokemon_is_special) and index < len(pokemon_decks):
+                image_name = pokemon_names[index] + \
+                    pokemon_is_special[index]
+                title = mw.col.decks.name(pokemon_decks[index])
+            print(image_name)
+            return table_image_html(image_name, title)
 
-            def format_table_text(index):
-                bolded = ""
-                subtext = ""
-                if index < len(pokemon_text):
-                    bolded = pokemon_text[index]
-                    subtext = pokemon_held_items[index]
+        def format_table_text(index):
+            bolded = ""
+            subtext = ""
+            if index < len(pokemon_text):
+                bolded = pokemon_text[index]
+                subtext = pokemon_held_items[index]
 
-                return table_text_html(bolded, subtext, True)
+            return table_text_html(bolded, subtext, True)
 
-            def format_table_progress(index):
-                text = ""
-                if index < len(pokemon_progress_text):
-                    text = pokemon_progress_text[index]
+        def format_table_progress(index):
+            text = ""
+            if index < len(pokemon_progress_text):
+                text = pokemon_progress_text[index]
 
-                return table_text_html(text)
+            return table_text_html(text)
 
-            while table_size < len(pokemon_text):
-                #   style="position:absolute; top: 1000; right: 1000"
-                table_text += "\n".join((
-                    "<tr>",
-                    format_table_image(table_size),
-                    format_table_image(table_size + 1),
-                    format_table_image(table_size + 2),
-                    "</tr>"
-                ))
-                table_text += "\n".join((
-                    "<tr>",
-                    format_table_text(table_size),
-                    format_table_text(table_size + 1),
-                    format_table_text(table_size + 2),
-                    "</tr>"
-                ))
-                table_text += "\n".join((
-                    "<tr>",
-                    format_table_progress(table_size),
-                    format_table_progress(table_size + 1),
-                    format_table_progress(table_size + 2),
-                    "</tr>"
-                ))
-                table_size += 3
+        while table_size < len(pokemon_text):
+            #   style="position:absolute; top: 1000; right: 1000"
+            table_text += "\n".join((
+                "<tr>",
+                format_table_image(table_size),
+                format_table_image(table_size + 1),
+                format_table_image(table_size + 2),
+                "</tr>"
+            ))
+            table_text += "\n".join((
+                "<tr>",
+                format_table_text(table_size),
+                format_table_text(table_size + 1),
+                format_table_text(table_size + 2),
+                "</tr>"
+            ))
+            table_text += "\n".join((
+                "<tr>",
+                format_table_progress(table_size),
+                format_table_progress(table_size + 1),
+                format_table_progress(table_size + 2),
+                "</tr>"
+            ))
+            table_size += 3
         # Assign table_text to txt
         txt += "<table width = 750>" + table_text + "</table>"
         # Make bottom line using function from stats.py and assign to text_lines
