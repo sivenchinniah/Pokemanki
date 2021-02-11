@@ -4,6 +4,7 @@ from .utils import *
 from .tags import Tags
 
 from aqt.qt import *
+from aqt.utils import tooltip
 
 # Nickname Settings
 
@@ -235,7 +236,9 @@ def giveEverstone():
             continue
         else:
             everstoneables.append(cb)
-
+    if not everstoneables:
+        tooltip("You don't have any pokemons that can get an everstone")
+        return
     window = QWidget()
     inp, ok = QInputDialog.getItem(
         window, "Pokemanki", "Select a Pokemon you would like to give an everstone to.", sorted(everstoneables), 0, False)
@@ -327,6 +330,9 @@ def giveMegastone():
                 megastoneables.append(cb)
         else:
             continue
+    if not megastoneables:
+        tooltip("You don't have any pokemons that can get a mega stone")
+        return
     window = QWidget()
     inp, ok = QInputDialog.getItem(
         window, "Pokemanki", "Select a Pokemon you would like to give a mega stone to", sorted(megastoneables), 0, False)
@@ -410,6 +416,9 @@ def giveAlolanPassport():
         else:
             alolanables.append(cb)
 
+    if not alolanables:
+        tooltip("You don't have any pokemons that you can give Alolan Passport to")
+        return
     window = QWidget()
     inp, ok = QInputDialog.getItem(
         window, "Pokemanki", "Select a Pokemon you would like to give an Alolan Passport to.", sorted(alolanables), 0, False)
@@ -497,6 +506,9 @@ def PrestigePokemon():
         else:
             continue
     window = QWidget()
+    if not possibleprestiges:
+        tooltip("You don't have any pokemons with level > 60")
+        return
     inp, ok = QInputDialog.getItem(
         window, "Pokemanki", "Select a Pokemon you would like to prestige (decreases level by 50, only availabe for Pokemon with level > 60)", sorted(possibleprestiges), 0, False)
     if inp and ok:
@@ -542,6 +554,9 @@ def UnprestigePokemon():
                     possibleunprestiges.append(cb)
         else:
             continue
+    if not possibleunprestiges:
+        tooltip("You don't have any pokemons with prestige")
+        return
     window = QWidget()
     inp, ok = QInputDialog.getItem(
         window, "Pokemanki", "Select a Pokemon you would like to unprestige", sorted(possibleunprestiges), 0, False)
