@@ -120,7 +120,11 @@ def _show(data, title, subtitle):
 
 def TagPokemon():
     tagmonlist = get_json('_tagmon.json', [])
+    savedtags = get_json("_tags.json", [])
     modifiedtagmon = []
+    for item in reversed(tagmonlist):
+        if item[1] in savedtags:
+            modifiedtagmon.append(item)
 
     thresholdsettings = get_json("_tagmonsettings.json", [
                                  50, 125, 250, 375, 500])
