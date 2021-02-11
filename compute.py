@@ -160,7 +160,7 @@ def FirstPokemon():
     # Determine which subdecks do not have their own subdecks
     nograndchildren = []
     for item in alldecks:
-        if len(mw.col.decks.children(int(item))) == 0 and item != "1":
+        if len(mw.col.decks.children(int(item))) == 0:
             nograndchildren.append(int(item))
     decklist = []
     for item in nograndchildren:
