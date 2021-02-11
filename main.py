@@ -25,7 +25,6 @@ tags = Tags()
 
 # Make actions for settings and reset
 nicknameaction = QAction("Nicknames", mw)
-thresholdaction = QAction("Threshold Settings", mw)
 resetaction = QAction("Reset", mw)
 tradeaction = QAction("Trade", mw)
 toggleaction = QAction("Decks vs. Tags", mw)
