@@ -8,7 +8,7 @@ from aqt.qt import *
 from aqt import mw
 
 from .utils import *
-from .compute import load_pokemon_gen_all
+from .compute import load_pokemon_gen_all, alertMsgText
 from .stats import TagStats
 from .display import pokemonDisplayText
 
@@ -239,49 +239,8 @@ def TagPokemon():
         elif already_assigned == False:
             tagmonData = (tagmon, item[0], Level)
             modifiedtagmon.append(tagmonData)
-        if already_assigned == True:
-            if name == "Egg":
-                if Level == 2 and previouslevel < 2:
-                    if nickname:
-                        msgtxt += "\n%s needs more time to hatch." % nickname
-                    else:
-                        msgtxt += "\nYour egg needs more time to hatch."
-                elif Level == 3 and previouslevel < 3:
-                    if nickname:
-                        msgtxt += "\n%s moves occasionally. It should hatch soon." % nickname
-                    else:
-                        msgtxt += "\nYour egg moves occasionally. It should hatch soon."
-                elif Level == 4 and previouslevel < 4:
-                    if nickname:
-                        msgtxt += "\n%s is making sounds! It's about to hatch!" % nickname
-                    else:
-                        msgtxt += "\nYour egg is making sounds! It's about to hatch!"
-            elif previouslevel < 5:
-                if nickname:
-                    msgtxt += ("\n%s has hatched! It's a %s!" %
-                               (nickname, tagmon))
-                else:
-                    msgtxt += ("\nYour egg has hatched! It's a %s!" % tagmon)
-                previouslevel = Level
-            if name != tagmon and name != "Egg" and int(previouslevel) < int(Level):
-                if nickname:
-                    msgtxt += ("\n%s has evolved into a %s (Level %s)! (+%s)" %
-                               (nickname, name, int(Level), (int(Level) - int(previouslevel))))
-                else:
-                    msgtxt += ("\nYour %s has evolved into a %s (Level %s)! (+%s)" %
-                               (tagmon, name, int(Level), (int(Level) - int(previouslevel))))
-            elif int(previouslevel) < int(Level) and name != "Egg":
-                if nickname:
-                    msgtxt += ("\n%s is now level %s! (+%s)" % (nickname,
-                                                                int(Level), (int(Level) - int(previouslevel))))
-                else:
-                    msgtxt += ("\nYour %s is now level %s! (+%s)" %
-                               (name, int(Level), (int(Level) - int(previouslevel))))
-        if already_assigned == False:
-            if name == "Egg":
-                msgtxt += "\nYou found an egg!"
-            else:
-                msgtxt += ("\nYou caught a %s (Level %s)" % (name, int(Level)))
+        msgtxt += alertMsgText(tagmon, item[0], name, int(Level),
+                               int(previouslevel), nickname, already_assigned)
         if already_assigned == True:
             for thing in tagmonlist:
                 if thing[1] == item[0]:

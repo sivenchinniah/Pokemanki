@@ -8,7 +8,6 @@ from aqt.qt import *
 from .utils import *
 from .stats import DeckStats, MultiStats, cardInterval, cardIdsFromDeckIds
 
-
 config = mw.addonManager.getConfig(__name__)
 
 
@@ -72,6 +71,60 @@ def load_pokemon_gen_all(pokemonlist, tiers, evolutionLevel1, evolution1, evolut
         load_pokemon_gen("pokemon_gen4.csv")
     if config['gen5']:
         load_pokemon_gen("pokemon_gen5.csv")
+
+
+def alertMsgText(mon: str, id, name: str, level: int, previousLevel: int, nickname: str, already_assigned: bool):
+    msgtxt = ""
+    if already_assigned == True:
+        if name == "Egg":
+            if level == 2 and previousLevel < 2:
+                if nickname:
+                    msgtxt = "%s needs more time to hatch." % nickname
+                else:
+                    msgtxt = "Your egg needs more time to hatch."
+            elif level == 3 and previousLevel < 3:
+                if nickname:
+                    msgtxt = "%s moves occasionally. It should hatch soon." % nickname
+                else:
+                    msgtxt = "Your egg moves occasionally. It should hatch soon."
+            elif level == 4 and previousLevel < 4:
+                if nickname:
+                    msgtxt = "%s is making sounds! It's about to hatch!" % nickname
+                else:
+                    msgtxt = "Your egg is making sounds! It's about to hatch!"
+        elif previousLevel < 5:
+            if nickname:
+                msgtxt = ("%s has hatched! It's a %s!" %
+                          (nickname, mon))
+            else:
+                msgtxt = ("Your egg has hatched! It's a %s!" % mon)
+            previousLevel = level
+        if name != mon and name != "Egg" and previousLevel < level:
+            if nickname:
+                msgtxt = ("%s has evolved into a %s (Level %s)! (+%s)" %
+                          (nickname, name, level, (level - previousLevel)))
+            else:
+                msgtxt = ("Your %s has evolved into a %s (Level %s)! (+%s)" %
+                          (mon, name, level, (level - previousLevel)))
+        elif previousLevel < level and name != "Egg":
+            displayName = name
+            if nickname:
+                displayName = nickname
+            if id in prestigelist:
+                msgtxt = "%s is now level %s! (+%s)" % (
+                    displayName, level - 50, level - previousLevel)
+            else:
+                msgtxt = ("Your %s is now level %s! (+%s)" %
+                          (displayName, level, (level - previousLevel)))
+    else:
+        if name == "Egg":
+            msgtxt = "You found an egg!"
+        else:
+            msgtxt = "You caught a %s (Level %s)" % (name, level)
+    if msgtxt:
+        return "\n" + msgtxt
+    else:
+        return ""
 
 
 def randomStarter():
@@ -356,58 +409,8 @@ def DeckPokemon():
     # Generate message box
     msgtxt = "Hello Pokémon Trainer!"
     # Show changes in egg hatching, leveling up, and evolving
-    if already_assigned == True:
-        if name == "Egg":
-            if int(Level) == 2 and previouslevel < 2:
-                if nickname:
-                    msgtxt += "\n%s needs more time to hatch." % nickname
-                else:
-                    msgtxt += "\nYour egg needs more time to hatch."
-            elif int(Level) == 3 and previouslevel < 3:
-                if nickname:
-                    msgtxt += "\n%s moves occasionally. It should hatch soon." % nickname
-                else:
-                    msgtxt += "\nYour egg moves occasionally. It should hatch soon."
-            elif int(Level) == 4 and previouslevel < 4:
-                if nickname:
-                    msgtxt += "\n%s is making sounds! It's about to hatch!" % nickname
-                else:
-                    msgtxt += "\nYour egg is making sounds! It's about to hatch!"
-        elif previouslevel < 5:
-            if nickname:
-                msgtxt += ("\n%s has hatched! It's a %s!" %
-                           (nickname, deckmon))
-            else:
-                msgtxt += ("\nYour egg has hatched! It's a %s!" % deckmon)
-            previouslevel = Level
-        if name != deckmon and name != "Egg" and int(previouslevel) < int(Level):
-            if nickname:
-                msgtxt += ("\n%s has evolved into a %s (Level %s)! (+%s)" %
-                           (nickname, name, int(Level), (int(Level) - int(previouslevel))))
-            else:
-                msgtxt += ("\nYour %s has evolved into a %s (Level %s)! (+%s)" %
-                           (deckmon, name, int(Level), (int(Level) - int(previouslevel))))
-        elif int(previouslevel) < int(Level) and name != "Egg":
-            if mw.col.decks.active()[0] in prestigelist:
-                if nickname:
-                    msgtxt += ("\n%s is now level %s! (+%s)" % (nickname,
-                                                                int(Level) - 50, (int(Level) - int(previouslevel))))
-                else:
-                    msgtxt += ("\nYour %s is now level %s! (+%s)" %
-                               (name, int(Level) - 50, (int(Level) - int(previouslevel))))
-            else:
-                if nickname:
-                    msgtxt += ("\n%s is now level %s! (+%s)" % (nickname,
-                                                                int(Level), (int(Level) - int(previouslevel))))
-                else:
-                    msgtxt += ("\nYour %s is now level %s! (+%s)" %
-                               (name, int(Level), (int(Level) - int(previouslevel))))
-    # Show new Pokemon and eggs
-    if already_assigned == False:
-        if name == "Egg":
-            msgtxt += "\nYou found an egg!"
-        else:
-            msgtxt += ("\nYou caught a %s (Level %s)" % (name, int(Level)))
+    msgtxt += alertMsgText(deckmon, mw.col.decks.active()[0], name, int(
+        Level), int(previouslevel), nickname, already_assigned)
     # Only show message box if there has been a change
     if msgtxt != "Hello Pokémon Trainer!":
         msgbox2 = QMessageBox()
@@ -570,57 +573,8 @@ def MultiPokemon():
         elif already_assigned == False:
             deckmonData = [deckmon, item[0], Level]
             modifiedpokemontotal.append(deckmonData)
-        if already_assigned == True:
-            if name == "Egg":
-                if Level == 2 and previouslevel < 2:
-                    if nickname:
-                        msgtxt += "\n%s needs more time to hatch." % nickname
-                    else:
-                        msgtxt += "\nYour egg needs more time to hatch."
-                elif Level == 3 and previouslevel < 3:
-                    if nickname:
-                        msgtxt += "\n%s moves occasionally. It should hatch soon." % nickname
-                    else:
-                        msgtxt += "\nYour egg moves occasionally. It should hatch soon."
-                elif Level == 4 and previouslevel < 4:
-                    if nickname:
-                        msgtxt += "\n%s is making sounds! It's about to hatch!" % nickname
-                    else:
-                        msgtxt += "\nYour egg is making sounds! It's about to hatch!"
-            elif previouslevel < 5:
-                if nickname:
-                    msgtxt += ("\n%s has hatched! It's a %s!" %
-                               (nickname, deckmon))
-                else:
-                    msgtxt += ("\nYour egg has hatched! It's a %s!" % deckmon)
-                previouslevel = Level
-            if name != deckmon and name != "Egg" and int(previouslevel) < int(Level):
-                if nickname:
-                    msgtxt += ("\n%s has evolved into a %s (Level %s)! (+%s)" %
-                               (nickname, name, int(Level), (int(Level) - int(previouslevel))))
-                else:
-                    msgtxt += ("\nYour %s has evolved into a %s (Level %s)! (+%s)" %
-                               (deckmon, name, int(Level), (int(Level) - int(previouslevel))))
-            elif int(previouslevel) < int(Level) and name != "Egg":
-                if item[0] in prestigelist:
-                    if nickname:
-                        msgtxt += ("\n%s is now level %s! (+%s)" % (nickname,
-                                                                    int(Level) - 50, (int(Level) - int(previouslevel))))
-                    else:
-                        msgtxt += ("\nYour %s is now level %s! (+%s)" %
-                                   (name, int(Level) - 50, (int(Level) - int(previouslevel))))
-                else:
-                    if nickname:
-                        msgtxt += ("\n%s is now level %s! (+%s)" % (nickname,
-                                                                    int(Level), (int(Level) - int(previouslevel))))
-                    else:
-                        msgtxt += ("\nYour %s is now level %s! (+%s)" %
-                                   (name, int(Level), (int(Level) - int(previouslevel))))
-        if already_assigned == False:
-            if name == "Egg":
-                msgtxt += "\nYou found an egg!"
-            else:
-                msgtxt += ("\nYou caught a %s (Level %s)" % (name, int(Level)))
+        msgtxt += alertMsgText(deckmon, item[0], name, int(
+            Level), int(previouslevel), nickname, already_assigned)
         if already_assigned == True:
             for thing in pokemontotal:
                 if thing[1] == item[0]:
