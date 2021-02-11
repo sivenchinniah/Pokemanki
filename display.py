@@ -91,6 +91,7 @@ def pokemonDisplay(wholeCollection):
     elif len(did) > 1:
         multideckmon = MultiPokemon(wholeCollection=False)
     else:
+        print("single")
         deckmon = DeckPokemon()
 
     # Get old result and add new tables with Pokemon
@@ -115,7 +116,8 @@ def _show(data, title, subtitle):
     if not data:
         return ""
     # Set text equal to title text to start
-    txt = txt = "<h1>{}</h1>{}".format(title, subtitle)
+    txt = "<h1 style='text-align: center;'>{}</h1>{}".format(
+        title, subtitle)
     # Line text variable, apparently needed for bottom line
     text_lines = []
     # Table text
