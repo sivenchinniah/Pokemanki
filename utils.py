@@ -43,7 +43,7 @@ def get_json(file_name: str, default=None):
         value = json.load(open(file_path))
     if not value:  # includes json with falsy value
         value = default
-    return default
+    return value
 
 
 def write_json(file_name: str, value):
