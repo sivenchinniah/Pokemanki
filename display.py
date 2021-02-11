@@ -70,7 +70,7 @@ def pokemonDisplayText(name, id, level, nickname):
     return (text, held, special)
 
 
-def pokemonDisplay():
+def pokemonDisplay(wholeCollection):
     # Assign Pokemon Image and Progress Bar folder directory names
     pkmnimgfolder = currentdirname / "pokemon_images"
     progressbarfolder = currentdirname / "progress_bars"
@@ -85,11 +85,11 @@ def pokemonDisplay():
     # Get id of active deck
     did = mw.col.decks.active()
     # See if "Whole Collection" is selected - if so, get all assigned Pokemon and assign to multideckmon
-    if mw.col.stats().wholeCollection:
-        multideckmon = MultiPokemon()
+    if wholeCollection:
+        multideckmon = MultiPokemon(wholeCollection=True)
     # If "Whole Collection" not selected, show Pokemon for either single deck or all subdecks and store into multideckmon/deckmon
     elif len(did) > 1:
-        multideckmon = MultiPokemon()
+        multideckmon = MultiPokemon(wholeCollection=False)
     else:
         deckmon = DeckPokemon()
 
@@ -188,6 +188,9 @@ def _show(data, title, subtitle):
                     return array[index]
                 else:
                     return ""
+            print(pokemon_names)
+            print(pokemon_is_special)
+            print(pokemon_decks)
 
             def format_table_image(index):
                 image_name = ""
@@ -196,7 +199,7 @@ def _show(data, title, subtitle):
                     image_name = pokemon_names[index] + \
                         pokemon_is_special[index]
                     title = mw.col.decks.name(pokemon_decks[index])
-
+                print(image_name)
                 return table_image_html(image_name, title)
 
             def format_table_text(index):

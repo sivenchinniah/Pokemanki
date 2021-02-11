@@ -426,7 +426,8 @@ def DeckPokemon():
     return displayData
 
 
-def MultiPokemon():
+def MultiPokemon(wholeCollection):
+    "Returns array of DeckPokemon"
 
     # Same deal as above
     FirstPokemon()
@@ -470,10 +471,7 @@ def MultiPokemon():
     # Assign empty list to multiData (to be returned at end)
     multiData = []
     # Get multideck results
-    if mw.col.stats().wholeCollection:
-        results = MultiStats()
-    else:
-        results = MultiStats()
+    results = MultiStats(wholeCollection)
     # If no results, return
     if len(results) == 0:
         return

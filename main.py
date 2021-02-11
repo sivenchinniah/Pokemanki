@@ -12,7 +12,7 @@ from .pokemon import *
 
 
 config = mw.addonManager.getConfig(__name__)
-
+statsDialog = None
 
 # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
 copy_directory("pokemon_images")
@@ -93,24 +93,34 @@ else:
 mw.testmenu.addAction(resetaction)
 
 
-def _onStatsOpen(statsDialog):
-    display = display_func().replace("`", '"')
-    js = """
-    addPokemanki = function(){{
-        console.log("run")
-        divEl = document.createElement("div");
-        divEl.className = "pokemanki";
-        divEl.innerHTML = `{}`;
-        mainEl = document.getElementById('main');
-        mainEl.parentElement.insertBefore(divEl, mainEl);
-    }}
-    if(document.readyState === 'complete'){{
-        addPokemanki();
-    }}
-    else{{
-        window.addEventListener('load', addPokemanki);
-    }}
-    """.format(display)
+def message_handler(handled, message, context):
+    # context is not set to NewDeckStats, so don't check for it
+    if not message.startswith("Pokemanki#"):
+        return (False, None)
+    print(message)
+    if message == "Pokemanki#currentDeck":
+        if f:
+            html = tagmonDisplay().replace("`", "'")
+        else:
+            html = pokemonDisplay(wholeCollection=False).replace("`", "'")
+    elif message == "Pokemanki#wholeCollection":
+        if f:
+            html = tagmonDisplay().replace("`", "'")
+        else:
+            html = pokemonDisplay(wholeCollection=True).replace("`", "'")
+    else:
+        starts = "Pokemanki#search#"
+        term = message[len(starts):]
+        # Todo: implement selective
+        return (True, None)
+    statsDialog.form.web.eval("Pokemanki.setPokemanki(`{}`)".format(html))
+    return (True, None)
+
+
+def _onStatsOpen(dialog):
+    global statsDialog
+    statsDialog = dialog
+    js = (addon_dir / "web.js").read_text()
     statsDialog.form.web.eval(js)
 
 
@@ -121,3 +131,4 @@ def onStatsOpen(statsDialog):
 
 
 gui_hooks.stats_dialog_will_show.append(onStatsOpen)
+gui_hooks.webview_did_receive_js_message.append(message_handler)

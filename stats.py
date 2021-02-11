@@ -33,13 +33,15 @@ def cardInterval(queryDb, cid):
     return ivl
 
 
-def DeckStats():
-    "Retrieve id and ivl for each card in a single deck"
+def deckStats(deck_ids):
+    """
+        deck_ids: list
+        returns [[card_id, card_interval], ...]
+    """
+    cardIds = cardIdsFromDeckIds(mw.col.db, deck_ids)
+
     # result = self.col.db.all("""select id, ivl from cards where did in %s""" %
     #             ids2str(self.col.decks.active()))
-    activeDeckIds = mw.col.decks.active()
-    cardIds = cardIdsFromDeckIds(mw.col.db, activeDeckIds)
-
     result = []
     for cid in cardIds:
         ivl = cardInterval(mw.col.db, cid)
@@ -48,10 +50,19 @@ def DeckStats():
     return result
 
 
-def MultiStats():
+def DeckStats():
+    """
+    Retrieve id and ivl for each card in a single deck
+    Returns [[cid, ivl], ...]
+    """
+    activeDeckIds = mw.col.decks.active()
+    return deckStats(activeDeckIds)
+
+
+def MultiStats(wholeCollection):
     "Retrieve id and ivl for each subdeck that does not have subdecks itself"
     # Get list of subdecks
-    if mw.col.stats().wholeCollection:
+    if wholeCollection:
         # Get results for all subdecks in collection
         alldecks = mw.col.decks.allIds()
         # Determine which subdecks do not have their own subdecks
@@ -73,17 +84,7 @@ def MultiStats():
     resultlist = []
     # Find results for each card in these decks
     for item in nograndchildren:
-        # result = self.col.db.all("""select id, ivl from cards where did == %s""" % item)
-
-        # cardIds = self.col.db.all("""select id from cards where did == %s""" % item)
-        cardIds = cardIdsFromDeckIds(mw.col.db, [item])
-
-        result = []
-        for cid in cardIds:
-            ivl = cardInterval(mw.col.db, cid)
-            result.append((cid, ivl))
-
-        resultlist.append(result)
+        resultlist.append(deckStats([item]))
     # Zip the deck ids with the results
     nograndchildresults = list(zip(nograndchildren, resultlist))
 
