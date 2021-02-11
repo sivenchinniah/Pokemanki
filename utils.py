@@ -31,10 +31,9 @@ def copy_directory(dir_addon: str, dir_anki: str = None):
         distutils.dir_util.copy_tree(str(fromdir), str(todir))
 
 
-def set_default(path: str, default=None):
-    if not (mediafolder / path).is_file():
-        with open(mediafolder / path, "w") as f:
-            json.dump(default, f)
+def set_default(file_name: str, default):
+    if not get_json(file_name, None):
+        write_json(file_name, default)
 
 
 def get_json(file_name: str, default=None):
@@ -47,7 +46,7 @@ def get_json(file_name: str, default=None):
     return default
 
 
-def write_json(file_name: str, value={}):
+def write_json(file_name: str, value):
     file_path = mediafolder / file_name
     with open(file_path, "w") as f:
         json.dump(value, f)
