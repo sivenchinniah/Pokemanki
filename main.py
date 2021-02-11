@@ -11,7 +11,6 @@ from .utils import *
 from .pokemon import *
 
 
-config = mw.addonManager.getConfig(__name__)
 statsDialog = None
 
 # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)

@@ -6,6 +6,7 @@ from typing import List, Union
 
 from aqt import mw
 
+config = mw.addonManager.getConfig(__name__)
 
 # Find current directory
 addon_dir = Path(__file__).parents[0]

@@ -8,8 +8,6 @@ from aqt.qt import *
 from .utils import *
 from .stats import DeckStats, MultiStats, cardInterval, cardIdsFromDeckIds
 
-config = mw.addonManager.getConfig(__name__)
-
 
 def loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2):
     with open(csv_fpath, "r") as csv_file:

@@ -13,9 +13,6 @@ from .stats import TagStats
 from .display import pokemonDisplayText
 
 
-config = mw.addonManager.getConfig(__name__)
-
-
 def tagmonDisplay():
     # Assign Pokemon Image and Progress Bar folder directory names
     pkmnimgfolder = currentdirname / "pokemon_images"

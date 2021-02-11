@@ -10,9 +10,6 @@ from aqt import mw
 from .utils import *
 
 
-config = mw.addonManager.getConfig(__name__)
-
-
 def pokemonLevelRangesFromCsv(csv_fpath):
     pokemon_records = []
 

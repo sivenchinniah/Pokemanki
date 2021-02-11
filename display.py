@@ -9,9 +9,6 @@ from .utils import *
 from .compute import DeckPokemon, MultiPokemon
 
 
-config = mw.addonManager.getConfig(__name__)
-
-
 def eggHatchText(level, name):
     if level < 2:
         text = ("%s (needs a lot more time to hatch)" % name)
