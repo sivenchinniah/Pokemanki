@@ -201,7 +201,6 @@ def FirstPokemon():
             else:
                 Level = 0
             deckmondata = [(deckmon, deck, Level)]
-            print(deckmondata)
             write_json("_pokemanki.json", deckmondata)
             firstpokemon = QMessageBox()
             firstpokemon.setWindowTitle("Pokemanki")
@@ -224,8 +223,6 @@ def DeckPokemon():
     otherwise [name, deck id, level]
     May return None
     """
-    print("DECK")
-
     FirstPokemon()
 
     pokemontotal = get_json('_pokemanki.json')
@@ -543,8 +540,6 @@ def MultiPokemon():
         for pokemon, tier, firstEL, firstEvol, secondEL, secondEvol in pokemon_tuple:
             if deckmon == pokemon or deckmon == firstEvol or deckmon == secondEvol:
                 details = (pokemon, firstEL, firstEvol, secondEL, secondEvol)
-        print(pokemon_tuple)
-
         name = details[0]
         firstEL = details[1]
         firstEvol = details[2]
