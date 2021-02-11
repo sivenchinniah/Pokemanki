@@ -167,32 +167,29 @@ def FirstPokemon():
 def DeckPokemon():
 
     FirstPokemon()
-    # Get existing pokemon from pokemanki.json
-    if media_exists("_pokemanki.json"):
 
-        pokemontotal = get_json('_pokemanki.json')
-        # Sort list by deck id, reverse sorted to make sure that most recent additions come first
-        sortedpokemontotal = list(reversed(pokemontotal))
-        # Assign most recent Pokemon result for each deck id to modifiedpokemontotal
-        modifiedpokemontotal = []
-        for item in sortedpokemontotal:
-            # Only assign if deck id not already in modifiedpokemontotal
-            for thing in modifiedpokemontotal:
-                if item[1] == thing[1]:
-                    break
-            else:
-                if str(item[1]) in mw.col.decks.allIds():
-                    modifiedpokemontotal.append(item)
-    # If no pokemanki.json, make empty pokemontotal and modifiedpokemontotal lists
-    else:
-        return
+    pokemontotal = get_json('_pokemanki.json')
+    if not pokemontotal:
+        return  # If no pokemanki.json, make empty pokemontotal and modifiedpokemontotal lists
+
+    # Sort list by deck id, reverse sorted to make sure that most recent additions come first
+    sortedpokemontotal = list(reversed(pokemontotal))
+    # Assign most recent Pokemon result for each deck id to modifiedpokemontotal
+    modifiedpokemontotal = []
+    for item in sortedpokemontotal:
+        # Only assign if deck id not already in modifiedpokemontotal
+        for thing in modifiedpokemontotal:
+            if item[1] == thing[1]:
+                break
+        else:
+            if str(item[1]) in mw.col.decks.allIds():
+                modifiedpokemontotal.append(item)
 
     # Download threshold settings if they exist, otherwise make from scratch
     thresholdsettings = get_json("_pokemankisettings.json",
                                  default=[100, 250, 500, 750, 1000])
 
     # Lists containing Pokemon, tiers, first evolution level, first evolution, second evolution level, and second evolution
-
     pokemonlist = []
     tiers = []
     evolutionLevel1 = []
@@ -425,19 +422,19 @@ def MultiPokemon():
 
     # Same deal as above
     FirstPokemon()
-    if media_exists("_pokemanki.json"):
-        pokemontotal = get_json("_pokemanki.json")
-        sortedpokemontotal = list(reversed(pokemontotal))
-        modifiedpokemontotal = []
-        for item in sortedpokemontotal:
-            for thing in modifiedpokemontotal:
-                if item[1] == thing[1]:
-                    break
-            else:
-                if str(item[1]) in mw.col.decks.allIds():
-                    modifiedpokemontotal.append(item)
-    else:
+    pokemontotal = get_json("_pokemanki.json", None)
+    if not pokemontotal:
         return
+
+    sortedpokemontotal = list(reversed(pokemontotal))
+    modifiedpokemontotal = []
+    for item in sortedpokemontotal:
+        for thing in modifiedpokemontotal:
+            if item[1] == thing[1]:
+                break
+        else:
+            if str(item[1]) in mw.col.decks.allIds():
+                modifiedpokemontotal.append(item)
     thresholdsettings = get_json("_pokemankisettings.json", [
                                  100, 250, 500, 750, 1000])
 

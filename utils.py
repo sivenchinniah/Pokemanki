@@ -39,24 +39,18 @@ def set_default(path: str, default=None):
 
 def get_json(file_name: str, default=None):
     file_path = mediafolder / file_name
+    value = None
     if file_path.exists():
-        return json.load(open(file_path))
-    else:
-        return default
+        value = json.load(open(file_path))
+    if not value:  # includes json with falsy value
+        value = default
+    return default
 
 
 def write_json(file_name: str, value={}):
     file_path = mediafolder / file_name
     with open(file_path, "w") as f:
         json.dump(value, f)
-
-
-def media_exists(file_name: str):
-    return (mediafolder / file_name).exists()
-
-
-def media(file_name: str):
-    return mediafolder / file_name
 
 
 def get_pokemon():

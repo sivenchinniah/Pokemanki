@@ -182,10 +182,8 @@ def ResetPokemon():
             "_alolanlist.json", "_everstonelist.json", "_everstonepokemonlist.json", "_megastonelist.json",
             "_pokemankisettings.json", "_prestigelist.json", "_tagmon.json", "_tags.json", "_trades.json"
         ]
-        for file in reset_files:
-            f = media(file)
-            if f.exists():
-                os.remove(f)
+        for fname in reset_files:
+            write_json(fname, {})
         # TODO reset everstone? and other stuff?
         # Message box confirming reset
         resetdone = QMessageBox()
