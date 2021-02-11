@@ -87,7 +87,6 @@ if f:
     mw.testmenu.addAction(tagsaction)
     display_func = tagmonDisplay
 else:
-    mw.testmenu.addAction(thresholdaction)
     mw.testmenu.addAction(tradeaction)
     display_func = pokemonDisplay
 

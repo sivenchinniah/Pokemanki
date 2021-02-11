@@ -8,9 +8,9 @@ from aqt.qt import *
 from aqt import mw
 
 from .utils import *
-from .compute import load_pokemon_gen_all,
+from .compute import load_pokemon_gen_all
 from .stats import TagStats
-from .display import eggHatchText
+from .display import pokemonDisplayText
 
 
 config = mw.addonManager.getConfig(__name__)
@@ -74,26 +74,8 @@ def _show(data, title, subtitle):
                 pokemon_progress_text.append("")
     pokemon_text = []
     table_size = 0
-    prestigelist = get_json("_prestigelist.json", [])
     for name, tag, level, nickname in pokemon_collection:
-        if int(float(level)) < 5:
-            if nickname:
-                text = eggHatchText(level, nickname)
-            else:
-                text = eggHatchText(level, name)
-        else:
-            if tag in prestigelist:
-                if nickname:
-                    text = ("%s (Level %s) - Prestiged" %
-                            (nickname, int(float(level))))
-                else:
-                    text = ("%s (Level %s) - Prestiged" %
-                            (name, int(float(level))))
-            else:
-                if nickname:
-                    text = ("%s (Level %s)" % (nickname, int(float(level))))
-                else:
-                    text = ("%s (Level %s)" % (name, int(float(level))))
+        (text, held, special) = pokemonDisplayText(name, tag, level, nickname)
         pokemon_text.append(text)
 
     def get(array, index):

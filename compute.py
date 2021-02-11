@@ -165,6 +165,12 @@ def FirstPokemon():
 
 
 def DeckPokemon():
+    """
+    Returns [name, deck id, level, nickname] if there is nickname,
+    otherwise [name, deck id, level]
+    May return None
+    """
+    print("DECK")
 
     FirstPokemon()
 

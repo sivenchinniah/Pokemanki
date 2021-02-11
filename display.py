@@ -24,6 +24,50 @@ def eggHatchText(level, name):
     return text
 
 
+def pokemonDisplayText(name, id, level, nickname):
+    prestigelist = get_json("_prestigelist.json", [])
+    everstonelist = get_json("_everstonelist.json", [])
+    megastonelist = get_json("_megastonelist.json", [])
+    alolanlist = get_json("_alolanlist.json", [])
+
+    held = ""
+    special = ""
+    everstone_html = '<img src="/pokemon_images/item_Everstone.png" hspace="10">'
+    megastone_html = '<img src="/pokemon_images/item_Mega_Stone.png" hspace="10">'
+    alolan_html = '<img src="/pokemon_images/item_Alolan_Passport.png" hspace="10">'
+    pkmnimgfolder = currentdirname / "pokemon_images"
+
+    displayname = name
+    if nickname:
+        displayname = nickname
+    if name == "Egg":
+        text = eggHatchText(level, displayname)
+    else:
+        if id in prestigelist:
+            text = ("%s (Level %s) - Prestiged" %
+                    (displayname, int(level - 50)))
+        else:
+            text = ("%s (Level %s)" % (displayname, int(level)))
+        if id in everstonelist:
+            held += everstone_html
+            # FIX: name is never declared!
+            if name == "Pikachu":
+                special += "_Ash" + str(random.randint(1, 5))
+        if id in megastonelist:
+            held += megastone_html
+
+            if any([name + "_Mega" in imgname for imgname in os.listdir(pkmnimgfolder)]):
+                special += "_Mega"
+                if name == "Charizard" or name == "Mewtwo":
+                    special += config["X_or_Y_mega_evolutions"]
+        if id in alolanlist:
+            held += alolan_html
+            if any([name + "_Alolan" in imgname for imgname in os.listdir(pkmnimgfolder)]):
+                special += "_Alolan"
+
+    return (text, held, special)
+
+
 def pokemonDisplay():
     # Assign Pokemon Image and Progress Bar folder directory names
     pkmnimgfolder = currentdirname / "pokemon_images"
@@ -74,56 +118,14 @@ def _show(data, title, subtitle):
     text_lines = []
     # Table text
     table_text = ""
-    prestigelist = get_json("_prestigelist.json", [])
-    everstonelist = get_json("_everstonelist.json", [])
-    megastonelist = get_json("_megastonelist.json", [])
-    alolanlist = get_json("_alolanlist.json", [])
-
-    held = ""
-    special = ""
-    everstone_html = '<img src="/pokemon_images/item_Everstone.png" hspace="10">'
-    megastone_html = '<img src="/pokemon_images/item_Mega_Stone.png" hspace="10">'
-    alolan_html = '<img src="/pokemon_images/item_Alolan_Passport.png" hspace="10">'
-    pkmnimgfolder = currentdirname / "pokemon_images"
 
     # If single Pokemon, show centered picture with name and level below
     if type(data) == tuple:
-        name = data[0]
-        # Don't show level for egg
-        if name == "Egg":
-            level = data[2]
-            displayname = name
-            if len(data) == 4:
-                displayname = data[3]  # nickname
-            text = eggHatchText(data, displayname)
-        else:
-            if data[1] in prestigelist:
-                if len(data) == 4:
-                    text = ("%s (Level %s)" % (data[3], int(data[2]) - 50))
-                else:
-                    text = ("%s (Level %s)" % (data[0], int(data[2]) - 50))
-            else:
-                if len(data) == 4:
-                    text = ("%s (Level %s)" % (data[3], int(data[2])))
-                else:
-                    text = ("%s (Level %s)" % (data[0], int(data[2])))
-
-            if data[1] in everstonelist:
-                held += everstone_html
-                # FIX: name is never declared!
-                if name == "Pikachu":
-                    special += "_Ash" + str(random.randint(1, 5))
-            if data[1] in megastonelist:
-                held += megastone_html
-
-                if any([name + "_Mega" in imgname for imgname in os.listdir(pkmnimgfolder)]):
-                    special += "_Mega"
-                    if name == "Charizard" or name == "Mewtwo":
-                        special += config["X_or_Y_mega_evolutions"]
-            if data[1] in alolanlist:
-                held += alolan_html
-                if any([name + "_Alolan" in imgname for imgname in os.listdir(pkmnimgfolder)]):
-                    special += "_Alolan"
+        nickname = ""
+        if len(data) == 4:
+            nickname = data[3]
+        (text, held, special) = pokemonDisplayText(
+            data[0], data[1], data[2], nickname)
 
         table_text += (("""<tr>
                         <td height = 300 width = 300 align = center><img src="/pokemon_images/%s.png" title=%s></td>""") % (data[0] + special, mw.col.decks.name(data[1])))
@@ -172,66 +174,9 @@ def _show(data, title, subtitle):
         pokemon_held_items = []
         pokemon_is_special = []
         table_size = 0
-        for name, deck, level, nickname in pokemon_collection:
-            held = ""
-            special = ""
-            if int(float(level)) < 5:
-                if nickname:
-                    if int(float(level)) == 1:
-                        text = ("%s (needs a lot more time to hatch)" %
-                                nickname)
-                    elif int(float(level)) == 2:
-                        text = ("%s (will take some time to hatch)" % nickname)
-                    elif int(float(level)) == 3:
-                        text = ("%s (moves around inside sometimes)" %
-                                nickname)
-                    elif int(float(level)) == 4:
-                        text = ("%s (making sounds inside)" % nickname)
-                else:
-                    if int(float(level)) == 1:
-                        text = ("%s (needs a lot more time to hatch)" % name)
-                    elif int(float(level)) == 2:
-                        text = ("%s (will take some time to hatch)" % name)
-                    elif int(float(level)) == 3:
-                        text = ("%s (moves around inside sometimes)" % name)
-                    elif int(float(level)) == 4:
-                        text = ("%s (making sounds inside)" % name)
-            else:
-                if deck in prestigelist:
-                    if nickname:
-                        text = ("%s (Level %s) - Prestiged" %
-                                (nickname, int(float(level)) - 50))
-                    else:
-                        text = ("%s (Level %s) - Prestiged" %
-                                (name, int(float(level)) - 50))
-                else:
-                    if nickname:
-                        text = ("%s (Level %s)" %
-                                (nickname, int(float(level))))
-                    else:
-                        text = ("%s (Level %s)" % (name, int(float(level))))
-
-                everstone_html = '<img src="/pokemon_images/item_Everstone.png" hspace="10">'
-                megastone_html = '<img src="/pokemon_images/item_Mega_Stone.png" hspace="10">'
-                alolan_html = '<img src="/pokemon_images/item_Alolan_Passport.png" hspace="10">'
-                pkmnimgfolder = currentdirname / "pokemon_images"
-
-                if deck in everstonelist:
-                    held += everstone_html
-                    if name == "Pikachu":
-                        special += "_Ash" + str(random.randint(1, 5))
-                if deck in megastonelist:
-                    held += megastone_html
-
-                    if any([name + "_Mega" in imgname for imgname in os.listdir(pkmnimgfolder)]):
-                        special += "_Mega"
-                        if name == "Charizard" or name == "Mewtwo":
-                            special += config["X_or_Y_mega_evolutions"]
-                if deck in alolanlist:
-                    held += alolan_html
-                    if any([name + "_Alola" in imgname for imgname in os.listdir(pkmnimgfolder)]):
-                        special += "_Alola"
-
+        for name, deckid, level, nickname in pokemon_collection:
+            (text, held, special) = pokemonDisplayText(
+                name, deckid, level, nickname)
             pokemon_text.append(text)
             pokemon_held_items.append(held)
             pokemon_is_special.append(special)
