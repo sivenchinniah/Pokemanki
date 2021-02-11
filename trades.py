@@ -114,7 +114,7 @@ class Trades:
         f = self.f
         if f:
             if os.path.exists("%s/_tagmon.json" % self.mediafolder):
-                deckmonlist = load_json("_tagmon.json", [])
+                deckmonlist = get_json("_tagmon.json", [])
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 noeggslist = []
                 for item in sorteddeckmonlist:
