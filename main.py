@@ -97,7 +97,6 @@ def message_handler(handled, message, context):
     # context is not set to NewDeckStats, so don't check for it
     if not message.startswith("Pokemanki#"):
         return (False, None)
-    print(message)
     if message == "Pokemanki#currentDeck":
         if f:
             html = tagmonDisplay().replace("`", "'")

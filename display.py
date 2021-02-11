@@ -183,15 +183,6 @@ def _show(data, title, subtitle):
             pokemon_held_items.append(held)
             pokemon_is_special.append(special)
 
-            def get(array, index):
-                if index < len(array):
-                    return array[index]
-                else:
-                    return ""
-            print(pokemon_names)
-            print(pokemon_is_special)
-            print(pokemon_decks)
-
         def format_table_image(index):
             image_name = ""
             title = ""
@@ -199,7 +190,6 @@ def _show(data, title, subtitle):
                 image_name = pokemon_names[index] + \
                     pokemon_is_special[index]
                 title = mw.col.decks.name(pokemon_decks[index])
-            print(image_name)
             return table_image_html(image_name, title)
 
         def format_table_text(index):
