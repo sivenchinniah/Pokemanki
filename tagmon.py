@@ -8,8 +8,9 @@ from aqt.qt import *
 from aqt import mw
 
 from .utils import *
-from .compute import load_pokemon_gen_all
+from .compute import load_pokemon_gen_all,
 from .stats import TagStats
+from .display import eggHatchText
 
 
 config = mw.addonManager.getConfig(__name__)
@@ -77,23 +78,9 @@ def _show(data, title, subtitle):
     for name, tag, level, nickname in pokemon_collection:
         if int(float(level)) < 5:
             if nickname:
-                if int(float(level)) < 2:
-                    text = ("%s (needs a lot more time to hatch)" % nickname)
-                elif int(float(level)) == 2:
-                    text = ("%s (will take some time to hatch)" % nickname)
-                elif int(float(level)) == 3:
-                    text = ("%s (moves around inside sometimes)" % nickname)
-                elif int(float(level)) == 4:
-                    text = ("%s (making sounds inside)" % nickname)
+                text = eggHatchText(level, nickname)
             else:
-                if int(float(level)) < 2:
-                    text = ("%s (needs a lot more time to hatch)" % name)
-                elif int(float(level)) == 2:
-                    text = ("%s (will take some time to hatch)" % name)
-                elif int(float(level)) == 3:
-                    text = ("%s (moves around inside sometimes)" % name)
-                elif int(float(level)) == 4:
-                    text = ("%s (making sounds inside)" % name)
+                text = eggHatchText(level, name)
         else:
             if tag in prestigelist:
                 if nickname:

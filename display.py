@@ -11,7 +11,17 @@ from .compute import DeckPokemon, MultiPokemon
 
 config = mw.addonManager.getConfig(__name__)
 
-# Display function that gets wrapped into anki.stats.py
+
+def eggHatchText(level, name):
+    if level < 2:
+        text = ("%s (needs a lot more time to hatch)" % name)
+    elif level < 3:
+        text = ("%s (will take some time to hatch)" % name)
+    elif level < 4:
+        text = ("%s (moves around inside sometimes)" % name)
+    else:
+        text = ("%s (making sounds inside)" % name)
+    return text
 
 
 def pokemonDisplay():
@@ -81,24 +91,11 @@ def _show(data, title, subtitle):
         name = data[0]
         # Don't show level for egg
         if name == "Egg":
+            level = data[2]
+            displayname = name
             if len(data) == 4:
-                if int(data[2]) == 1:
-                    text = ("%s (needs a lot more time to hatch)" % data[3])
-                elif int(data[2]) == 2:
-                    text = ("%s (will take some time to hatch)" % data[3])
-                elif int(data[2]) == 3:
-                    text = ("%s (moves around inside sometimes)" % data[3])
-                elif int(data[2]) == 4:
-                    text = ("%s (making sounds inside)" % data[3])
-            else:
-                if int(data[2]) == 1:
-                    text = ("%s (needs a lot more time to hatch)" % data[0])
-                elif int(data[2]) == 2:
-                    text = ("%s (will take some time to hatch)" % data[0])
-                elif int(data[2]) == 3:
-                    text = ("%s (moves around inside sometimes)" % data[0])
-                elif int(data[2]) == 4:
-                    text = ("%s (making sounds inside)" % data[0])
+                displayname = data[3]  # nickname
+            text = eggHatchText(data, displayname)
         else:
             if data[1] in prestigelist:
                 if len(data) == 4:
