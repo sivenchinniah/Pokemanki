@@ -180,7 +180,7 @@ def ResetPokemon():
         reset_files = [
             "_pokemanki.json", "_tagmon.json",
             "_alolanlist.json", "_everstonelist.json", "_everstonepokemonlist.json", "_megastonelist.json",
-            "_pokemankisettings.json", "_prestigelist.json", "_tagmon.json", "_tags.json", "_trades.json"
+            "_pokemankisettings.json", "_tagmonsettings.json", "_prestigelist.json", "_tagmon.json", "_tags.json", "_trades.json"
         ]
         for fname in reset_files:
             write_json(fname, {})
