@@ -74,6 +74,7 @@ def load_pokemon_gen_all(pokemonlist, tiers, evolutionLevel1, evolution1, evolut
 
 
 def alertMsgText(mon: str, id, name: str, level: int, previousLevel: int, nickname: str, already_assigned: bool):
+    prestigelist = get_json("_prestigelist.json", [])
     msgtxt = ""
     if already_assigned == True:
         if name == "Egg":
@@ -302,6 +303,7 @@ def DeckPokemon():
     already_assigned = False
     details = ()
     nickname = ""
+    previouslevel = 0
     # Assign Deckmon from modifiedpokemontotal if already assigned
     for item in modifiedpokemontotal:
         if item[1] == mw.col.decks.active()[0]:
@@ -512,6 +514,7 @@ def MultiPokemon():
         already_assigned = False
         details = ()
         nickname = ""
+        previouslevel = ""
         for thing in modifiedpokemontotal:
             if thing[1] == item[0]:
                 deckmon = thing[0]

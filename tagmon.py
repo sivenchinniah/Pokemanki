@@ -181,6 +181,8 @@ def TagPokemon():
         tagmon = ""
         already_assigned = False
         details = ()
+        nickname = ""
+        previouslevel = 0
         for thing in modifiedtagmon:
             if thing[1] == item[0]:
                 tagmon = thing[0]
