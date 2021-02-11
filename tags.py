@@ -1,5 +1,3 @@
-import json
-
 from aqt.qt import *
 from aqt import mw
 

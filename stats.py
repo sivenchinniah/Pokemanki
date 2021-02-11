@@ -1,7 +1,7 @@
-from .utils import *
-
 from aqt import mw
 from anki.utils import ids2str
+
+from .utils import *
 
 
 def cardIdsFromDeckIds(queryDb, deckIds):

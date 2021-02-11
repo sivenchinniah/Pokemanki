@@ -1,15 +1,13 @@
+
+import random
+import csv
+
+from aqt import mw
+from aqt.qt import *
+
 from .utils import *
 from .stats import DeckStats, MultiStats, cardInterval, cardIdsFromDeckIds
 
-from anki.utils import ids2str
-import json
-import os.path
-import random
-from aqt.qt import *
-from aqt import mw
-import csv
-import inspect
-import os
 
 config = mw.addonManager.getConfig(__name__)
 

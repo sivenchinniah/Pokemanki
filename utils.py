@@ -1,9 +1,10 @@
-from aqt import mw
-from pathlib import Path
 import json
 import shutil
 import distutils.dir_util
+from pathlib import Path
 from typing import List, Union
+
+from aqt import mw
 
 
 # Find current directory

@@ -1,13 +1,14 @@
-from .utils import *
-
-from aqt.qt import *
-from aqt import mw
 import os
-import json
 import inspect
 import random
 import csv
 from datetime import date as dt
+
+from aqt.qt import *
+from aqt import mw
+
+from .utils import *
+
 
 config = mw.addonManager.getConfig(__name__)
 

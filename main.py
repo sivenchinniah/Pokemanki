@@ -1,3 +1,8 @@
+import os
+
+from aqt import mw, gui_hooks
+from aqt.qt import *
+
 from .display import pokemonDisplay
 from .tagmon import tagmonDisplay
 from .tags import Tags
@@ -5,13 +10,6 @@ from .trades import Trades
 from .utils import *
 from .pokemon import *
 
-import anki.stats
-from anki.hooks import wrap
-from aqt import gui_hooks
-import os
-from aqt.qt import *
-from aqt import mw
-import json
 
 config = mw.addonManager.getConfig(__name__)
 

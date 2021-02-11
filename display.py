@@ -1,12 +1,13 @@
 import os
-from .compute import DeckPokemon, MultiPokemon
-from anki.lang import _
-from collections import namedtuple
-from aqt import mw
 import shutil
 import random
 
+from anki.lang import _
+from aqt import mw
+
 from .utils import *
+from .compute import DeckPokemon, MultiPokemon
+
 
 config = mw.addonManager.getConfig(__name__)
 

@@ -1,7 +1,7 @@
+import os
+
 from .utils import *
 from .tags import Tags
-
-import os
 
 from aqt.qt import *
 

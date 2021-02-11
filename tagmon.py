@@ -1,15 +1,11 @@
-# -*- coding: utf-8 -*-
+import random
+import os
+import shutil
 
 from anki.lang import _
 from aqt import *
 from aqt.qt import *
 from aqt import mw
-import json
-import random
-import os
-import inspect
-import shutil
-from typing import List
 
 from .utils import *
 from .compute import load_pokemon_gen_all
