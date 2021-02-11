@@ -507,7 +507,7 @@ def MultiPokemon(wholeCollection):
         already_assigned = False
         details = ()
         nickname = ""
-        previouslevel = ""
+        previouslevel = 0
         for thing in modifiedpokemontotal:
             if thing[1] == item[0]:
                 deckmon = thing[0]
