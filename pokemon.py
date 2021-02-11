@@ -104,8 +104,12 @@ def Nickname():
 def Toggle():
     window = QWidget()
     items = ("Decks (Default)", "Tags")
+    by = get_json("_decksortags.json")
+    default = 0
+    if by:
+        default = 1
     inp, ok = QInputDialog.getItem(
-        window, "Pokemanki", "Choose how you would like Pokemanki to assign you Pokémon.", items, 0, False)
+        window, "Pokemanki", "Choose how you would like Pokemanki to assign you Pokémon.", items, default, False)
     if ok and inp:
         if inp == "Tags":
             write_json("_decksortags.json", inp)
