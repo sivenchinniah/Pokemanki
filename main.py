@@ -65,35 +65,40 @@ mw.prestigemenu = QMenu('&Prestige Menu', mw)
 mw.testmenu.addMenu(mw.prestigemenu)
 mw.prestigemenu.addAction(prestigeaction)
 mw.prestigemenu.addAction(unprestigeaction)
-mw.everstonemenu = QMenu('&Everstone', mw)
-mw.testmenu.addMenu(mw.everstonemenu)
-mw.everstonemenu.addAction(everstoneaction)
-mw.everstonemenu.addAction(uneverstoneaction)
-mw.megastonemenu = QMenu('&Mega Stone', mw)
-mw.testmenu.addMenu(mw.megastonemenu)
-mw.megastonemenu.addAction(megastoneaction)
-mw.megastonemenu.addAction(unmegastoneaction)
-mw.alolanmenu = QMenu('&Alolan Passport', mw)
-mw.testmenu.addMenu(mw.alolanmenu)
-mw.alolanmenu.addAction(alolanaction)
-mw.alolanmenu.addAction(unalolanaction)
 
-# Wrap pokemonDisplay function of display.py with the todayStats function of anki.stats.py
-addonsfolder = os.path.dirname(currentdirname)
+
 f = get_json("_decksortags.json", "")
-
 if f:
     mw.testmenu.addAction(tagsaction)
+else:  # Not yet implemented for tagmon
+    mw.everstonemenu = QMenu('&Everstone', mw)
+    mw.testmenu.addMenu(mw.everstonemenu)
+    mw.everstonemenu.addAction(everstoneaction)
+    mw.everstonemenu.addAction(uneverstoneaction)
+    mw.megastonemenu = QMenu('&Mega Stone', mw)
+    mw.testmenu.addMenu(mw.megastonemenu)
+    mw.megastonemenu.addAction(megastoneaction)
+    mw.megastonemenu.addAction(unmegastoneaction)
+    mw.alolanmenu = QMenu('&Alolan Passport', mw)
+    mw.testmenu.addMenu(mw.alolanmenu)
+    mw.alolanmenu.addAction(alolanaction)
+    mw.alolanmenu.addAction(unalolanaction)
+    mw.testmenu.addAction(tradeaction)
+mw.testmenu.addAction(resetaction)
+
+
+# Wrap pokemonDisplay function of display.py with the todayStats function of anki.stats.py
+# Note that above comment *may* be outdated
+
+if f:
     display_func = tagmonDisplay
 else:
-    mw.testmenu.addAction(tradeaction)
     display_func = pokemonDisplay
-
-mw.testmenu.addAction(resetaction)
 
 
 def message_handler(handled, message, context):
     # context is not set to NewDeckStats, so don't check for it
+    # maybe Anki bug?
     if not message.startswith("Pokemanki#"):
         return (False, None)
     if message == "Pokemanki#currentDeck":
