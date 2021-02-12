@@ -173,7 +173,8 @@ def ResetPokemon():
     resetwindow.setWindowTitle("Pokemanki")
     resetwindow.setText("\n".join((
         "Are you sure you want to reset your Pokémon?",
-        "This will reset everything including everstone, settings stored in collection.media, etc."
+        "This will reset everything including everstone, settings stored in collection.media, etc.",
+        "All your pokemons will be lost - both in deck and tag mode."
     )))
     resetwindow.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
     resetwindow.setDefaultButton(QMessageBox.No)
