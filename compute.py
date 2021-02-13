@@ -557,7 +557,15 @@ def MultiPokemon(wholeCollection):
                     name = secondEvol
         else:
             idx = everstonelist.index(item[0])
-            name = everstonepokemonlist[idx]
+            try:  # temporary patch
+                name = everstonepokemonlist[idx]
+                assert type(name) is str
+            except Exception as e:
+                print("ERROR(Pokemanki): while getting everstone list")
+                print("Deleting entry from everstonelist")
+                print(e)
+                everstonelist.pop(idx)
+                everstonepokemonlist.pop(idx)
         if name.startswith("Eevee"):
             name = "Eevee"
 
