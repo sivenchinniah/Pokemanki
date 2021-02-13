@@ -95,7 +95,7 @@ def Nickname():
         else:
             modifieddeckmonlist.append(item)
     if f:
-        write_json("_pokemanki.json", modifieddeckmonlist)
+        write_json("_tagmon.json", modifieddeckmonlist)
     else:
         write_json("_pokemanki.json", modifieddeckmonlist)
 
