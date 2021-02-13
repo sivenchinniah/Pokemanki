@@ -8,17 +8,8 @@ from aqt.utils import tooltip
 
 
 def Nickname():
-    f = get_json("_decksortags.json", "")
-    if f and (mediafolder / "_tagmon.json").exists():
-        deckmonlist = get_json("_tagmon.json")
-    elif not f and (mediafolder / "_pokemanki.json").exists():
-        deckmonlist = get_json("_pokemanki.json")
-    else:
-        nopokemon = QMessageBox()
-        nopokemon.setWindowTitle("Pokemanki")
-        nopokemon.setText(
-            "Please open the Stats window to get your Pokémon.")
-        nopokemon.exec_()
+    deckmonlist, f = get_pokemons()
+    if deckmonlist is None:
         return
 
     displaylist = []
@@ -213,12 +204,9 @@ def MovetoTop():
 
 
 def giveEverstone():
-    f = get_json("_decksortags.json", None)
-
-    if f:
-        pokemon = get_json("_tagmon.json")
-    else:
-        pokemon = get_json("_pokemanki.json")
+    pokemon, f = get_pokemons()
+    if pokemon is None:
+        return
     everstonelist = get_json("_everstonelist.json", default=[])
     everstonepokemonlist = get_json("_everstonepokemonlist.json", default=[])
 
@@ -260,11 +248,9 @@ def giveEverstone():
 
 
 def takeEverstone():
-    f = get_json("_decksortags.json", None)
-    if f:
-        pokemon = get_json("_tagmon.json")
-    else:
-        pokemon = get_json("_pokemanki.json")
+    pokemon, f = get_pokemons()
+    if pokemon is None:
+        return
     everstonelist = get_json("_everstonelist.json", [])
     everstonepokemonlist = get_json("_everstonepokemonlist.json", [])
     if not everstonelist:
@@ -307,11 +293,9 @@ def takeEverstone():
 
 
 def giveMegastone():
-    f = get_json("_decksortags.json", None)
-    if f:
-        pokemon = get_json("_tagmon.json")
-    else:
-        pokemon = get_json("_pokemanki.json")
+    pokemon, f = get_pokemons()
+    if pokemon is None:
+        return
     megastonelist = get_json("_megastonelist.json", [])
     megastoneables = []
     for item in pokemon:
@@ -350,11 +334,9 @@ def giveMegastone():
 
 
 def takeMegastone():
-    f = get_json("_decksortags.json", None)
-    if f:
-        pokemon = get_json("_tagmon.json")
-    else:
-        pokemon = get_json("_pokemanki.json")
+    pokemon, f = get_pokemons()
+    if pokemon is None:
+        return
     megastonelist = get_json("_megastonelist.json", [])
     if not megastonelist:
         nomegastone = QMessageBox()
@@ -394,11 +376,9 @@ def takeMegastone():
 
 
 def giveAlolanPassport():
-    f = get_json("_decksortags.json", None)
-    if f:
-        pokemon = get_json("_tagmon.json")
-    else:
-        pokemon = get_json("_pokemanki.json")
+    pokemon, f = get_pokemons()
+    if pokemon is None:
+        return
     alolanlist = get_json("_alolanlist.json", [])
 
     alolanables = []
@@ -437,11 +417,9 @@ def giveAlolanPassport():
 
 
 def takeAlolanPassport():
-    f = get_json("_decksortags.json", None)
-    if f:
-        pokemon = get_json("_tagmon.json")
-    else:
-        pokemon = get_json("_pokemanki.json")
+    pokemon, f = get_pokemons()
+    if pokemon is None:
+        return
     alolanlist = get_json("_alolanlist.json", [])
     if not alolanlist:
         noalolan = QMessageBox()
@@ -482,11 +460,9 @@ def takeAlolanPassport():
 
 
 def PrestigePokemon():
-    f = get_json("_decksortags.json", None)
-    if f:
-        pokemon = get_json("_tagmon.json")
-    else:
-        pokemon = get_json("_pokemanki.json")
+    pokemon, f = get_pokemons()
+    if pokemon is None:
+        return
     prestigelist = get_json("_prestigelist.json", [])
     possibleprestiges = []
     for item in pokemon:
@@ -526,12 +502,9 @@ def PrestigePokemon():
 
 
 def UnprestigePokemon():
-    f = get_json("_decksortags.json", None)
-
-    if f:
-        pokemon = get_json("_tagmon.json")
-    else:
-        pokemon = get_json("_pokemanki.json")
+    pokemon, f = get_pokemons()
+    if pokemon is None:
+        return
     prestigelist = get_json("_prestigelist.json", [])
     if not prestigelist:
         noprestige = QMessageBox()

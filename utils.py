@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List, Union
 
 from aqt import mw
+from aqt.qt import *
 
 config = mw.addonManager.getConfig(__name__)
 
@@ -53,13 +54,32 @@ def write_json(file_name: str, value):
         json.dump(value, f)
 
 
-def get_pokemon():
-    f = get_json("_decksortags.json", None)
+def no_pokemon():
+    nopokemon = QMessageBox()
+    nopokemon.setWindowTitle("Pokemanki")
+    nopokemon.setText(
+        "Please open the Stats window to get your Pokémon.")
+    nopokemon.exec_()
+
+
+def get_pokemons():
+    f = get_json("_decksortags.json", "")
     if f:
-        pokemon = get_json("_tagmon.json")
+        pokemons = get_json("_tagmon.json", None)
     else:
-        pokemon = get_json("_pokemanki.json")
-    return pokemon
+        pokemons = get_json("_pokemanki.json", None)
+    if pokemons is None:
+        no_pokemon()
+        return (None, None)
+    # patch - remove deplicates from pokemon json
+    # TODO: fix the code duplicating pokemon
+    ids = []
+    ret_pokemons = []
+    for pokemon in pokemons:
+        if pokemon[1] not in ids:  # only one pokemon per id
+            ret_pokemons.append(pokemon)
+            ids.append(pokemon[1])
+    return (ret_pokemons, f)
 
 
 def line(
