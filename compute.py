@@ -186,9 +186,8 @@ def FirstPokemon():
             cardIds = cardIdsFromDeckIds(mw.col.db, [deck])
             stats = []
             for cid in cardIds:
-                for cid in cardIds:
-                    ivl = cardInterval(mw.col.db, cid)
-                    stats.append((cid, ivl))
+                ivl = cardInterval(mw.col.db, cid)
+                stats.append((cid, ivl))
 
             sumivl = 0
             for id, ivl in stats:
@@ -265,7 +264,7 @@ def DeckPokemon():
             tierdict[tier].append(pokemon)
 
     # Get results from DeckStats
-    result = DeckStats()
+    result = ()
     # If no results, return
     if len(result) == 0:
         return
