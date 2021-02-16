@@ -264,7 +264,7 @@ def DeckPokemon():
             tierdict[tier].append(pokemon)
 
     # Get results from DeckStats
-    result = ()
+    result = DeckStats()
     # If no results, return
     if len(result) == 0:
         return
