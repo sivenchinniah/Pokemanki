@@ -42,7 +42,8 @@ def get_json(file_name: str, default=None):
     file_path = mediafolder / file_name
     value = None
     if file_path.exists():
-        value = json.load(open(file_path))
+        with open(file_path, "r") as f:
+            value = json.load(f)
     if not value:  # includes json with falsy value
         value = default
     return value
