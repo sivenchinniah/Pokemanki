@@ -264,7 +264,7 @@ def DeckPokemon():
             tierdict[tier].append(pokemon)
 
     # Get results from DeckStats
-    result = DeckStats()
+    result = MultiStats(False)
     # If no results, return
     if len(result) == 0:
         return
@@ -326,7 +326,6 @@ def DeckPokemon():
             randno = random.randint(0, tiernumber - 1)
             deckmon = tierlabel[randno]
     # Get details for Deckmon from pokemon_tuple list
-    details = ()
     for pokemon, tier, firstEL, firstEvol, secondEL, secondEvol in pokemon_tuple:
         if deckmon == pokemon or deckmon == firstEvol or deckmon == secondEvol:
             details = (pokemon, firstEL, firstEvol, secondEL, secondEvol)

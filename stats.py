@@ -50,15 +50,6 @@ def deckStats(deck_ids):
     return result
 
 
-def DeckStats():
-    """
-    Retrieve id and ivl for each card in a single deck
-    Returns [[cid, ivl], ...]
-    """
-    activeDeckIds = mw.col.decks.active()
-    return deckStats(activeDeckIds)
-
-
 def MultiStats(wholeCollection):
     "Retrieve id and ivl for each subdeck that does not have subdecks itself"
     # Get list of subdecks
@@ -72,15 +63,17 @@ def MultiStats(wholeCollection):
                 nograndchildren.append(int(item))
     else:
         # Get results only for all subdecks of selected deck
-        children = mw.col.decks.children(mw.col.decks.active()[0])
-        childlist = []
-        for item in children:
-            childlist.append(item[1])
-        # Determine which subdecks do not have their own subdecks
-        nograndchildren = []
-        for item in childlist:
-            if len(mw.col.decks.children(item)) == 0:
-                nograndchildren.append(item)
+        curr_deck = mw.col.decks.active()[0]
+        children = mw.col.decks.children(curr_deck)
+        if not children:
+            nograndchildren = [curr_deck]
+        else:
+            childlist = [item[1] for item in children]
+            # Determine which subdecks do not have their own subdecks
+            nograndchildren = []
+            for item in childlist:
+                if len(mw.col.decks.children(item)) == 0:
+                    nograndchildren.append(item)
     resultlist = []
     # Find results for each card in these decks
     for item in nograndchildren:

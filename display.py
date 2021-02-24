@@ -76,33 +76,17 @@ def pokemonDisplay(wholeCollection):
         shutil.copytree(pkmnimgfolder, "%s/pokemon_images" % mediafolder)
     if os.path.exists("%s/progress_bars" % mediafolder) == False and os.path.exists(progressbarfolder):
         shutil.copytree(progressbarfolder, "%s/progress_bars" % mediafolder)
-    # Assign deckmon and multideckmon variables (either tuple or list of tuples)
-    deckmon = ()
-    multideckmon = []
-    # Get id of active deck
-    did = mw.col.decks.active()
     # See if "Whole Collection" is selected - if so, get all assigned Pokemon and assign to multideckmon
     if wholeCollection:
         multideckmon = MultiPokemon(wholeCollection=True)
     # If "Whole Collection" not selected, show Pokemon for either single deck or all subdecks and store into multideckmon/deckmon
-    elif len(did) > 1:
-        multideckmon = MultiPokemon(wholeCollection=False)
     else:
-        print("single")
-        deckmon = DeckPokemon()
-
+        multideckmon = MultiPokemon(wholeCollection=False)
     # Get old result and add new tables with Pokemon
-    result = ""
-    if deckmon:
-        result += _show(
-            deckmon,
-            "Pokémon",
-            "Your Pokémon")
-    elif multideckmon:
-        result += _show(
-            multideckmon,
-            "Pokémon",
-            "Your Pokémon")
+    result = _show(
+        multideckmon,
+        "Pokémon",
+        "Your Pokémon")
     # Return result
     return result
 
