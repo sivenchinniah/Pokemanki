@@ -6,7 +6,7 @@ from aqt import mw
 from aqt.qt import *
 
 from .utils import *
-from .stats import DeckStats, MultiStats, cardInterval, cardIdsFromDeckIds
+from .stats import MultiStats, cardInterval, cardIdsFromDeckIds
 
 
 def loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2):
@@ -212,6 +212,16 @@ def FirstPokemon():
         return
 
 
+def getPokemonIndex(pokemon_name, pokemons1, pokemons2, pokemons3):
+    "Returns a string of integer because 0 is a falsey value, while '0' is truthy"
+    def getIndex(pokemons):
+        try:
+            return str(pokemons.index(pokemon_name))
+        except:
+            return None
+    return getIndex(pokemons1) or getIndex(pokemons2) or getIndex(pokemons3)
+
+
 def MultiPokemon(wholeCollection):
     "Returns array of DeckPokemon"
 
@@ -245,14 +255,10 @@ def MultiPokemon(wholeCollection):
     load_pokemon_gen_all(pokemonlist, tiers, evolutionLevel1,
                          evolution1, evolutionLevel2, evolution2)
 
-    pokemon_tuple = tuple(
-        zip(pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2))
-
     tierdict = {"A": [], "B": [], "C": [], "D": [], "E": [], "F": []}
-
-    for pokemon, tier, firstEL, firstEvol, secondEL, secondEvol in pokemon_tuple:
+    for i, tier in enumerate(tiers):
         if tier != "S":
-            tierdict[tier].append(pokemon)
+            tierdict[tier].append(pokemonlist[i])
 
     # Have default message text here because of future for loop iterating through multideck results
     msgtxt = "Hello Pokémon Trainer!"
@@ -307,8 +313,8 @@ def MultiPokemon(wholeCollection):
                 previouslevel = thing[2]
                 if len(thing) == 4:
                     nickname = thing[3]
-        # Assign Deckmon if not already assigned
-        if deckmon == "":
+        # Assign Deckmon if not already assigned or not valid
+        if deckmon == "" or not getPokemonIndex(deckmon, pokemonlist, evolution1, evolution2):
             # If starter Pokemon, allow choice
             if pokemontier == "A":
                 msgbox = QMessageBox()
@@ -327,17 +333,15 @@ def MultiPokemon(wholeCollection):
                 tierlabel = tierdict[pokemontier]
                 randno = random.randint(0, tiernumber - 1)
                 deckmon = tierlabel[randno]
-        details = ()
-        # Get details for Deckmon from pokemon_tuple list
-        for pokemon, tier, firstEL, firstEvol, secondEL, secondEvol in pokemon_tuple:
-            if deckmon == pokemon or deckmon == firstEvol or deckmon == secondEvol:
-                details = (pokemon, firstEL, firstEvol, secondEL, secondEvol)
+
+        idx = getPokemonIndex(deckmon, pokemonlist, evolution1, evolution2)
+        idx = int(idx)
         # Assign details for name, evolutions, and evolution levels
-        name = details[0]
-        firstEL = details[1]
-        firstEvol = details[2]
-        secondEL = details[3]
-        secondEvol = details[4]
+        name = pokemonlist[idx]
+        firstEL = evolutionLevel1[idx]
+        firstEvol = evolution1[idx]
+        secondEL = evolutionLevel2[idx]
+        secondEvol = evolution2[idx]
         # Set max level to 100
         if Level > 100 and item[0] not in prestigelist:
             Level = 100
