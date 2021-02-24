@@ -211,18 +211,12 @@ def FirstPokemon():
     else:
         return
 
-# Assign Pokemon and levels for single deck
 
+def MultiPokemon(wholeCollection):
+    "Returns array of DeckPokemon"
 
-def DeckPokemon():
-    """
-    Returns [name, deck id, level, nickname] if there is nickname,
-    otherwise [name, deck id, level]
-    May return None
-    """
     FirstPokemon()
-
-    pokemontotal = get_json('_pokemanki.json')
+    pokemontotal = get_json("_pokemanki.json", None)
     if not pokemontotal:
         return  # If no pokemanki.json, make empty pokemontotal and modifiedpokemontotal lists
 
@@ -238,211 +232,9 @@ def DeckPokemon():
         else:
             if str(item[1]) in mw.col.decks.allIds():
                 modifiedpokemontotal.append(item)
-
     # Download threshold settings if they exist, otherwise make from scratch
-    thresholdsettings = get_json("_pokemankisettings.json",
-                                 default=[100, 250, 500, 750, 1000])
-
-    # Lists containing Pokemon, tiers, first evolution level, first evolution, second evolution level, and second evolution
-    pokemonlist = []
-    tiers = []
-    evolutionLevel1 = []
-    evolution1 = []
-    evolutionLevel2 = []
-    evolution2 = []
-    load_pokemon_gen_all(pokemonlist, tiers, evolutionLevel1,
-                         evolution1, evolutionLevel2, evolution2)
-
-    # Zip lists into list of tuples
-    pokemon_tuple = tuple(
-        zip(pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2))
-
-    # Make dictionary based on tiers of Pokemon
-    tierdict = {"A": [], "B": [], "C": [], "D": [], "E": [], "F": []}
-    for pokemon, tier, firstEL, firstEvol, secondEL, secondEvol in pokemon_tuple:
-        if tier != "S":
-            tierdict[tier].append(pokemon)
-
-    # Get results from DeckStats
-    result = MultiStats(False)
-    # If no results, return
-    if len(result) == 0:
-        return
-    # Determine level of Pokemon (if zero, do not assign Pokemon)
-    sumivl = 0
-    for id, ivl in result:
-        adjustedivl = (100 * (ivl/100)**(0.5))
-        sumivl += adjustedivl
-    Level = round((sumivl/len(result)+0.5), 2)
-    if Level < 1:
-        return
-
-    # Determine tier of Pokemon based on deck size
-    pokemontier = ""
-    if len(result) < thresholdsettings[0]:
-        pokemontier = "F"
-    elif len(result) < thresholdsettings[1]:
-        pokemontier = "E"
-    elif len(result) < thresholdsettings[2]:
-        pokemontier = "D"
-    elif len(result) < thresholdsettings[3]:
-        pokemontier = "C"
-    elif len(result) < thresholdsettings[4]:
-        pokemontier = "B"
-    else:
-        pokemontier = "A"
-
-    # Assign "Deckmon"
-    deckmon = ""
-    already_assigned = False
-    details = ()
-    nickname = ""
-    previouslevel = 0
-    # Assign Deckmon from modifiedpokemontotal if already assigned
-    for item in modifiedpokemontotal:
-        if item[1] == mw.col.decks.active()[0]:
-            deckmon = item[0]
-            already_assigned = True
-            previouslevel = item[2]
-            if len(item) == 4:
-                nickname = item[3]
-    # Assign Deckmon if not already assigned
-    if deckmon == "":
-        # If starter Pokemon, allow choice
-        if pokemontier == "A":
-            msgbox = QMessageBox()
-            msgbox.setWindowTitle("Pokemanki")
-            msgbox.setText("Choose a starter Pokémon for the %s deck" %
-                           mw.col.decks.name(mw.col.decks.active()[0]))
-            msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
-            msgbox.addButton("Charmander", QMessageBox.AcceptRole)
-            msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
-            msgbox.exec_()
-            deckmon = msgbox.clickedButton().text()
-        # Else, randomize based on tier
-        else:
-            tiernumber = len(tierdict[pokemontier])
-            tierlabel = tierdict[pokemontier]
-            randno = random.randint(0, tiernumber - 1)
-            deckmon = tierlabel[randno]
-    # Get details for Deckmon from pokemon_tuple list
-    for pokemon, tier, firstEL, firstEvol, secondEL, secondEvol in pokemon_tuple:
-        if deckmon == pokemon or deckmon == firstEvol or deckmon == secondEvol:
-            details = (pokemon, firstEL, firstEvol, secondEL, secondEvol)
-
-    # Assign details for name, evolutions, and evolution levels
-    name = details[0]
-    firstEL = details[1]
-    firstEvol = details[2]
-    secondEL = details[3]
-    secondEvol = details[4]
-    prestigelist = get_json("_prestigelist.json", [])
-    everstonelist = get_json("_everstonelist.json", [])
-    everstonepokemonlist = get_json("_everstonepokemonlist.json", [])
-    # Set max level to 100
-    if Level > 100 and mw.col.decks.active()[0] not in prestigelist:
-        Level = 100.00
-    # Give egg if level < 5
-    if Level < 5:
-        name = "Egg"
-    # Reassign name if Pokemon has evolved
-    if firstEL is not None:
-        firstEL = int(firstEL)
-        if Level > firstEL:
-            name = firstEvol
-    if secondEL is not None:
-        secondEL = int(secondEL)
-        if Level > secondEL:
-            name = secondEvol
-    # Make display name Eevee if one of the Eevees
-    if name.startswith("Eevee"):
-        name = "Eevee"
-    if name.startswith("Slowpoke"):
-        name = "Slowpoke"
-    if name.startswith("Tyrogue"):
-        name = "Tyrogue"
-
-    # Assign new name to modifiedpokemontotal if not already assigned (making sure to assign Deckmon original name if Eevee or Egg)
-    if already_assigned == False and name != "Eevee" and name != "Egg":
-        deckmonData = (name, mw.col.decks.active()[0], Level)
-        modifiedpokemontotal.append(deckmonData)
-    elif already_assigned == False:
-        deckmonData = (deckmon, mw.col.decks.active()[0], Level)
-        modifiedpokemontotal.append(deckmonData)
-    # If already assigned, assign new level/name to modifiedpokemontotal if new level/name
-    if already_assigned == True:
-        for item in pokemontotal:
-            if item[1] == mw.col.decks.active()[0]:
-                if name == "Eevee" or name == "Egg":
-                    if nickname:
-                        if (item[0], item[1], Level, nickname) in modifiedpokemontotal:
-                            pass
-                        else:
-                            modifiedpokemontotal.append(
-                                (item[0], item[1], Level, nickname))
-                    else:
-                        if (item[0], item[1], Level) in modifiedpokemontotal:
-                            pass
-                        else:
-                            modifiedpokemontotal.append(
-                                (item[0], item[1], Level))
-                else:
-                    if nickname:
-                        if (name, item[1], Level, nickname) in modifiedpokemontotal:
-                            pass
-                        else:
-                            modifiedpokemontotal.append(
-                                (name, item[1], Level, nickname))
-                    else:
-                        if (name, item[1], Level) in modifiedpokemontotal:
-                            pass
-                        else:
-                            modifiedpokemontotal.append((name, item[1], Level))
-    # Save new Pokemon data
-    write_json("_pokemanki.json", modifiedpokemontotal)
-
-    # Generate message box
-    msgtxt = "Hello Pokémon Trainer!"
-    # Show changes in egg hatching, leveling up, and evolving
-    msgtxt += alertMsgText(deckmon, mw.col.decks.active()[0], name, int(
-        Level), int(previouslevel), nickname, already_assigned)
-    # Only show message box if there has been a change
-    if msgtxt != "Hello Pokémon Trainer!":
-        msgbox2 = QMessageBox()
-        msgbox2.setWindowTitle("Pokemanki")
-        msgbox2.setText(msgtxt)
-        msgbox2.exec_()
-
-    # Set displayData for pokemonDisplay function in display.py
-    if nickname:
-        displayData = (name, mw.col.decks.active()[0], Level, nickname)
-    else:
-        displayData = (name, mw.col.decks.active()[0], Level)
-    # Return displayData
-    return displayData
-
-
-def MultiPokemon(wholeCollection):
-    "Returns array of DeckPokemon"
-
-    # Same deal as above
-    FirstPokemon()
-    pokemontotal = get_json("_pokemanki.json", None)
-    if not pokemontotal:
-        return
-
-    sortedpokemontotal = list(reversed(pokemontotal))
-    modifiedpokemontotal = []
-    for item in sortedpokemontotal:
-        for thing in modifiedpokemontotal:
-            if item[1] == thing[1]:
-                break
-        else:
-            if str(item[1]) in mw.col.decks.allIds():
-                modifiedpokemontotal.append(item)
     thresholdsettings = get_json("_pokemankisettings.json", [
                                  100, 250, 500, 750, 1000])
-
     pokemonlist = []
     tiers = []
     evolutionLevel1 = []
@@ -474,7 +266,7 @@ def MultiPokemon(wholeCollection):
     prestigelist = get_json("_prestigelist.json", [])
     everstonelist = get_json("_everstonelist.json", [])
     everstonepokemonlist = get_json("_everstonepokemonlist.json", [])
-    # Do the following (basically DeckPokemon) for each deck in results
+    # Determine level of Pokemon (if zero, do not assign Pokemon)
     for item in results:
         result = item[1]
         sumivl = 0
@@ -487,8 +279,8 @@ def MultiPokemon(wholeCollection):
         if Level < 1:
             continue
 
+        # Determine tier of Pokemon based on deck size
         pokemontier = ""
-
         if len(result) < thresholdsettings[0]:
             pokemontier = "F"
         elif len(result) < thresholdsettings[1]:
@@ -501,11 +293,13 @@ def MultiPokemon(wholeCollection):
             pokemontier = "B"
         else:
             pokemontier = "A"
+        # Assign "Deckmon"
         deckmon = ""
         already_assigned = False
         details = ()
         nickname = ""
         previouslevel = 0
+        # Assign Deckmon from modifiedpokemontotal if already assigned
         for thing in modifiedpokemontotal:
             if thing[1] == item[0]:
                 deckmon = thing[0]
@@ -513,7 +307,9 @@ def MultiPokemon(wholeCollection):
                 previouslevel = thing[2]
                 if len(thing) == 4:
                     nickname = thing[3]
+        # Assign Deckmon if not already assigned
         if deckmon == "":
+            # If starter Pokemon, allow choice
             if pokemontier == "A":
                 msgbox = QMessageBox()
                 msgbox.setWindowTitle("Pokemanki")
@@ -525,26 +321,31 @@ def MultiPokemon(wholeCollection):
                     msgbox.addButton(starter, QMessageBox.AcceptRole)
                 msgbox.exec_()
                 deckmon = msgbox.clickedButton().text()
+            # Else, randomize based on tier
             else:
                 tiernumber = len(tierdict[pokemontier])
                 tierlabel = tierdict[pokemontier]
                 randno = random.randint(0, tiernumber - 1)
                 deckmon = tierlabel[randno]
         details = ()
+        # Get details for Deckmon from pokemon_tuple list
         for pokemon, tier, firstEL, firstEvol, secondEL, secondEvol in pokemon_tuple:
             if deckmon == pokemon or deckmon == firstEvol or deckmon == secondEvol:
                 details = (pokemon, firstEL, firstEvol, secondEL, secondEvol)
+        # Assign details for name, evolutions, and evolution levels
         name = details[0]
         firstEL = details[1]
         firstEvol = details[2]
         secondEL = details[3]
         secondEvol = details[4]
-
+        # Set max level to 100
         if Level > 100 and item[0] not in prestigelist:
             Level = 100
+        # Give egg if level < 5
         if Level < 5:
             name = "Egg"
         if item[0] not in everstonelist:
+            # Reassign name if Pokemon has evolved
             if firstEL is not None:
                 firstEL = int(firstEL)
                 if Level > firstEL:
@@ -564,9 +365,14 @@ def MultiPokemon(wholeCollection):
                 print(e)
                 everstonelist.pop(idx)
                 everstonepokemonlist.pop(idx)
+        # Make display name Eevee if one of the Eevees
         if name.startswith("Eevee"):
             name = "Eevee"
-
+        if name.startswith("Slowpoke"):
+            name = "Slowpoke"
+        if name.startswith("Tyrogue"):
+            name = "Tyrogue"
+        # Assign new name to modifiedpokemontotal if not already assigned (making sure to assign Deckmon original name if Eevee or Egg)
         if already_assigned == False and name != "Eevee" and name != "Egg":
             deckmonData = [name, item[0], Level]
             modifiedpokemontotal.append(deckmonData)
@@ -575,6 +381,7 @@ def MultiPokemon(wholeCollection):
             modifiedpokemontotal.append(deckmonData)
         msgtxt += alertMsgText(deckmon, item[0], name, int(
             Level), int(previouslevel), nickname, already_assigned)
+        # If already assigned, assign new level/name to modifiedpokemontotal if new level/name
         if already_assigned == True:
             for thing in pokemontotal:
                 if thing[1] == item[0]:

@@ -6,7 +6,7 @@ from anki.lang import _
 from aqt import mw
 
 from .utils import *
-from .compute import DeckPokemon, MultiPokemon
+from .compute import MultiPokemon
 
 
 def eggHatchText(level, name):
