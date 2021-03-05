@@ -84,9 +84,12 @@ def _show(data, title, subtitle):
     while table_size < len(pokemon_text):
         table_text += "\n".join((
             "<tr>",
-            table_image_html(get(pokemon_names, table_size)),
-            table_image_html(get(pokemon_names, table_size + 1)),
-            table_image_html(get(pokemon_names, table_size + 2)),
+            table_image_html(get(pokemon_names, table_size),
+                             get(pokemon_tags, table_size)),
+            table_image_html(get(pokemon_names, table_size + 1),
+                             get(pokemon_tags, table_size + 1)),
+            table_image_html(get(pokemon_names, table_size + 2),
+                             get(pokemon_tags, table_size + 2)),
             "</tr>"
         ))
         table_text += "\n".join((
