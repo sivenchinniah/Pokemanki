@@ -100,7 +100,7 @@ def message_handler(handled, message, context):
     # context is not set to NewDeckStats, so don't check for it
     # maybe Anki bug?
     if not message.startswith("Pokemanki#"):
-        return (False, None)
+        return handled
     if message == "Pokemanki#currentDeck":
         if f:
             html = tagmonDisplay().replace("`", "'")
@@ -115,7 +115,6 @@ def message_handler(handled, message, context):
         starts = "Pokemanki#search#"
         term = message[len(starts):]
         # Todo: implement selective
-        return (True, None)
     statsDialog.form.web.eval("Pokemanki.setPokemanki(`{}`)".format(html))
     return (True, None)
 
