@@ -1,4 +1,5 @@
 import os
+import sys
 
 from aqt import mw, gui_hooks
 from aqt.qt import *
@@ -40,21 +41,21 @@ bottomaction = QAction("Move Pokémon to Bottom", mw)
 topaction = QAction("Move Pokémon to Top", mw)
 
 # Connect actions to functions
-nicknameaction.triggered.connect(Nickname)
-resetaction.triggered.connect(ResetPokemon)
-tradeaction.triggered.connect(tradeclass.tradeFunction)
-toggleaction.triggered.connect(Toggle)
-tagsaction.triggered.connect(tags.tagMenu)
-prestigeaction.triggered.connect(PrestigePokemon)
-unprestigeaction.triggered.connect(UnprestigePokemon)
-everstoneaction.triggered.connect(giveEverstone)
-uneverstoneaction.triggered.connect(takeEverstone)
-megastoneaction.triggered.connect(giveMegastone)
-unmegastoneaction.triggered.connect(takeMegastone)
-alolanaction.triggered.connect(giveAlolanPassport)
-unalolanaction.triggered.connect(takeAlolanPassport)
-bottomaction.triggered.connect(MovetoBottom)
-topaction.triggered.connect(MovetoTop)
+qconnect(nicknameaction.triggered, Nickname)
+qconnect(resetaction.triggered, ResetPokemon)
+qconnect(tradeaction.triggered, tradeclass.tradeFunction)
+qconnect(toggleaction.triggered, Toggle)
+qconnect(tagsaction.triggered, tags.tagMenu)
+qconnect(prestigeaction.triggered, PrestigePokemon)
+qconnect(unprestigeaction.triggered, UnprestigePokemon)
+qconnect(everstoneaction.triggered, giveEverstone)
+qconnect(uneverstoneaction.triggered, takeEverstone)
+qconnect(megastoneaction.triggered, giveMegastone)
+qconnect(unmegastoneaction.triggered, takeMegastone)
+qconnect(alolanaction.triggered, giveAlolanPassport)
+qconnect(unalolanaction.triggered, takeAlolanPassport)
+qconnect(bottomaction.triggered, MovetoBottom)
+qconnect(topaction.triggered, MovetoTop)
 
 # Make new Pokemanki menu under tools
 mw.testmenu = QMenu('&Pokemanki', mw)
