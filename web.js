@@ -1,14 +1,11 @@
 Pokemanki = {}
 
 Pokemanki.addPokemanki = function(){
-    let padDiv = document.createElement("div")
-    padDiv.setAttribute("class", "range-box-pad")
     let divEl = document.createElement("div");
     divEl.setAttribute("id", "pokemanki")
     divEl.className = "pokemanki";
-    let mainEl = document.getElementById('main');
-    mainEl.parentElement.insertBefore(padDiv, mainEl)
-    mainEl.parentElement.insertBefore(divEl, mainEl);
+    let rangeBoxPad = document.querySelector('.range-box-pad');
+    rangeBoxPad.before(divEl);
 }
 Pokemanki.setPokemanki = function(html){
     document.getElementById('pokemanki').innerHTML = html;
