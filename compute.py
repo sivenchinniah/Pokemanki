@@ -156,12 +156,12 @@ def FirstPokemon():
     deckmonlist = get_json("_pokemanki.json")
     if deckmonlist:
         return
-    alldecks = mw.col.decks.allIds()
+    alldecks = mw.col.decks.all_names_and_ids()
     # Determine which subdecks do not have their own subdecks
     nograndchildren = []
     for item in alldecks:
-        if len(mw.col.decks.children(int(item))) == 0:
-            nograndchildren.append(int(item))
+        if len(mw.col.decks.children(int(item.id))) == 0:
+            nograndchildren.append(int(item.id))
     decklist = []
     for item in nograndchildren:
         decklist.append(mw.col.decks.name(item))
@@ -240,7 +240,8 @@ def MultiPokemon(wholeCollection):
             if item[1] == thing[1]:
                 break
         else:
-            if str(item[1]) in mw.col.decks.allIds():
+            allIds = [deck.id for deck in mw.col.decks.all_names_and_ids()]
+            if item[1] in allIds:
                 modifiedpokemontotal.append(item)
     # Download threshold settings if they exist, otherwise make from scratch
     thresholdsettings = get_json("_pokemankisettings.json", [

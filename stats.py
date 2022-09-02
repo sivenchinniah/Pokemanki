@@ -55,12 +55,12 @@ def MultiStats(wholeCollection):
     # Get list of subdecks
     if wholeCollection:
         # Get results for all subdecks in collection
-        alldecks = mw.col.decks.allIds()
+        alldecks = mw.col.decks.all_names_and_ids()
         # Determine which subdecks do not have their own subdecks
         nograndchildren = []
         for item in alldecks:
-            if len(mw.col.decks.children(int(item))) == 0:
-                nograndchildren.append(int(item))
+            if len(mw.col.decks.children(int(item.id))) == 0:
+                nograndchildren.append(int(item.id))
     else:
         # Get results only for all subdecks of selected deck
         curr_deck = mw.col.decks.active()[0]
