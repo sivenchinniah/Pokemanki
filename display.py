@@ -61,8 +61,8 @@ def pokemonDisplayText(name, id, level, nickname):
                     special += config["X_or_Y_mega_evolutions"]
         if id in alolanlist:
             held += alolan_html
-            if any([name + "_Alolan" in imgname for imgname in os.listdir(pkmnimgfolder)]):
-                special += "_Alolan"
+            if any([name + "_Alola" in imgname for imgname in os.listdir(pkmnimgfolder)]):
+                special += "_Alola"
 
     return (text, held, special)
 
