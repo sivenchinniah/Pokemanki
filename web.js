@@ -6,7 +6,7 @@ Pokemanki.addPokemanki = function(){
     let divEl = document.createElement("div");
     divEl.setAttribute("id", "pokemanki")
     divEl.className = "pokemanki";
-    let mainEl = document.getElementById('main');
+    let mainEl = document.getElementsByTagName('body')[0].children[0].children[0];
     mainEl.parentElement.insertBefore(padDiv, mainEl)
     mainEl.parentElement.insertBefore(divEl, mainEl);
 }
