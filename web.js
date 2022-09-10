@@ -6,6 +6,11 @@ Pokemanki.addPokemanki = function(){
     divEl.className = "pokemanki";
     let rangeBoxPad = document.querySelector('.range-box-pad');
     rangeBoxPad.before(divEl);
+
+    link = document.createElement('link');
+    link.href = "/pokemon_images/pokemanki.css";
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
 }
 Pokemanki.setPokemanki = function(html){
     document.getElementById('pokemanki').innerHTML = html;
