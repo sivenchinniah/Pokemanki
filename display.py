@@ -58,7 +58,6 @@ def _show(data):
           '<div style="text-align: center;">Your pokemon</div>'
 
     # If single Pokemon, show centered picture with name and level below
-    print(type(data))
     if type(data) == tuple:
         txt += '<div class="pk-st-single">'
         txt += card_html(data[0], data[1], data[2], data[3] if len(data) == 4 else "")
@@ -127,11 +126,6 @@ def card_html(name, deckid, level, nickname="", multi=False):
     #############
     card += '<div class="pk-st-card-info" style="margin-top: auto;">' \
             '<div class="pk-st-divider" style="margin-bottom: 10px;"></div>'
-    # Progress bar
-    if name == "Egg":
-        card += '<span class="pk-st-card-xp">{}</span>'.format(egg_hatch_text(level))
-    else:
-        card += '<img src="/progress_bars/{}.png" class="pk-st-card-xp"/>'.format(calculate_xp_progress(level))
     # Held/SP
     held = held_html(deckid)
     if held != "":
@@ -139,6 +133,11 @@ def card_html(name, deckid, level, nickname="", multi=False):
                 '<span><b>SP: </b></span>'
         card += held
         card += '</div>'
+    # Progress bar
+    if name == "Egg":
+        card += '<span class="pk-st-card-xp">{}</span>'.format(egg_hatch_text(level))
+    else:
+        card += '<img src="/progress_bars/{}.png" class="pk-st-card-xp"/>'.format(calculate_xp_progress(level))
     card += '</div>'
 
     # End card
