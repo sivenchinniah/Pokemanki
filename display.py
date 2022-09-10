@@ -9,143 +9,6 @@ from .utils import *
 from .compute import MultiPokemon
 
 
-def egg_hatch_text(level):
-    """
-    Get the egg's hatch text.
-
-    :param int level: The level of the egg.
-    :return: The hatch text.
-    :rtype: str
-    """
-    if level < 2:
-        return "Needs a lot more time to hatch"
-    elif level < 3:
-        return "Will take some time to hatch"
-    elif level < 4:
-        return "Moves around inside sometimes"
-    else:
-        return "Making sounds inside"
-
-
-def eggHatchText(level, name):
-    if level < 2:
-        text = ("%s (needs a lot more time to hatch)" % name)
-    elif level < 3:
-        text = ("%s (will take some time to hatch)" % name)
-    elif level < 4:
-        text = ("%s (moves around inside sometimes)" % name)
-    else:
-        text = ("%s (making sounds inside)" % name)
-    return text
-
-def pokemonDisplayText(name, id, level, nickname):
-    prestigelist = get_json("_prestigelist.json", [])
-    everstonelist = get_json("_everstonelist.json", [])
-    megastonelist = get_json("_megastonelist.json", [])
-    alolanlist = get_json("_alolanlist.json", [])
-
-    held = ""
-    special = ""
-    everstone_html = '<img src="/pokemon_images/item_Everstone.png" hspace="10">'
-    megastone_html = '<img src="/pokemon_images/item_Mega_Stone.png" hspace="10">'
-    alolan_html = '<img src="/pokemon_images/item_Alolan_Passport.png" hspace="10">'
-    pkmnimgfolder = currentdirname / "pokemon_images"
-
-    level = int(float(level))  # float string such as "1.2"
-
-    displayname = name
-    if nickname:
-        displayname = nickname
-    if name == "Egg":
-        text = eggHatchText(level, displayname)
-    else:
-        if id in prestigelist:
-            text = ("%s (Level %s) - Prestiged" %
-                    (displayname, level - 50))
-        else:
-            text = ("%s (Level %s)" % (displayname, level))
-        if id in everstonelist:
-            held += everstone_html
-            # FIX: name is never declared!
-            if name == "Pikachu":
-                special += "_Ash" + str(random.randint(1, 5))
-        if id in megastonelist:
-            held += megastone_html
-
-            if any([name + "_Mega" in imgname for imgname in os.listdir(pkmnimgfolder)]):
-                special += "_Mega"
-                if name == "Charizard" or name == "Mewtwo":
-                    special += config["X_or_Y_mega_evolutions"]
-        if id in alolanlist:
-            held += alolan_html
-            if any([name + "_Alolan" in imgname for imgname in os.listdir(pkmnimgfolder)]):
-                special += "_Alolan"
-
-    return (text, held, special)
-
-
-def image_name(name, deckid):
-    """
-    Get the image name based on the Pokemon's name and any special attributes.
-
-    :param str name: Pokemon's name.
-    :param int deckid: Id of the deck the Pokemon belongs to.
-    :return: The image name to be used to retrieve it.
-    :rtype: str
-    """
-
-    everstonelist = get_json("_everstonelist.json", [])
-    megastonelist = get_json("_megastonelist.json", [])
-    alolanlist = get_json("_alolanlist.json", [])
-    pkmnimgfolder = currentdirname / "pokemon_images"
-
-    fullname = name
-    if deckid in everstonelist:
-        # FIX: name is never declared!u
-        if name == "Pikachu":
-            fullname += "_Ash" + str(random.randint(1, 5))
-    if deckid in megastonelist:
-        if any([name + "_Mega" in imgname for imgname in os.listdir(pkmnimgfolder)]):
-            fullname += "_Mega"
-            if name == "Charizard" or name == "Mewtwo":
-                fullname += config["X_or_Y_mega_evolutions"]
-    if deckid in alolanlist:
-        if any([name + "_Alolan" in imgname for imgname in os.listdir(pkmnimgfolder)]):
-            fullname += "_Alolan"
-
-    return fullname
-
-def held_html(deckid):
-    """
-    Generate the held html code for the given Pokemon.
-
-    :param int deckId: Id of the deck the Pokemon belongs to.
-    :return: The concatenation of all held items' html. Empty if it has no items.
-    :rtype: str
-    """
-    """Generate the held html code for the given Pokemon"""
-    prestigelist = get_json("_prestigelist.json", [])
-    everstonelist = get_json("_everstonelist.json", [])
-    megastonelist = get_json("_megastonelist.json", [])
-    alolanlist = get_json("_alolanlist.json", [])
-
-    held = ""
-    everstone_html = '<img src="/pokemon_images/item_Everstone.png" height="20px"/>'
-    megastone_html = '<img src="/pokemon_images/item_Mega_Stone.png" height="25px"/>'
-    alolan_html = '<img src="/pokemon_images/item_Alolan_Passport.png" height="25px"/>'
-
-    if deckid in prestigelist:
-        held += '<span>Prestiged </span>'
-    if deckid in everstonelist:
-        held += everstone_html
-    if deckid in alolanlist:
-        held += alolan_html
-    if deckid in megastonelist:
-        held += megastone_html
-
-    return held
-
-
 def pokemonDisplay(wholeCollection):
     """
     Control the generation of the html code to displau.
@@ -179,29 +42,6 @@ def pokemonDisplay(wholeCollection):
     return result
 
 
-def calculate_xp_progress(level):
-    """
-    Calculate the xp progress for the xp bar based on the given level.
-
-    :param int level: The level to base the calculations on.
-    :return: The progress in the xp bar.
-    :rtype: int
-    """
-    return int(float(20*(float(level) - int(float(level)))))
-
-
-def get_deck_name(deckid):
-    """
-    Get the name of the deck based on its id.
-
-    :param int deckid: Deck's id.
-    :return: The name of the deck
-    :rtype: str
-    """
-
-    return mw.col.decks.name(deckid)
-
-
 def _show(data):
     """
     Generate the html to inject into the new stats window.
@@ -214,19 +54,27 @@ def _show(data):
     if not data:
         return ""
 
-    txt = '<h1 style="text-align: center;">Pokemanki</h1>' \
-          '<h3 style="text-align: center;">Your pokemon</h3>' \
-          '<div class="pk-st-container">'
+    txt = '<h1 style="text-align: center; font-weight: 700; margin-top: 40px;">Pokemanki</h1>' \
+          '<div style="text-align: center;">Your pokemon</div>'
 
     # If single Pokemon, show centered picture with name and level below
+    print(type(data))
     if type(data) == tuple:
+        txt += '<div class="pk-st-single">'
         txt += card_html(data[0], data[1], data[2], data[3] if len(data) == 4 else "")
     # If multiple Pokemon, show table of Pokemon with name and level below
     elif type(data) == list:
+        if len(data) == 1:
+            txt += '<div class="pk-st-single">'
+            multi = False
+        else:
+            txt += '<div class="pk-st-container">'
+            multi = True
+
         _num_pokemon = len(data)
         sortedData = sorted(data, key=lambda k: k[2], reverse=True)
         for pokemon in sortedData:
-            txt += card_html(pokemon[0], pokemon[1], pokemon[2], pokemon[3] if len(pokemon) == 4 else "")
+            txt += card_html(pokemon[0], pokemon[1], pokemon[2], pokemon[3] if len(pokemon) == 4 else "", multi)
 
     txt += '</div>'
 
@@ -234,148 +82,7 @@ def _show(data):
     return txt
 
 
-def _showOld(data, title, subtitle):
-
-    # Return empty if no data
-    if not data:
-        return ""
-    # TODO: Write starter html
-    # Set text equal to title text to start
-    # TODO: Write header html
-    txt = "<h1 style='text-align: center;'>{}</h1>{}".format(
-        title, subtitle)
-    # Line text variable, apparently needed for bottom line
-    text_lines = []
-    # Table text
-    table_text = ""
-
-    # If single Pokemon, show centered picture with name and level below
-    if type(data) == tuple:
-        nickname = ""
-        if len(data) == 4:
-            nickname = data[3]
-        (text, held, special) = pokemonDisplayText(
-            data[0], data[1], data[2], nickname)
-
-        # TODO: Write Pokemon card
-        table_text += (("""<tr>
-                        <td height = 300 width = 300 align = center><img src="/pokemon_images/%s.png" title=%s></td>""") % (data[0] + special, mw.col.decks.name(data[1])))
-        table_text += (("""<tr>
-                           <td height = 30 width = 250 align = center><b>%s</b>%s</td>
-                           </tr>""") % (text, held))
-        if int(data[2]) > 5:
-            table_text += (("""<tr>
-                               <td height = 30 width = 250 align = center><img src="/progress_bars/%s.png"></td>
-                               </tr>""") % int(20*(data[2] - int(data[2]))))
-        # Add table_text to txt
-        txt += "<table width = 300>" + table_text + "</table>"
-    # If multiple Pokemon, show table of Pokemon with name and level below
-    elif type(data) == list:
-        _num_pokemon = len(data)
-        pokemon_names = []
-        pokemon_decks = []
-        pokemon_levels = []
-        pokemon_nicknames = []
-        sorteddata = sorted(data, key=lambda k: k[2], reverse=True)
-        for pokemon in sorteddata:
-            if len(pokemon) == 4:
-                pokemon_nicknames.append(pokemon[3])
-            else:
-                pokemon_nicknames.append(None)
-            pokemon_names.append(pokemon[0])
-            pokemon_decks.append(pokemon[1])
-            pokemon_levels.append(str(pokemon[2]))
-        pokemon_collection = tuple(
-            zip(pokemon_names, pokemon_decks, pokemon_levels, pokemon_nicknames))
-        pokemon_progress = []
-        for level in pokemon_levels:
-            if float(level) < 5:
-                pokemon_progress.append(None)
-            else:
-                pokemon_progress.append(
-                    int(float(20*(float(level) - int(float(level))))))
-        pokemon_progress_text = []
-        for item in pokemon_progress:
-            if item is not None:
-                pokemon_progress_text.append(
-                    """<img src="/progress_bars/%s.png">""" % item)
-            else:
-                pokemon_progress_text.append("")
-        pokemon_text = []
-        pokemon_held_items = []
-        pokemon_is_special = []
-        table_size = 0
-        for name, deckid, level, nickname in pokemon_collection:
-            (text, held, special) = pokemonDisplayText(
-                name, deckid, level, nickname)
-            pokemon_text.append(text)
-            pokemon_held_items.append(held)
-            pokemon_is_special.append(special)
-
-        def format_table_image(index):
-            image_name = ""
-            title = ""
-            if index < len(pokemon_names) and index < len(pokemon_is_special) and index < len(pokemon_decks):
-                image_name = pokemon_names[index] + \
-                    pokemon_is_special[index]
-                title = mw.col.decks.name(pokemon_decks[index])
-            return table_image_html(image_name, title)
-
-        def format_table_text(index):
-            bolded = ""
-            subtext = ""
-            if index < len(pokemon_text):
-                bolded = pokemon_text[index]
-                subtext = pokemon_held_items[index]
-
-            return table_text_html(bolded, subtext, True)
-
-        def format_table_progress(index):
-            text = ""
-            if index < len(pokemon_progress_text):
-                text = pokemon_progress_text[index]
-
-            return table_text_html(text)
-
-        while table_size < len(pokemon_text):
-            #   style="position:absolute; top: 1000; right: 1000"
-            table_text += "\n".join((
-                "<tr>",
-                format_table_image(table_size),
-                format_table_image(table_size + 1),
-                format_table_image(table_size + 2),
-                "</tr>"
-            ))
-            table_text += "\n".join((
-                "<tr>",
-                format_table_text(table_size),
-                format_table_text(table_size + 1),
-                format_table_text(table_size + 2),
-                "</tr>"
-            ))
-            table_text += "\n".join((
-                "<tr>",
-                format_table_progress(table_size),
-                format_table_progress(table_size + 1),
-                format_table_progress(table_size + 2),
-                "</tr>"
-            ))
-            table_size += 3
-        # Assign table_text to txt
-        txt += "<table width = 750>" + table_text + "</table>"
-        # Make bottom line using function from stats.py and assign to text_lines
-        line(
-            text_lines,
-            "<b>Total</b>",
-            "</b>%s Pokémon<b>" % _num_pokemon)
-        # Make table from bottom line and assign to txt
-        txt += lineTbl(text_lines)
-
-    # Return txt
-    return txt
-
-
-def card_html(name, deckid, level, nickname=""):
+def card_html(name, deckid, level, nickname="", multi=False):
     """
     Generate the html text for a Pokemon card.
 
@@ -383,11 +90,12 @@ def card_html(name, deckid, level, nickname=""):
     :param int deckid: Id of the deck the Pokemon belongs to.
     :param int level: The Pokemon's lvl.
     :param str nickname: Pokemon's nickname, if it has any.
+    :param bool multi: True if multiple Pokemon are being rendered.
     :return: The card html.
     :rtype: str
     """
     # Start card
-    card = '<div class="pk-st-card">'
+    card = '<div class="pk-st-card {}">'.format('pk-st-shrink' if multi else "")
 
     #############
     # Head info
@@ -437,3 +145,166 @@ def card_html(name, deckid, level, nickname=""):
     card += '</div>'
 
     return card
+
+
+def get_deck_name(deckid):
+    """
+    Get the name of the deck based on its id.
+
+    :param int deckid: Deck's id.
+    :return: The name of the deck
+    :rtype: str
+    """
+
+    return mw.col.decks.name(deckid)
+
+
+def image_name(name, deckid):
+    """
+    Get the image name based on the Pokemon's name and any special attributes.
+
+    :param str name: Pokemon's name.
+    :param int deckid: Id of the deck the Pokemon belongs to.
+    :return: The image name to be used to retrieve it.
+    :rtype: str
+    """
+
+    everstonelist = get_json("_everstonelist.json", [])
+    megastonelist = get_json("_megastonelist.json", [])
+    alolanlist = get_json("_alolanlist.json", [])
+    pkmnimgfolder = currentdirname / "pokemon_images"
+
+    fullname = name
+    if deckid in everstonelist:
+        # FIX: name is never declared!u
+        if name == "Pikachu":
+            fullname += "_Ash" + str(random.randint(1, 5))
+    if deckid in megastonelist:
+        if any([name + "_Mega" in imgname for imgname in os.listdir(pkmnimgfolder)]):
+            fullname += "_Mega"
+            if name == "Charizard" or name == "Mewtwo":
+                fullname += config["X_or_Y_mega_evolutions"]
+    if deckid in alolanlist:
+        if any([name + "_Alolan" in imgname for imgname in os.listdir(pkmnimgfolder)]):
+            fullname += "_Alolan"
+
+    return fullname
+
+
+def egg_hatch_text(level):
+    """
+    Get the egg's hatch text.
+
+    :param int level: The level of the egg.
+    :return: The hatch text.
+    :rtype: str
+    """
+    if level < 2:
+        return "Needs a lot more time to hatch"
+    elif level < 3:
+        return "Will take some time to hatch"
+    elif level < 4:
+        return "Moves around inside sometimes"
+    else:
+        return "Making sounds inside"
+
+
+def calculate_xp_progress(level):
+    """
+    Calculate the xp progress for the xp bar based on the given level.
+
+    :param int level: The level to base the calculations on.
+    :return: The progress in the xp bar.
+    :rtype: int
+    """
+    return int(float(20*(float(level) - int(float(level)))))
+
+
+def held_html(deckid):
+    """
+    Generate the held html code for the given Pokemon.
+
+    :param int deckId: Id of the deck the Pokemon belongs to.
+    :return: The concatenation of all held items' html. Empty if it has no items.
+    :rtype: str
+    """
+    """Generate the held html code for the given Pokemon"""
+    prestigelist = get_json("_prestigelist.json", [])
+    everstonelist = get_json("_everstonelist.json", [])
+    megastonelist = get_json("_megastonelist.json", [])
+    alolanlist = get_json("_alolanlist.json", [])
+
+    held = ""
+    everstone_html = '<img src="/pokemon_images/item_Everstone.png" height="20px"/>'
+    megastone_html = '<img src="/pokemon_images/item_Mega_Stone.png" height="25px"/>'
+    alolan_html = '<img src="/pokemon_images/item_Alolan_Passport.png" height="25px"/>'
+
+    if deckid in prestigelist:
+        held += '<span>Prestiged </span>'
+    if deckid in everstonelist:
+        held += everstone_html
+    if deckid in alolanlist:
+        held += alolan_html
+    if deckid in megastonelist:
+        held += megastone_html
+
+    return held
+
+
+# Deprecated: For tagmon.py only
+def eggHatchText(level, name):
+    if level < 2:
+        text = ("%s (needs a lot more time to hatch)" % name)
+    elif level < 3:
+        text = ("%s (will take some time to hatch)" % name)
+    elif level < 4:
+        text = ("%s (moves around inside sometimes)" % name)
+    else:
+        text = ("%s (making sounds inside)" % name)
+    return text
+
+
+def pokemonDisplayText(name, id, level, nickname):
+    prestigelist = get_json("_prestigelist.json", [])
+    everstonelist = get_json("_everstonelist.json", [])
+    megastonelist = get_json("_megastonelist.json", [])
+    alolanlist = get_json("_alolanlist.json", [])
+
+    held = ""
+    special = ""
+    everstone_html = '<img src="/pokemon_images/item_Everstone.png" hspace="10">'
+    megastone_html = '<img src="/pokemon_images/item_Mega_Stone.png" hspace="10">'
+    alolan_html = '<img src="/pokemon_images/item_Alolan_Passport.png" hspace="10">'
+    pkmnimgfolder = currentdirname / "pokemon_images"
+
+    level = int(float(level))  # float string such as "1.2"
+
+    displayname = name
+    if nickname:
+        displayname = nickname
+    if name == "Egg":
+        text = eggHatchText(level, displayname)
+    else:
+        if id in prestigelist:
+            text = ("%s (Level %s) - Prestiged" %
+                    (displayname, level - 50))
+        else:
+            text = ("%s (Level %s)" % (displayname, level))
+        if id in everstonelist:
+            held += everstone_html
+            # FIX: name is never declared!
+            if name == "Pikachu":
+                special += "_Ash" + str(random.randint(1, 5))
+        if id in megastonelist:
+            held += megastone_html
+
+            if any([name + "_Mega" in imgname for imgname in os.listdir(pkmnimgfolder)]):
+                special += "_Mega"
+                if name == "Charizard" or name == "Mewtwo":
+                    special += config["X_or_Y_mega_evolutions"]
+        if id in alolanlist:
+            held += alolan_html
+            if any([name + "_Alolan" in imgname for imgname in os.listdir(pkmnimgfolder)]):
+                special += "_Alolan"
+
+    return (text, held, special)

@@ -5,7 +5,7 @@ Pokemanki.addPokemanki = function(){
     divEl.setAttribute("id", "pokemanki")
     divEl.className = "pokemanki";
     let rangeBoxPad = document.querySelector('.range-box-pad');
-    rangeBoxPad.before(divEl);
+    rangeBoxPad.after(divEl);
 
     link = document.createElement('link');
     link.href = "/pokemon_images/pokemanki.css";
