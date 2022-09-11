@@ -60,7 +60,7 @@ def no_pokemon():
     nopokemon.setWindowTitle("Pokemanki")
     nopokemon.setText(
         "Please open the Stats window to get your Pokémon.")
-    nopokemon.exec_()
+    nopokemon.exec()
 
 
 def get_pokemons():

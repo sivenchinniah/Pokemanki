@@ -156,12 +156,12 @@ def FirstPokemon():
     deckmonlist = get_json("_pokemanki.json")
     if deckmonlist:
         return
-    alldecks = mw.col.decks.allIds()
+    alldecks = mw.col.decks.all_names_and_ids(skip_empty_default=True)
     # Determine which subdecks do not have their own subdecks
     nograndchildren = []
     for item in alldecks:
-        if len(mw.col.decks.children(int(item))) == 0:
-            nograndchildren.append(int(item))
+        if len(mw.col.decks.children(item.id)) == 0:
+            nograndchildren.append(item.id)
     decklist = []
     for item in nograndchildren:
         decklist.append(mw.col.decks.name(item))
@@ -173,13 +173,13 @@ def FirstPokemon():
         msgbox = QMessageBox()
         msgbox.setWindowTitle("Pokemanki")
         msgbox.setText("Choose a starter Pokémon for %s" % inp)
-        msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
-        msgbox.addButton("Charmander", QMessageBox.AcceptRole)
-        msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
-        msgbox.exec_()
+        msgbox.addButton("Bulbasaur", QMessageBox.ButtonRole.AcceptRole)
+        msgbox.addButton("Charmander", QMessageBox.ButtonRole.AcceptRole)
+        msgbox.addButton("Squirtle", QMessageBox.ButtonRole.AcceptRole)
+        msgbox.exec()
         deckmon = msgbox.clickedButton().text()
         if deckmon:
-            deck = mw.col.decks.byName(inp)['id']
+            deck = mw.col.decks.by_name(inp)['id']
             # stats = mw.col.db.all("""select id, ivl from cards where did in (%s)""" % deck)
 
             # cardIds = mw.col.db.all("""select id from cards where did in (%s)""" % deck)
@@ -205,7 +205,7 @@ def FirstPokemon():
                 firstpokemon.setText("You've found a %s egg" % deckmon)
             else:
                 firstpokemon.setText("You've caught a %s!" % deckmon)
-            firstpokemon.exec_()
+            firstpokemon.exec()
         else:
             FirstPokemon()
     else:
@@ -240,7 +240,7 @@ def MultiPokemon(wholeCollection):
             if item[1] == thing[1]:
                 break
         else:
-            if str(item[1]) in mw.col.decks.allIds():
+            if item[1] in [d.id for d in mw.col.decks.all_names_and_ids()]:
                 modifiedpokemontotal.append(item)
     # Download threshold settings if they exist, otherwise make from scratch
     thresholdsettings = get_json("_pokemankisettings.json", [
@@ -325,7 +325,7 @@ def MultiPokemon(wholeCollection):
                 starters = randomStarter()
                 for starter in starters:
                     msgbox.addButton(starter, QMessageBox.AcceptRole)
-                msgbox.exec_()
+                msgbox.exec()
                 deckmon = msgbox.clickedButton().text()
             # Else, randomize based on tier
             else:
@@ -428,6 +428,6 @@ def MultiPokemon(wholeCollection):
         msgbox2 = QMessageBox()
         msgbox2.setWindowTitle("Pokemanki")
         msgbox2.setText(msgtxt)
-        msgbox2.exec_()
+        msgbox2.exec()
     # Return multiData
     return multiData

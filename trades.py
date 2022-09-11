@@ -131,7 +131,7 @@ class Trades:
                 nopokemon.setWindowTitle("Pokemanki")
                 nopokemon.setText(
                     "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                nopokemon.exec()
                 return
         else:
             deckmonlist = get_json("_pokemanki.json", None)
@@ -154,7 +154,7 @@ class Trades:
                 nopokemon.setWindowTitle("Pokemanki")
                 nopokemon.setText(
                     "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                nopokemon.exec()
                 return
         possiblehaveslist = []
         while i < 3:
@@ -297,7 +297,7 @@ class Trades:
         btn1.clicked.connect(self.trade1)
         btn2.clicked.connect(self.trade2)
         btn3.clicked.connect(self.trade3)
-        tradewindow.exec_()
+        tradewindow.exec()
 
     def trade1(self):
         have = self.trades[0][0]
@@ -321,7 +321,7 @@ class Trades:
                 nopokemon.setWindowTitle("Pokemanki")
                 nopokemon.setText(
                     "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                nopokemon.exec()
                 return
         else:
             deckmonlist = get_json("_pokemanki.json", None)
@@ -340,7 +340,7 @@ class Trades:
                 nopokemon.setWindowTitle("Pokemanki")
                 nopokemon.setText(
                     "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                nopokemon.exec()
                 return
         for item in deckmonlist:
             if item[0] == want[0] or (item[0].startswith("Eevee") and want[0] == "Eevee") and int(item[2]) >= 5:
@@ -350,7 +350,7 @@ class Trades:
             novalidpokemon.setWindowTitle("Pokemanki")
             novalidpokemon.setText(
                 "Sorry, you do not have the Pokemon needed to complete this trade.")
-            novalidpokemon.exec_()
+            novalidpokemon.exec()
             return
         displaylist = []
         for item in possiblefits:
@@ -388,7 +388,7 @@ class Trades:
             "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
         confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirmation.setDefaultButton(QMessageBox.No)
-        result = confirmation.exec_()
+        result = confirmation.exec()
         if result == QMessageBox.Yes:
             modifieddeckmonlist = []
             for item in deckmonlist:
@@ -407,7 +407,7 @@ class Trades:
             tradedone.setWindowTitle("Pokemanki")
             tradedone.setText("You have traded your %s for a %s" %
                               (displaytext, have[0]))
-            tradedone.exec_()
+            tradedone.exec()
 
     def trade2(self):
         have = self.trades[1][0]
@@ -431,7 +431,7 @@ class Trades:
                 nopokemon.setWindowTitle("Pokemanki")
                 nopokemon.setText(
                     "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                nopokemon.exec()
                 return
         else:
             deckmonlist = get_json("_pokemanki.json", None)
@@ -450,7 +450,7 @@ class Trades:
                 nopokemon.setWindowTitle("Pokemanki")
                 nopokemon.setText(
                     "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                nopokemon.exec()
                 return
         for item in deckmonlist:
             if item[0] == want[0] or (item[0].startswith("Eevee") and want[0] == "Eevee") and int(item[2]) >= 5:
@@ -460,7 +460,7 @@ class Trades:
             novalidpokemon.setWindowTitle("Pokemanki")
             novalidpokemon.setText(
                 "Sorry, you do not have the Pokémon needed to complete this trade.")
-            novalidpokemon.exec_()
+            novalidpokemon.exec()
             return
         displaylist = []
         for item in possiblefits:
@@ -498,7 +498,7 @@ class Trades:
             "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
         confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirmation.setDefaultButton(QMessageBox.No)
-        result = confirmation.exec_()
+        result = confirmation.exec()
         if result == QMessageBox.Yes:
             modifieddeckmonlist = []
             for item in deckmonlist:
@@ -517,7 +517,7 @@ class Trades:
             tradedone.setWindowTitle("Pokemanki")
             tradedone.setText("You have traded your %s for a %s" %
                               (displaytext, have[0]))
-            tradedone.exec_()
+            tradedone.exec()
 
     def trade3(self):
         have = self.trades[2][0]
@@ -541,7 +541,7 @@ class Trades:
                 nopokemon.setWindowTitle("Pokemanki")
                 nopokemon.setText(
                     "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                nopokemon.exec()
                 return
         else:
             deckmonlist = get_json("_pokemanki.json", None)
@@ -560,7 +560,7 @@ class Trades:
                 nopokemon.setWindowTitle("Pokemanki")
                 nopokemon.setText(
                     "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                nopokemon.exec()
                 return
         for item in deckmonlist:
             if item[0] == want[0] or (item[0].startswith("Eevee") and want[0] == "Eevee") and int(item[2]) >= 5:
@@ -570,7 +570,7 @@ class Trades:
             novalidpokemon.setWindowTitle("Pokemanki")
             novalidpokemon.setText(
                 "Sorry, you do not have the Pokemon needed to complete this trade.")
-            novalidpokemon.exec_()
+            novalidpokemon.exec()
             return
         displaylist = []
         for item in possiblefits:
@@ -608,7 +608,7 @@ class Trades:
             "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
         confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirmation.setDefaultButton(QMessageBox.No)
-        result = confirmation.exec_()
+        result = confirmation.exec()
         if result == QMessageBox.Yes:
             modifieddeckmonlist = []
             for item in deckmonlist:
@@ -627,4 +627,4 @@ class Trades:
             tradedone.setWindowTitle("Pokemanki")
             tradedone.setText("You have traded your %s for a %s" %
                               (displaytext, have[0]))
-            tradedone.exec_()
+            tradedone.exec()

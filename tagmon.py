@@ -198,7 +198,7 @@ def TagPokemon():
                 msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
                 msgbox.addButton("Charmander", QMessageBox.AcceptRole)
                 msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
-                msgbox.exec_()
+                msgbox.exec()
                 tagmon = msgbox.clickedButton().text()
             else:
                 tiernumber = len(tierdict[pokemontier])
@@ -278,6 +278,6 @@ def TagPokemon():
         msgbox2 = QMessageBox()
         msgbox2.setWindowTitle("Pokemanki")
         msgbox2.setText(msgtxt)
-        msgbox2.exec_()
+        msgbox2.exec()
     # Return multiData
     return multiData
