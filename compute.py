@@ -6,7 +6,7 @@ from aqt import mw
 from aqt.qt import *
 
 from .utils import *
-from .stats import MultiStats, cardInterval, cardIdsFromDeckIds
+from .stats import MultiStats, TagStats, cardInterval, cardIdsFromDeckIds
 
 
 def loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2):
@@ -223,7 +223,13 @@ def getPokemonIndex(pokemon_name, pokemons1, pokemons2, pokemons3):
 
 
 def MultiPokemon(wholeCollection):
-    "Returns array of DeckPokemon"
+    """
+    Generate an array of DeckPokemon
+
+    :param bool wholeCollection: True if multiple Pokemon, False if single.
+    :return: Array of DeckPokemon.
+    :rtype: Array
+    """
 
     FirstPokemon()
     pokemontotal = get_json("_pokemanki.json", None)
@@ -430,5 +436,181 @@ def MultiPokemon(wholeCollection):
         msgbox2.setWindowTitle("Pokemanki")
         msgbox2.setText(msgtxt)
         msgbox2.exec_()
+    # Return multiData
+    return multiData
+
+
+def TagPokemon():
+    """
+    Generate an array of TagPokemon
+
+    :return: Array of TagPokemon.
+    :rtype: Array
+    """
+
+    tagmonlist = get_json('_tagmon.json', [])
+    savedtags = get_json("_tags.json", [])
+    modifiedtagmon = []
+    for item in reversed(tagmonlist):
+        if item[1] in savedtags:
+            modifiedtagmon.append(item)
+
+    thresholdsettings = get_json("_tagmonsettings.json", [
+        50, 125, 250, 375, 500])
+
+    pokemonlist = []
+    tiers = []
+    evolutionLevel1 = []
+    evolution1 = []
+    evolutionLevel2 = []
+    evolution2 = []
+    load_pokemon_gen_all(pokemonlist, tiers, evolutionLevel1,
+                         evolution1, evolutionLevel2, evolution2)
+
+    pokemon_tuple = tuple(
+        zip(pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2))
+    tierdict = {"A": [], "B": [], "C": [], "D": [], "E": [], "F": []}
+
+    for pokemon, tier, firstEL, firstEvol, secondEL, secondEvol in pokemon_tuple:
+        if tier != "S":
+            tierdict[tier].append(pokemon)
+
+    # Have default message text here because of future for loop iterating through multideck results
+    msgtxt = "Hello Pokémon Trainer!"
+    # Assign empty list to multiData (to be returned at end)
+    multiData = []
+    results = TagStats()
+    if len(results) == 0:
+        return
+    prestigelist = get_json("_prestigelist.json", [])
+    for item in results:
+        result = item[1]
+        sumivl = 0
+        for id, ivl in result:
+            adjustedivl = (100 * (ivl/100)**(0.5))
+            sumivl += adjustedivl
+        if len(result) == 0:
+            continue
+        Level = round((sumivl/len(result)+0.5), 2)
+
+        pokemontier = ""
+
+        if len(result) < thresholdsettings[0]:
+            pokemontier = "F"
+        elif len(result) < thresholdsettings[1]:
+            pokemontier = "E"
+        elif len(result) < thresholdsettings[2]:
+            pokemontier = "D"
+        elif len(result) < thresholdsettings[3]:
+            pokemontier = "C"
+        elif len(result) < thresholdsettings[4]:
+            pokemontier = "B"
+        else:
+            pokemontier = "A"
+        tagmon = ""
+        already_assigned = False
+        details = ()
+        nickname = ""
+        previouslevel = 0
+        for thing in modifiedtagmon:
+            if thing[1] == item[0]:
+                tagmon = thing[0]
+                already_assigned = True
+                previouslevel = thing[2]
+                if len(thing) == 4:
+                    nickname = thing[3]
+                else:
+                    nickname = ""
+        if tagmon == "":
+            if pokemontier == "A":
+                msgbox = QMessageBox()
+                msgbox.setWindowTitle("Pokemanki")
+                msgbox.setText(
+                    "Choose a starter Pokémon for the %s tag" % item[0])
+                msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
+                msgbox.addButton("Charmander", QMessageBox.AcceptRole)
+                msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
+                msgbox.exec_()
+                tagmon = msgbox.clickedButton().text()
+            else:
+                tiernumber = len(tierdict[pokemontier])
+                tierlabel = tierdict[pokemontier]
+                randno = random.randint(0, tiernumber - 1)
+                tagmon = tierlabel[randno]
+        details = ()
+        for pokemon, tier, firstEL, firstEvol, secondEL, secondEvol in pokemon_tuple:
+            if tagmon == pokemon or tagmon == firstEvol or tagmon == secondEvol:
+                details = (pokemon, firstEL, firstEvol, secondEL, secondEvol)
+
+        name = details[0]
+        firstEL = details[1]
+        firstEvol = details[2]
+        secondEL = details[3]
+        secondEvol = details[4]
+
+        if Level > 100 and item[0] not in prestigelist:
+            Level = 100
+        if item[0] in prestigelist:
+            Level -= 50
+        if Level < 5:
+            name = "Egg"
+        if firstEL is not None:
+            firstEL = int(firstEL)
+            if Level > firstEL:
+                name = firstEvol
+        if secondEL is not None:
+            secondEL = int(secondEL)
+            if Level > secondEL:
+                name = secondEvol
+        if name.startswith("Eevee"):
+            name = "Eevee"
+        if already_assigned == False and name != "Eevee" and name != "Egg":
+            tagmonData = (name, item[0], Level)
+            modifiedtagmon.append(tagmonData)
+        elif already_assigned == False:
+            tagmonData = (tagmon, item[0], Level)
+            modifiedtagmon.append(tagmonData)
+        msgtxt += alertMsgText(tagmon, item[0], name, int(Level),
+                               int(previouslevel), nickname, already_assigned)
+        if already_assigned == True:
+            for thing in tagmonlist:
+                if thing[1] == item[0]:
+                    if name == "Eevee" or name == "Egg":
+                        if nickname:
+                            if (thing[0], thing[1], Level, nickname) in modifiedtagmon:
+                                pass
+                            else:
+                                modifiedtagmon.append(
+                                    (thing[0], thing[1], Level, nickname))
+                        else:
+                            if (thing[0], thing[1], Level) in modifiedtagmon:
+                                pass
+                            else:
+                                modifiedtagmon.append(
+                                    (thing[0], thing[1], Level))
+                    else:
+                        if nickname:
+                            if (name, thing[1], Level, nickname) in modifiedtagmon:
+                                pass
+                            else:
+                                modifiedtagmon.append(
+                                    (name, thing[1], Level, nickname))
+                        else:
+                            if (name, thing[1], Level) in modifiedtagmon:
+                                pass
+                            else:
+                                modifiedtagmon.append((name, thing[1], Level))
+        displayData = (name, item[0], Level)
+        multiData.append(displayData)
+
+    # After iterating through each deck, store data into pokemanki.json
+    write_json("_tagmon.json", modifiedtagmon)
+    # Only display message if changes
+    if msgtxt != "Hello Pokémon Trainer!":
+        msgbox2 = QMessageBox()
+        msgbox2.setWindowTitle("Pokemanki")
+        msgbox2.setText(msgtxt)
+        msgbox2.exec_()
+
     # Return multiData
     return multiData

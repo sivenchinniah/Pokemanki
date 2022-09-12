@@ -4,8 +4,7 @@ import sys
 from aqt import mw, gui_hooks
 from aqt.qt import *
 
-from .display import pokemonDisplay
-from .tagmon import tagmonDisplay
+from .display import pokemon_display
 from .tags import Tags
 from .trades import Trades
 from .utils import *
@@ -88,13 +87,9 @@ else:  # Not yet implemented for tagmon
 mw.testmenu.addAction(resetaction)
 
 
-# Wrap pokemonDisplay function of display.py with the todayStats function of anki.stats.py
+# Wrap pokemon_display function of display.py with the todayStats function of anki.stats.py
 # Note that above comment *may* be outdated
-
-if f:
-    display_func = tagmonDisplay
-else:
-    display_func = pokemonDisplay
+display_func = pokemon_display
 
 
 def message_handler(handled, message, context):
@@ -103,15 +98,9 @@ def message_handler(handled, message, context):
     if not message.startswith("Pokemanki#"):
         return (False, None)
     if message == "Pokemanki#currentDeck":
-        if f:
-            html = tagmonDisplay().replace("`", "'")
-        else:
-            html = pokemonDisplay(wholeCollection=False).replace("`", "'")
+        html = pokemon_display(f, False).replace("`", "'")
     elif message == "Pokemanki#wholeCollection":
-        if f:
-            html = tagmonDisplay().replace("`", "'")
-        else:
-            html = pokemonDisplay(wholeCollection=True).replace("`", "'")
+        html = pokemon_display(f, True).replace("`", "'")
     else:
         starts = "Pokemanki#search#"
         term = message[len(starts):]
