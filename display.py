@@ -111,7 +111,7 @@ def card_html(name, deckid, level, nickname="", multi=False):
             '<span style="text-align: right;">Lvl</span>' \
             '<span style="text-align: right;"><b>{}</b></span>' \
             '</div>' \
-            '</div>'.format(int(level))
+            '</div>'.format(int(level-50) if in_list("prestige", deckid) else int(50))
     # Divider and end of top info
     card += '<div class="pk-st-divider" style="margin-top: 10px;"></div>' \
             '</div>'
@@ -158,6 +158,23 @@ def get_deck_name(deckid):
     return mw.col.decks.name(deckid)
 
 
+def in_list(listname, item):
+    """
+    Check if an item is in a list. Mainly used to avoid copy/pasting code
+    to open the json files.
+
+    :param str listname: Name of the list to check in.
+    :param item: Item to find in the list
+    :return: True if the list exists and the item is in it, otherwise false.
+    :rtype: bool
+    """
+
+    if listname not in ["prestige", "everstone", "megastone", "alolan"]:
+        return False
+
+    return item in get_json(f"_{listname}list.json", [])
+
+
 def image_name(name, deckid):
     """
     Get the image name based on the Pokemon's name and any special attributes.
@@ -168,22 +185,19 @@ def image_name(name, deckid):
     :rtype: str
     """
 
-    everstonelist = get_json("_everstonelist.json", [])
-    megastonelist = get_json("_megastonelist.json", [])
-    alolanlist = get_json("_alolanlist.json", [])
     pkmnimgfolder = currentdirname / "pokemon_images"
 
     fullname = name
-    if deckid in everstonelist:
+    if in_list("everstone", deckid):
         # FIX: name is never declared!u
         if name == "Pikachu":
             fullname += "_Ash" + str(random.randint(1, 5))
-    if deckid in megastonelist:
+    if in_list("megastone", deckid):
         if any([name + "_Mega" in imgname for imgname in os.listdir(pkmnimgfolder)]):
             fullname += "_Mega"
             if name == "Charizard" or name == "Mewtwo":
                 fullname += config["X_or_Y_mega_evolutions"]
-    if deckid in alolanlist:
+    if in_list("alolan", deckid):
         if any([name + "_Alolan" in imgname for imgname in os.listdir(pkmnimgfolder)]):
             fullname += "_Alolan"
 
@@ -238,13 +252,13 @@ def held_html(deckid):
     megastone_html = '<img src="/pokemon_images/item_Mega_Stone.png" height="25px"/>'
     alolan_html = '<img src="/pokemon_images/item_Alolan_Passport.png" height="25px"/>'
 
-    if deckid in prestigelist:
+    if in_list("prestige", deckid):
         held += '<span>Prestiged </span>'
-    if deckid in everstonelist:
+    if in_list("everstone", deckid):
         held += everstone_html
-    if deckid in alolanlist:
+    if in_list("alolan", deckid):
         held += alolan_html
-    if deckid in megastonelist:
+    if in_list("megastone", deckid):
         held += megastone_html
 
     return held
