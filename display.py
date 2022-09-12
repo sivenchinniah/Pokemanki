@@ -7,7 +7,39 @@ from aqt import mw
 
 from .utils import *
 from .compute import MultiPokemon
+from .tagmon import TagPokemon
 
+
+def display(istagmon, wholecollection=True):
+    """
+    Control the generation of the html code to displau.
+
+    :param bool istagmon: True to switch to use tag's displau, False for deck.
+    :param bool wholeCollection: True if multiple Pokemon, false if single.
+    :return: The html text to display.
+    :rtype: str
+    """
+
+    # Assign Pokemon Image and Progress Bar folder directory names
+    pkmnimgfolder = currentdirname / "pokemon_images"
+    progressbarfolder = currentdirname / "progress_bars"
+
+    # Move Pokemon Image folder to collection.media folder if not already there
+    # (Anki reads from here when running anki.stats.py)
+    if (not os.path.exists(f"{mediafolder}/pokemon_images")) and os.path.exists(pkmnimgfolder):
+        shutil.copytree(pkmnimgfolder, f"{mediafolder}/pokemon_images")
+    if (not os.path.exists(f"{mediafolder}/progress_bars")) and os.path.exists(progressbarfolder):
+        shutil.copytree(progressbarfolder, f"{mediafolder}/progress_bars")
+
+    # Get list of Pokemon from tags or decks.
+    #   For decks, if wholeCollection, get all assigned Pokemon and assign to Pokemon,
+    #   else, show Pokemon for either single deck or all subdecks and store in Pokemon
+    pokemon = TagPokemon() if istagmon else MultiPokemon(wholecollection)
+
+    # Get the html code to display
+    result = _show(pokemon)
+
+    return result
 
 def pokemonDisplay(wholeCollection):
     """
