@@ -22,19 +22,16 @@ def pokemonDisplay(wholeCollection):
     pkmnimgfolder = currentdirname / "pokemon_images"
     progressbarfolder = currentdirname / "progress_bars"
 
-    # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
-    if os.path.exists(f"{mediafolder}/pokemon_images") == False and os.path.exists(pkmnimgfolder):
+    # Move Pokemon Image folder to collection.media folder if not already there
+    # (Anki reads from here when running anki.stats.py)
+    if (not os.path.exists(f"{mediafolder}/pokemon_images")) and os.path.exists(pkmnimgfolder):
         shutil.copytree(pkmnimgfolder, f"{mediafolder}/pokemon_images")
-    if os.path.exists(f"{mediafolder}/progress_bars") == False and os.path.exists(progressbarfolder):
+    if (not os.path.exists(f"{mediafolder}/progress_bars")) and os.path.exists(progressbarfolder):
         shutil.copytree(progressbarfolder, f"{mediafolder}/progress_bars")
 
-    # See if "Whole Collection" is selected - if so, get all assigned Pokemon and assign to multideckmon
-    if wholeCollection:
-        multideckmon = MultiPokemon(wholeCollection=True)
-    # If "Whole Collection" not selected, show Pokemon for either single deck or all subdecks
-    # and store into multideckmon/deckmon
-    else:
-        multideckmon = MultiPokemon(wholeCollection=False)
+    # If wholeCollection, get all assigned Pokemon and assign to multideckmon,
+    # else, show Pokemon for either single deck or all subdecks and store into multideckmon/deckmon
+    multideckmon = MultiPokemon(wholeCollection)
 
     # Get the html code to display
     result = _show(multideckmon)
@@ -58,11 +55,11 @@ def _show(data):
     txt = '<h1 style="text-align: center; font-weight: 700; margin-top: 40px;">Pokemanki</h1>' \
           '<div style="text-align: center;">Your pokemon</div>'
 
-    # If single Pokemon, show centered picture with name and level below
+    # If single Pokemon, show centered card
     if type(data) == tuple:
         txt += '<div class="pk-st-single">'
         txt += card_html(data[0], data[1], data[2], data[3] if len(data) == 4 else "")
-    # If multiple Pokemon, show table of Pokemon with name and level below
+    # If multiple Pokemon, show flex row of cards
     elif type(data) == list:
         if len(data) == 1:
             txt += '<div class="pk-st-single">'
