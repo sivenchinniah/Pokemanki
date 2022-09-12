@@ -23,10 +23,10 @@ def pokemonDisplay(wholeCollection):
     progressbarfolder = currentdirname / "progress_bars"
 
     # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
-    if os.path.exists("%s/pokemon_images" % mediafolder) == False and os.path.exists(pkmnimgfolder):
-        shutil.copytree(pkmnimgfolder, "%s/pokemon_images" % mediafolder)
-    if os.path.exists("%s/progress_bars" % mediafolder) == False and os.path.exists(progressbarfolder):
-        shutil.copytree(progressbarfolder, "%s/progress_bars" % mediafolder)
+    if os.path.exists(f"{mediafolder}/pokemon_images") == False and os.path.exists(pkmnimgfolder):
+        shutil.copytree(pkmnimgfolder, f"{mediafolder}/pokemon_images")
+    if os.path.exists(f"{mediafolder}/progress_bars") == False and os.path.exists(progressbarfolder):
+        shutil.copytree(progressbarfolder, f"{mediafolder}/progress_bars")
 
     # See if "Whole Collection" is selected - if so, get all assigned Pokemon and assign to multideckmon
     if wholeCollection:
@@ -54,6 +54,7 @@ def _show(data):
     if not data:
         return ""
 
+    # Pokemanki container header
     txt = '<h1 style="text-align: center; font-weight: 700; margin-top: 40px;">Pokemanki</h1>' \
           '<div style="text-align: center;">Your pokemon</div>'
 
@@ -94,7 +95,7 @@ def card_html(name, deckid, level, nickname="", multi=False):
     :rtype: str
     """
     # Start card
-    card = '<div class="pk-st-card {}">'.format('pk-st-shrink' if multi else "")
+    card = f'<div class="pk-st-card {"pk-st-shrink" if multi else ""}">'
 
     #############
     # Head info
@@ -103,15 +104,17 @@ def card_html(name, deckid, level, nickname="", multi=False):
             '<div class="pk-st-card-top">'
     # Name and deck
     card += '<div class="pk-st-card-name">' \
-            '<span><b>{}</b></span>' \
-            '<span><i>{}</i></span>' \
-            '</div>'.format(nickname if nickname != "" else name, get_deck_name(deckid))
+            f'<span><b>{nickname if nickname != "" else name}</b></span>' \
+            f'<span><i>{get_deck_name(deckid)}</i></span>' \
+            '</div>'
     # Level
     card += '<div class="pk-st-card-lvl">' \
             '<span style="text-align: right;">Lvl</span>' \
-            '<span style="text-align: right;"><b>{}</b></span>' \
+            '<span style="text-align: right;">' \
+            f'<b>{int(level-50) if in_list("prestige", deckid) else int(level)}</b>' \
+            '</span>' \
             '</div>' \
-            '</div>'.format(int(level-50) if in_list("prestige", deckid) else int(50))
+            '</div>'
     # Divider and end of top info
     card += '<div class="pk-st-divider" style="margin-top: 10px;"></div>' \
             '</div>'
@@ -119,7 +122,7 @@ def card_html(name, deckid, level, nickname="", multi=False):
     #############
     # Image
     #############
-    card += '<img src="/pokemon_images/{}.png" class="pk-st-card-img"/>'.format(image_name(name, deckid))
+    card += f'<img src="/pokemon_images/{image_name(name, deckid)}.png" class="pk-st-card-img"/>'
 
     #############
     # Bottom info
@@ -135,9 +138,9 @@ def card_html(name, deckid, level, nickname="", multi=False):
         card += '</div>'
     # Progress bar
     if name == "Egg":
-        card += '<span class="pk-st-card-xp">{}</span>'.format(egg_hatch_text(level))
+        card += f'<span class="pk-st-card-xp">{egg_hatch_text(level)}</span>'
     else:
-        card += '<img src="/progress_bars/{}.png" class="pk-st-card-xp"/>'.format(calculate_xp_progress(level))
+        card += f'<img src="/progress_bars/{calculate_xp_progress(level)}.png" class="pk-st-card-xp"/>'
     card += '</div>'
 
     # End card
