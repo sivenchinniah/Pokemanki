@@ -15,6 +15,7 @@ statsDialog = None
 
 # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
 copy_directory("pokemon_images")
+copy_directory("pokemanki_css")
 
 # Download threshold settings (or make from scratch if not already made)
 set_default("_pokemankisettings.json", default=[100, 250, 500, 750, 1000])

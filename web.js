@@ -8,7 +8,7 @@ Pokemanki.addPokemanki = function(){
     rangeBoxPad.after(divEl);
 
     link = document.createElement('link');
-    link.href = "/pokemon_images/pokemanki.css";
+    link.href = "/pokemanki_css/view_stats.css";
     link.rel = 'stylesheet';
     document.head.appendChild(link);
 }

@@ -244,15 +244,10 @@ def _held_html(source):
     """
     Generate the held html code for the given Pokemon.
 
-    :param source: Id of the deck the Pokemon belongs to.
+    :param source: Id of the deck or tag name the Pokemon belongs to.
     :return: The concatenation of all held items' html. Empty if it has no items.
     :rtype: str
     """
-    """Generate the held html code for the given Pokemon"""
-    prestigelist = get_json("_prestigelist.json", [])
-    everstonelist = get_json("_everstonelist.json", [])
-    megastonelist = get_json("_megastonelist.json", [])
-    alolanlist = get_json("_alolanlist.json", [])
 
     held = ""
     everstone_html = '<img src="/pokemon_images/item_Everstone.png" height="20px"/>'
