@@ -124,10 +124,10 @@ def Toggle():
 def ThresholdSettings():
     global thresholdlist
     # Find recommended number of cards for starter Pokemon threshold (based on deck with highest number of cards).
-    decklist = mw.col.decks.allIds()
+    decklist = mw.col.decks.all_names_and_ids()
     sumlist = []
     for deck in decklist:
-        sumlist.append(len(mw.col.decks.cids(deck)))
+        sumlist.append(len(mw.col.decks.cids(deck.id)))
     recommended = .797 * max(sumlist)
     # Refresh threshold settings
     thresholdlist = get_json("_pokemankisettings.json")
