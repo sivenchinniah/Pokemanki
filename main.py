@@ -3,6 +3,7 @@ import sys
 
 from aqt import mw, gui_hooks
 from aqt.qt import *
+from bs4 import BeautifulSoup
 
 from .display import pokemon_display
 from .tags import Tags
@@ -123,6 +124,16 @@ def onStatsOpen(statsDialog):
     statsDialog.form.web.loadFinished.connect(
         lambda _: _onStatsOpen(statsDialog))
 
+def replace_gears(deck_browser, content):
+	pokemons = get_json("_pokemanki.json", None)
+	soup = BeautifulSoup(content.tree, "html.parser")
+	for tr in soup.select('tr[id]'):
+		deck_id = int(tr['id'])
+		name = next((pokemon[0] for pokemon in pokemons if pokemon[1]==deck_id), None)
+		if name:
+			tr.select('img.gears')[0]['src'] = "pokemon_images/" + name + ".png"
+	content.tree = soup
 
 gui_hooks.stats_dialog_will_show.append(onStatsOpen)
 gui_hooks.webview_did_receive_js_message.append(message_handler)
+gui_hooks.deck_browser_will_render_content.append(replace_gears)
