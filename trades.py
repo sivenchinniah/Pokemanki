@@ -5,106 +5,47 @@ import csv
 from datetime import date as dt
 
 from aqt.qt import *
+from aqt.webview import AnkiWebView
 from aqt import mw
 
 from .utils import *
 
 
-def pokemonLevelRangesFromCsv(csv_fpath):
-    pokemon_records = []
-
-    with open(csv_fpath, "r") as csv_file:
-        csv_reader = csv.DictReader(csv_file, delimiter=",")
-
-        for line in csv_reader:
-            pokemon = line["pokemon"]
-            tier = line["tier"]
-            first_ev_lv = line["first_evolution_level"]
-            if first_ev_lv.isnumeric():
-                first_ev_lv = int(first_ev_lv)
-            else:
-                first_ev_lv = None
-            first_ev = line["first_evolution"]
-            if first_ev == "NA":
-                first_ev = None
-            second_ev_lv = line["second_evolution_level"]
-            if second_ev_lv.isnumeric():
-                second_ev_lv = int(second_ev_lv)
-            else:
-                second_ev_lv = None
-            second_ev = line["second_evolution"]
-            if second_ev == "NA":
-                second_ev = None
-
-            pk1_lo_lv = 0
-            if first_ev_lv:
-                pk1_hi_lv = first_ev_lv
-            else:
-                pk1_hi_lv = 100
-            pokemon_records.append((pokemon, tier, pk1_lo_lv, pk1_hi_lv))
-
-            if first_ev is not None:
-                pk2_lo_lv = pk1_hi_lv
-                if second_ev_lv:
-                    pk2_hi_lv = second_ev_lv
-                else:
-                    pk2_hi_lv = 100
-                pokemon_records.append((first_ev, tier, pk2_lo_lv, pk2_hi_lv))
-
-            if second_ev is not None:
-                pk3_lo_lv = pk2_hi_lv
-                pk3_hi_lv = 100
-                pokemon_records.append((second_ev, tier, pk3_lo_lv, pk3_hi_lv))
-
-    return pokemon_records
 
 
-class Trades:
+class Trades(QDialog):
     def __init__(self):
+        super().__init__(None, Qt.WindowType.Window)
         self.tradewindow = QDialog()
         self.dirname = os.path.dirname(os.path.abspath(
             inspect.getfile(inspect.currentframe())))
         self.mediafolder = mediafolder
+        self.setWindowTitle("Trades")
 
-        pokemon_records = []
-        csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1.csv"
-        pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-        if config['gen2']:
-            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen2.csv"
-            pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-
-            if config['gen4_evolutions']:
-                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_plus4.csv"
-                pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen2_plus4.csv"
-                pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-            else:
-                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_no4.csv"
-                pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen2_no4.csv"
-                pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-        else:
-            if config['gen4_evolutions']:
-                # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
-                # so let's just include gen 2 for these evolution lines
-                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_plus4.csv"
-                pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-            else:
-                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_no2_no4.csv"
-                pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-
-        if config['gen3']:
-            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen3.csv"
-            pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-        if config['gen4']:
-            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen4.csv"
-            pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-        if config['gen5']:
-            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen5.csv"
-            pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-
-        self.allpokemon = pokemon_records
+        self.allpokemon = get_pokemon_records()
         self.f = get_json("_decksortags.json", "")
+
+    def open(self):
+        self._create_gui()
+        self._setup_web_view()
+        self.show()
+        self.tradeFunction()
+
+    def _create_gui(self):
+        """
+        Create the basic trade gui. Follows the code of the Previewer
+        """
+        self.setWindowTitle("Trade Pokémon")
+
+        self.vbox = QVBoxLayout()
+        self.vbox.setContentsMargins(0, 0, 0, 0)
+        self._web = AnkiWebView(title="pokemanki-trades")
+        self.vbox.addWidget(self._web)
+        self.setLayout(self.vbox)
+
+    def _setup_web_view(self):
+        self._web.stdHtml(body="", css=["/pokemanki_css/view_trade.css"], context=self)
+        self._web.set_bridge_command(self._on_bridge_cmd, self)
 
     def newTrades(self):
         self.trades = []
@@ -131,7 +72,7 @@ class Trades:
                 nopokemon.setWindowTitle("Pokemanki")
                 nopokemon.setText(
                     "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                nopokemon.exec()
                 return
         else:
             deckmonlist = get_json("_pokemanki.json", None)
@@ -154,7 +95,7 @@ class Trades:
                 nopokemon.setWindowTitle("Pokemanki")
                 nopokemon.setText(
                     "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                nopokemon.exec()
                 return
         possiblehaveslist = []
         while i < 3:
@@ -223,6 +164,7 @@ class Trades:
         if tradeData:
             date = dt.today().strftime("%d/%m/%Y")
             if date == tradeData[0] and len(tradeData) == 3:
+                # TODO: To simplify
                 if f == tradeData[2]:
                     self.trades = tradeData[1]
                 elif f == "" and tradeData[2] == "decks":
@@ -238,7 +180,7 @@ class Trades:
             tradeData = get_json("_trades.json")
         tradewindow = self.tradewindow
         tradewindow.setWindowTitle("Pokemanki")
-        tradewindow.setWindowModality(Qt.ApplicationModal)
+        tradewindow.setWindowModality(Qt.WindowModality.ApplicationModal)
         table = """<table>
                    <tr>
                    <td height 50 width = 150 align = center></td>
@@ -283,7 +225,12 @@ class Trades:
                    <td height = 30 width = 150 align = center><b>%s</b></td>
                    <td height = 30 width = 150 align = center><b>%s</b></td>
                    </tr>
-                   </table>""" % (
+                   <tr><button onclick="test()">TEST</button></tr>
+                   </table>
+                   <script>
+                   function test() { pycmd("TEST"); }
+                   </script>
+                   """ % (
             self.dirname, self.trades[0][0][0], self.dirname, self.trades[1][0][0], self.dirname, self.trades[2][0][0],
             self.trades[0][0][0], self.trades[1][0][0], self.trades[2][0][0], self.mediafolder, self.trades[0][1][0],
             self.mediafolder, self.trades[1][1][0], self.mediafolder, self.trades[2][1][0], self.trades[0][1][0],
@@ -301,7 +248,7 @@ class Trades:
         btn1.clicked.connect(self.trade1)
         btn2.clicked.connect(self.trade2)
         btn3.clicked.connect(self.trade3)
-        tradewindow.exec_()
+        tradewindow.exec()
 
     def trade1(self):
         self.make_trade(self.trades[0][0], self.trades[0][1])
@@ -332,7 +279,7 @@ class Trades:
                 nopokemon.setWindowTitle("Pokemanki")
                 nopokemon.setText(
                     "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                nopokemon.exec()
                 return
         else:
             deckmonlist = get_json("_pokemanki.json", None)
@@ -351,7 +298,7 @@ class Trades:
                 nopokemon.setWindowTitle("Pokemanki")
                 nopokemon.setText(
                     "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                nopokemon.exec()
                 return
         for item in deckmonlist:
             if item[0] == want[0] or (item[0].startswith("Eevee") and want[0] == "Eevee") and int(item[2]) >= 5:
@@ -361,7 +308,7 @@ class Trades:
             novalidpokemon.setWindowTitle("Pokemanki")
             novalidpokemon.setText(
                 "Sorry, you do not have the Pokemon needed to complete this trade.")
-            novalidpokemon.exec_()
+            novalidpokemon.exec()
             return
         displaylist = []
         for item in possiblefits:
@@ -397,10 +344,10 @@ class Trades:
         confirmation.setWindowTitle("Pokemanki")
         confirmation.setText(
             "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
-        confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        confirmation.setDefaultButton(QMessageBox.No)
-        result = confirmation.exec_()
-        if result == QMessageBox.Yes:
+        confirmation.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        confirmation.setDefaultButton(QMessageBox.StandardButton.No)
+        result = confirmation.exec()
+        if result == QMessageBox.StandardButton.Yes:
             modifieddeckmonlist = []
             for item in deckmonlist:
                 if item[1] == tradepokemon[1]:
@@ -413,9 +360,150 @@ class Trades:
                 else:
                     modifieddeckmonlist.append(item)
             write_json("_pokemanki.json", modifieddeckmonlist)
-            self.tradewindow.done(QDialog.Accepted)
+            self.tradewindow.done(QDialog.DialogCode.Accepted)
             tradedone = QMessageBox()
             tradedone.setWindowTitle("Pokemanki")
             tradedone.setText("You have traded your %s for a %s" %
                               (displaytext, have[0]))
-            tradedone.exec_()
+            tradedone.exec()
+
+    def trades_html(self):
+        """
+        Generate the html code for the trades window.
+
+        :return: The html code.
+        :rtype: str
+        """
+
+        # Header
+        txt = '<h1 style="text-align: center;">Today\'s Trades</h1>'
+
+        # Open trades container
+        txt += '<div class="pk-td-container">'
+
+        # for i < len(self.trades):
+
+
+        # Close trades container
+        txt += '</div>'
+
+
+        return txt
+
+    def trade_html(self, i):
+        """
+
+        """
+        trade = ""
+
+        return trade
+
+    def _on_bridge_cmd(self, cmd):
+        nopokemon = QMessageBox()
+        nopokemon.setWindowTitle("Pokemanki")
+        nopokemon.setText(
+            "Please open the Stats window to get your Pokémon.")
+        nopokemon.exec()
+
+
+def get_pokemon_records():
+    """
+    Generate a list of all Pokémons based on the user's generation configuration.
+
+    :return: List of pokemon records.
+    :rtype: List
+    """
+    pokemon_records = []
+    csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1.csv"
+    pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+    if config['gen2']:
+        csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen2.csv"
+        pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+
+        if config['gen4_evolutions']:
+            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_plus4.csv"
+            pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen2_plus4.csv"
+            pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+        else:
+            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_no4.csv"
+            pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen2_no4.csv"
+            pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+    else:
+        if config['gen4_evolutions']:
+            # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
+            # so let's just include gen 2 for these evolution lines
+            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_plus4.csv"
+            pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+        else:
+            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_no2_no4.csv"
+            pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+
+    if config['gen3']:
+        csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen3.csv"
+        pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+    if config['gen4']:
+        csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen4.csv"
+        pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+    if config['gen5']:
+        csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen5.csv"
+        pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
+
+    return pokemon_records
+
+
+def pokemonLevelRangesFromCsv(csv_fpath):
+    """
+    Get the list of evolution level ranges for all Pokémon.
+
+    :param str csv_fpath: Path of the csv containing the evolution list
+    :return: List of pokemon ranges.
+    :rtype: List
+    """
+    pokemon_records = []
+
+    with open(csv_fpath, "r") as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter=",")
+
+        for line in csv_reader:
+            pokemon = line["pokemon"]
+            tier = line["tier"]
+            first_ev_lv = line["first_evolution_level"]
+            if first_ev_lv.isnumeric():
+                first_ev_lv = int(first_ev_lv)
+            else:
+                first_ev_lv = None
+            first_ev = line["first_evolution"]
+            if first_ev == "NA":
+                first_ev = None
+            second_ev_lv = line["second_evolution_level"]
+            if second_ev_lv.isnumeric():
+                second_ev_lv = int(second_ev_lv)
+            else:
+                second_ev_lv = None
+            second_ev = line["second_evolution"]
+            if second_ev == "NA":
+                second_ev = None
+
+            pk1_lo_lv = 0
+            if first_ev_lv:
+                pk1_hi_lv = first_ev_lv
+            else:
+                pk1_hi_lv = 100
+            pokemon_records.append((pokemon, tier, pk1_lo_lv, pk1_hi_lv))
+
+            if first_ev is not None:
+                pk2_lo_lv = pk1_hi_lv
+                if second_ev_lv:
+                    pk2_hi_lv = second_ev_lv
+                else:
+                    pk2_hi_lv = 100
+                pokemon_records.append((first_ev, tier, pk2_lo_lv, pk2_hi_lv))
+
+            if second_ev is not None:
+                pk3_lo_lv = pk2_hi_lv
+                pk3_hi_lv = 100
+                pokemon_records.append((second_ev, tier, pk3_lo_lv, pk3_hi_lv))
+
+    return pokemon_records
