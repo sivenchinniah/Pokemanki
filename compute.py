@@ -147,7 +147,7 @@ def randomStarter():
     elif choice_generation == 4:
         return ["Turtwig", "Chimchar", "Piplup"]
     elif choice_generation == 5:
-        return ["Snivy", "Tepig" "Oshawott"]
+        return ["Snivy", "Tepig", "Oshawott"]
 
 
 def FirstPokemon():
