@@ -7,10 +7,16 @@ Pokemanki.addPokemanki = function(){
     let rangeBoxPad = document.querySelector('.range-box-pad');
     rangeBoxPad.after(divEl);
 
-    link = document.createElement('link');
-    link.href = "/pokemanki_css/view_stats.css";
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
+    link1 = document.createElement('link');
+    link1.href = "/pokemanki_css/view_stats.css";
+    link1.rel = 'stylesheet';
+
+    link2 = document.createElement('link');
+    link2.href = "/pokemanki_css/main.css";
+    link2.rel = 'stylesheet';
+
+    document.head.appendChild(link1);
+    document.head.appendChild(link12;
 }
 Pokemanki.setPokemanki = function(html){
     document.getElementById('pokemanki').innerHTML = html;

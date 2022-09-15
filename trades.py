@@ -11,8 +11,6 @@ from aqt import mw
 from .utils import *
 
 
-
-
 class Trades(QDialog):
     def __init__(self):
         super().__init__(None, Qt.WindowType.Window)
@@ -24,12 +22,13 @@ class Trades(QDialog):
 
         self.allpokemon = get_pokemon_records()
         self.f = get_json("_decksortags.json", "")
+        self.tradeFunction()
 
     def open(self):
         self._create_gui()
         self._setup_web_view()
-        self.show()
         self.tradeFunction()
+        self.show()
 
     def _create_gui(self):
         """
@@ -42,10 +41,45 @@ class Trades(QDialog):
         self._web = AnkiWebView(title="pokemanki-trades")
         self.vbox.addWidget(self._web)
         self.setLayout(self.vbox)
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
     def _setup_web_view(self):
-        self._web.stdHtml(body="", css=["/pokemanki_css/view_trade.css"], context=self)
+        # TODO: May have ot replace quotes
+        self._web.stdHtml(
+            body=self.trades_html(),
+            css=["/pokemanki_css/view_trade.css", "/pokemanki_css/main.css"],
+            context=self)
         self._web.set_bridge_command(self._on_bridge_cmd, self)
+
+    def _on_bridge_cmd(self, cmd):
+        print(cmd)
+        nopokemon = QMessageBox()
+        nopokemon.setWindowTitle("Pokemanki")
+        nopokemon.setText(
+            "Please open the Stats window to get your Pokémon.")
+        nopokemon.exec()
+
+    def tradeFunction(self):
+        # show a message box
+        f = self.f
+        tradeData = get_json("_trades.json", None)
+        if tradeData:
+            date = dt.today().strftime("%d/%m/%Y")
+            if date == tradeData[0] and len(tradeData) == 3:
+                # TODO: To simplify
+                if f == tradeData[2]:
+                    self.trades = tradeData[1]
+                elif f == "" and tradeData[2] == "decks":
+                    self.trades = tradeData[1]
+                else:
+                    self.newTrades()
+                    tradeData = get_json("_trades.json")
+            else:
+                self.newTrades()
+                tradeData = get_json("_trades.json")
+        else:
+            self.newTrades()
+            tradeData = get_json("_trades.json")
 
     def newTrades(self):
         self.trades = []
@@ -156,99 +190,6 @@ class Trades(QDialog):
             tradeData = [date, self.trades, "decks"]
         testData = [date, self.trades, possiblehaveslist]
         write_json("_trades.json", tradeData)
-
-    def tradeFunction(self):
-        # show a message box
-        f = self.f
-        tradeData = get_json("_trades.json", None)
-        if tradeData:
-            date = dt.today().strftime("%d/%m/%Y")
-            if date == tradeData[0] and len(tradeData) == 3:
-                # TODO: To simplify
-                if f == tradeData[2]:
-                    self.trades = tradeData[1]
-                elif f == "" and tradeData[2] == "decks":
-                    self.trades = tradeData[1]
-                else:
-                    self.newTrades()
-                    tradeData = get_json("_trades.json")
-            else:
-                self.newTrades()
-                tradeData = get_json("_trades.json")
-        else:
-            self.newTrades()
-            tradeData = get_json("_trades.json")
-        tradewindow = self.tradewindow
-        tradewindow.setWindowTitle("Pokemanki")
-        tradewindow.setWindowModality(Qt.WindowModality.ApplicationModal)
-        table = """<table>
-                   <tr>
-                   <td height 50 width = 150 align = center></td>
-                   <td height 50 width = 150 align = center><h1>Today's Trades</h1></td>
-                   <td height 50 width = 150 align = center></td>
-                   <tr>
-                   <tr>
-                   <td height 40 width = 150 align = center><h2>Trainer 1</h2></td>
-                   <td height 40 width = 150 align = center><h2>Trainer 2</h2></td>
-                   <td height 40 width = 150 align = center><h2>Trainer 3</h2></td>
-                   <tr>
-                   <tr>
-                   <td height 30 width = 150 align = center><h3>Currently has</h3></td>
-                   <td height 30 width = 150 align = center><h3>Currently has</h3></td>
-                   <td height 30 width = 150 align = center><h3>Currently has</h3></td>
-                   <tr>
-                   <td height = 150 width = 150 align = center><img src = "%s/pokemon_images/%s.png" width = 150 height = 150></td>
-                   <td height = 150 width = 150 align = center><img src = "%s/pokemon_images/%s.png" width = 150 height = 150></td>
-                   <td height = 150 width = 150 align = center><img src = "%s/pokemon_images/%s.png" width = 150 height = 150></td>
-                   </tr>
-                   <tr>
-                   <td height = 30 width = 150 align = center><b>%s</b></td>
-                   <td height = 30 width = 150 align = center><b>%s</b></td>
-                   <td height = 30 width = 150 align = center><b>%s</b></td>
-                   </tr>
-                   <tr>
-                   <td height 1 width = 150 align = center></td>
-                   <td height 1 width = 150 align = center></td>
-                   <td height 1 width = 150 align = center></td>
-                   <tr>
-                   <tr>
-                   <td height 30 width = 150 align = center><h3>And wants</h3></td>
-                   <td height 30 width = 150 align = center><h3>And wants</h3></td>
-                   <td height 30 width = 150 align = center><h3>And wants</h3></td>
-                   <tr>
-                   <td height = 150 width = 150 align = center><img src = "%s/pokemon_images/%s.png" width = 150 height = 150></td>
-                   <td height = 150 width = 150 align = center><img src = "%s/pokemon_images/%s.png" width = 150 height = 150></td>
-                   <td height = 150 width = 150 align = center><img src = "%s/pokemon_images/%s.png" width = 150 height = 150></td>
-                   </tr>
-                   <tr>
-                   <td height = 30 width = 150 align = center><b>%s</b></td>
-                   <td height = 30 width = 150 align = center><b>%s</b></td>
-                   <td height = 30 width = 150 align = center><b>%s</b></td>
-                   </tr>
-                   <tr><button onclick="test()">TEST</button></tr>
-                   </table>
-                   <script>
-                   function test() { pycmd("TEST"); }
-                   </script>
-                   """ % (
-            self.dirname, self.trades[0][0][0], self.dirname, self.trades[1][0][0], self.dirname, self.trades[2][0][0],
-            self.trades[0][0][0], self.trades[1][0][0], self.trades[2][0][0], self.mediafolder, self.trades[0][1][0],
-            self.mediafolder, self.trades[1][1][0], self.mediafolder, self.trades[2][1][0], self.trades[0][1][0],
-            self.trades[1][1][0], self.trades[2][1][0])
-        lbl1 = QLabel(table, tradewindow)
-        lbl1.move(0, 0)
-        lbl2 = QLabel("", tradewindow)
-        lbl2.move(360, 420)
-        btn1 = QPushButton("TRADE", tradewindow)
-        btn1.move(50, 455)
-        btn2 = QPushButton("TRADE", tradewindow)
-        btn2.move(200, 455)
-        btn3 = QPushButton("TRADE", tradewindow)
-        btn3.move(350, 455)
-        btn1.clicked.connect(self.trade1)
-        btn2.clicked.connect(self.trade2)
-        btn3.clicked.connect(self.trade3)
-        tradewindow.exec()
 
     def trade1(self):
         self.make_trade(self.trades[0][0], self.trades[0][1])
@@ -381,29 +322,86 @@ class Trades(QDialog):
         # Open trades container
         txt += '<div class="pk-td-container">'
 
-        # for i < len(self.trades):
-
+        # Generate each of the trades
+        for i in range(0, 3):
+            txt += self.trade_html(i)
 
         # Close trades container
         txt += '</div>'
-
 
         return txt
 
     def trade_html(self, i):
         """
+        Generate the html code for a trade.
 
+        :param int i: Trade number.
+        :return: Trade's html.
+        :rtype: str
         """
-        trade = ""
+
+        trade = '<script>' \
+                f'{self.buttons_js()}' \
+                '</script>'
+
+        # Open trade container
+        trade += '<div class="pk-td-trade">'
+
+        ###########
+        # Head info
+        ###########
+        trade += '<div class="pk-td-trainer" style="margin-bottom: auto;">' \
+                 f'<h2 style="text-align: center;"><b>Trainer {i+1}</b></h2>' \
+                 '<div class="pk-divider" style="margin-top: 10px;"></div>' \
+                 '</div>'
+
+        ##########
+        # Has
+        ##########
+        trade += '<div class="pk-td-offer">' \
+                 '<div class="pk-td-offer-txt">' \
+                 '<span class="pk-td-offer-txt-title"><b>Has:</b></span>' \
+                 f'<span class="pk-td-offer-txt-name"><b>{self.trades[i][0][0]}</b></span>' \
+                 '</div>' \
+                 f'<img src="{self.mediafolder}/pokemon_images/{self.trades[i][0][0]}.png" class="pk-td-offer-img"/>' \
+                 '</div>'
+
+        ##########
+        # Wants
+        ##########
+        trade += '<div class="pk-td-offer">' \
+                 '<div class="pk-td-offer-txt">' \
+                 '<span class="pk-td-offer-txt-title"><b>Wants:</b></span>' \
+                 f'<span class="pk-td-offer-txt-name"><b>{self.trades[i][1][0]}</b></span>' \
+                 '</div>' \
+                 f'<img src="{self.mediafolder}/pokemon_images/{self.trades[i][1][0]}.png" class="pk-td-offer-img"/>' \
+                 '</div>'
+
+        ##########
+        # Bottom
+        ##########
+        trade += '<div class="pk-td-bottom">' \
+                 '<div class="pk-divider" style="margin-bottom: 10px"></div>' \
+                 f'<button class"pk-button" onclick="trade{i+1}()">Trade</button>' \
+                 '</div>'
+
+        # Close trade
+        trade += '</div>'
 
         return trade
 
-    def _on_bridge_cmd(self, cmd):
-        nopokemon = QMessageBox()
-        nopokemon.setWindowTitle("Pokemanki")
-        nopokemon.setText(
-            "Please open the Stats window to get your Pokémon.")
-        nopokemon.exec()
+    def buttons_js(self):
+        js = 'function trade1() {' \
+             'pycmd(1);' \
+             '}' \
+             'function trade2() {' \
+             'pycmd(1);' \
+             '}' \
+             'function trade3() {' \
+             'pycmd(3);' \
+             '}'
+
+        return js
 
 
 def get_pokemon_records():
