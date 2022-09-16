@@ -52,12 +52,8 @@ class Trades(QDialog):
         self._web.set_bridge_command(self._on_bridge_cmd, self)
 
     def _on_bridge_cmd(self, cmd):
-        print(cmd)
-        nopokemon = QMessageBox()
-        nopokemon.setWindowTitle("Pokemanki")
-        nopokemon.setText(
-            "Please open the Stats window to get your Pokémon.")
-        nopokemon.exec()
+        if cmd in ["0", "1", "2"]:
+            self.make_trade(self.trades[int(cmd)][0], self.trades[int(cmd)][1])
 
     def tradeFunction(self):
         # show a message box
@@ -190,15 +186,6 @@ class Trades(QDialog):
             tradeData = [date, self.trades, "decks"]
         testData = [date, self.trades, possiblehaveslist]
         write_json("_trades.json", tradeData)
-
-    def trade1(self):
-        self.make_trade(self.trades[0][0], self.trades[0][1])
-
-    def trade2(self):
-        self.make_trade(self.trades[1][0], self.trades[1][1])
-
-    def trade3(self):
-        self.make_trade(self.trades[2][0], self.trades[2][1])
 
     def make_trade(self, have, want):
         possiblefits = []
@@ -363,7 +350,7 @@ class Trades(QDialog):
                  '<span class="pk-td-offer-txt-title"><b>Has:</b></span>' \
                  f'<span class="pk-td-offer-txt-name"><b>{self.trades[i][0][0]}</b></span>' \
                  '</div>' \
-                 f'<img src="{self.mediafolder}/pokemon_images/{self.trades[i][0][0]}.png" class="pk-td-offer-img"/>' \
+                 f'<img src="pokemon_images/{self.trades[i][0][0]}.png" class="pk-td-offer-img"/>' \
                  '</div>'
 
         ##########
@@ -374,7 +361,7 @@ class Trades(QDialog):
                  '<span class="pk-td-offer-txt-title"><b>Wants:</b></span>' \
                  f'<span class="pk-td-offer-txt-name"><b>{self.trades[i][1][0]}</b></span>' \
                  '</div>' \
-                 f'<img src="{self.mediafolder}/pokemon_images/{self.trades[i][1][0]}.png" class="pk-td-offer-img"/>' \
+                 f'<img src="pokemon_images/{self.trades[i][1][0]}.png" class="pk-td-offer-img"/>' \
                  '</div>'
 
         ##########
@@ -382,7 +369,7 @@ class Trades(QDialog):
         ##########
         trade += '<div class="pk-td-bottom">' \
                  '<div class="pk-divider" style="margin-bottom: 10px"></div>' \
-                 f'<button class"pk-button" onclick="trade{i+1}()">Trade</button>' \
+                 f'<button class"pk-button" onclick="callTrade({i})">Trade</button>' \
                  '</div>'
 
         # Close trade
@@ -391,14 +378,8 @@ class Trades(QDialog):
         return trade
 
     def buttons_js(self):
-        js = 'function trade1() {' \
-             'pycmd(1);' \
-             '}' \
-             'function trade2() {' \
-             'pycmd(1);' \
-             '}' \
-             'function trade3() {' \
-             'pycmd(3);' \
+        js = 'function callTrade(n) {' \
+             'pycmd(n);' \
              '}'
 
         return js

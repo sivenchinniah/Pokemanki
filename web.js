@@ -16,7 +16,7 @@ Pokemanki.addPokemanki = function(){
     link2.rel = 'stylesheet';
 
     document.head.appendChild(link1);
-    document.head.appendChild(link12;
+    document.head.appendChild(link2);
 }
 Pokemanki.setPokemanki = function(html){
     document.getElementById('pokemanki').innerHTML = html;
