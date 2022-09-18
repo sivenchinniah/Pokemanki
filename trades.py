@@ -194,6 +194,7 @@ class Trades:
             elif len(possiblehaves) == 1:
                 have = possiblehaves[0]
             else:
+                i += 1
                 continue
             if have[0].startswith("Eevee") and want[0].startswith("Eevee"):
                 self.trades.append(
@@ -236,6 +237,13 @@ class Trades:
         else:
             self.newTrades()
             tradeData = get_json("_trades.json")
+        if tradeData[1] == []:
+            notrademsg = QMessageBox()
+            notrademsg.setWindowTitle("Pokemanki")
+            notrademsg.setText(
+                "No trades are possible at the moment.")
+            notrademsg.exec()
+            return
         tradewindow = self.tradewindow
         tradewindow.setWindowTitle("Pokemanki")
         tradewindow.setWindowModality(Qt.ApplicationModal)
