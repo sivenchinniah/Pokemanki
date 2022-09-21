@@ -4,6 +4,7 @@ import csv
 
 from aqt import mw
 from aqt.qt import *
+from aqt.utils import showInfo
 
 from .utils import *
 from .stats import MultiStats, TagStats, cardInterval, cardIdsFromDeckIds
@@ -176,7 +177,7 @@ def FirstPokemon():
         msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
         msgbox.addButton("Charmander", QMessageBox.AcceptRole)
         msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
-        msgbox.exec_()
+        msgbox.exec()
         deckmon = msgbox.clickedButton().text()
         if deckmon:
             deck = mw.col.decks.byName(inp)['id']
@@ -199,13 +200,10 @@ def FirstPokemon():
                 Level = 0
             deckmondata = [(deckmon, deck, Level)]
             write_json("_pokemanki.json", deckmondata)
-            firstpokemon = QMessageBox()
-            firstpokemon.setWindowTitle("Pokemanki")
             if Level < 5:
-                firstpokemon.setText("You've found a %s egg" % deckmon)
+                showInfo(f"You've found a {deckmon} egg.")
             else:
-                firstpokemon.setText("You've caught a %s!" % deckmon)
-            firstpokemon.exec_()
+                showInfo(f"You've caught a {deckmon}!")
         else:
             FirstPokemon()
     else:
@@ -332,7 +330,7 @@ def MultiPokemon(wholeCollection):
                 starters = randomStarter()
                 for starter in starters:
                     msgbox.addButton(starter, QMessageBox.AcceptRole)
-                msgbox.exec_()
+                msgbox.exec()
                 deckmon = msgbox.clickedButton().text()
             # Else, randomize based on tier
             else:
@@ -432,10 +430,7 @@ def MultiPokemon(wholeCollection):
     write_json("_pokemanki.json", modifiedpokemontotal)
     # Only display message if changes
     if msgtxt != "Hello Pokémon Trainer!":
-        msgbox2 = QMessageBox()
-        msgbox2.setWindowTitle("Pokemanki")
-        msgbox2.setText(msgtxt)
-        msgbox2.exec_()
+        showInfo(msgtxt, parent=mw, title="Pokémanki")
     # Return multiData
     return multiData
 
@@ -530,7 +525,7 @@ def TagPokemon():
                 msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
                 msgbox.addButton("Charmander", QMessageBox.AcceptRole)
                 msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
-                msgbox.exec_()
+                msgbox.exec()
                 tagmon = msgbox.clickedButton().text()
             else:
                 tiernumber = len(tierdict[pokemontier])
@@ -607,10 +602,7 @@ def TagPokemon():
     write_json("_tagmon.json", modifiedtagmon)
     # Only display message if changes
     if msgtxt != "Hello Pokémon Trainer!":
-        msgbox2 = QMessageBox()
-        msgbox2.setWindowTitle("Pokemanki")
-        msgbox2.setText(msgtxt)
-        msgbox2.exec_()
+        showInfo(msgtxt, parent=mw, title="Pokémanki")
 
     # Return multiData
     return multiData

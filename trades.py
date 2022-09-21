@@ -6,6 +6,7 @@ from datetime import date as dt
 
 from aqt.qt import *
 from aqt import mw
+from aqt.utils import showInfo
 
 from .utils import *
 
@@ -127,11 +128,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                no_pokemon()
                 return
         else:
             deckmonlist = get_json("_pokemanki.json", None)
@@ -150,11 +147,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                no_pokemon()
                 return
         possiblehaveslist = []
         while i < 3:
@@ -297,7 +290,7 @@ class Trades:
         btn1.clicked.connect(self.trade1)
         btn2.clicked.connect(self.trade2)
         btn3.clicked.connect(self.trade3)
-        tradewindow.exec_()
+        tradewindow.exec()
 
     def trade1(self):
         have = self.trades[0][0]
@@ -317,11 +310,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                no_pokemon()
                 return
         else:
             deckmonlist = get_json("_pokemanki.json", None)
@@ -336,21 +325,14 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                no_pokemon()
                 return
         for item in deckmonlist:
             if item[0] == want[0] or (item[0].startswith("Eevee") and want[0] == "Eevee") and int(item[2]) >= 5:
                 possiblefits.append(item)
         if possiblefits == []:
-            novalidpokemon = QMessageBox()
-            novalidpokemon.setWindowTitle("Pokemanki")
-            novalidpokemon.setText(
-                "Sorry, you do not have the Pokemon needed to complete this trade.")
-            novalidpokemon.exec_()
+            showInfo("Sorry, you do not have the Pokemon needed to complete this trade.",
+                     parent=mw, title="Pokémanki")
             return
         displaylist = []
         for item in possiblefits:
@@ -388,7 +370,7 @@ class Trades:
             "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
         confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirmation.setDefaultButton(QMessageBox.No)
-        result = confirmation.exec_()
+        result = confirmation.exec()
         if result == QMessageBox.Yes:
             modifieddeckmonlist = []
             for item in deckmonlist:
@@ -403,11 +385,8 @@ class Trades:
                     modifieddeckmonlist.append(item)
             write_json("_pokemanki.json", modifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
-            tradedone = QMessageBox()
-            tradedone.setWindowTitle("Pokemanki")
-            tradedone.setText("You have traded your %s for a %s" %
-                              (displaytext, have[0]))
-            tradedone.exec_()
+            showInfo(f"You have traded your {displaytext} for a {have[0].}",
+                     parent=mw, title="Pokémanki")
 
     def trade2(self):
         have = self.trades[1][0]
@@ -427,11 +406,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                no_pokemon()
                 return
         else:
             deckmonlist = get_json("_pokemanki.json", None)
@@ -446,21 +421,14 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                no_pokemon()
                 return
         for item in deckmonlist:
             if item[0] == want[0] or (item[0].startswith("Eevee") and want[0] == "Eevee") and int(item[2]) >= 5:
                 possiblefits.append(item)
         if possiblefits == []:
-            novalidpokemon = QMessageBox()
-            novalidpokemon.setWindowTitle("Pokemanki")
-            novalidpokemon.setText(
-                "Sorry, you do not have the Pokémon needed to complete this trade.")
-            novalidpokemon.exec_()
+            showInfo("""Sorry, you do not have the Pokémon needed to complete
+                     this trade.""", parent=mw, title="Pokémanki")
             return
         displaylist = []
         for item in possiblefits:
@@ -498,7 +466,7 @@ class Trades:
             "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
         confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirmation.setDefaultButton(QMessageBox.No)
-        result = confirmation.exec_()
+        result = confirmation.exec()
         if result == QMessageBox.Yes:
             modifieddeckmonlist = []
             for item in deckmonlist:
@@ -513,11 +481,8 @@ class Trades:
                     modifieddeckmonlist.append(item)
             write_json("_pokemanki.json", modifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
-            tradedone = QMessageBox()
-            tradedone.setWindowTitle("Pokemanki")
-            tradedone.setText("You have traded your %s for a %s" %
-                              (displaytext, have[0]))
-            tradedone.exec_()
+            showInfo(f"You have traded your {displaytext} for a {have[0].}",
+                     parent=mw, title="Pokémanki")
 
     def trade3(self):
         have = self.trades[2][0]
@@ -537,11 +502,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                no_pokemon()
                 return
         else:
             deckmonlist = get_json("_pokemanki.json", None)
@@ -556,21 +517,14 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec_()
+                no_pokemon()
                 return
         for item in deckmonlist:
             if item[0] == want[0] or (item[0].startswith("Eevee") and want[0] == "Eevee") and int(item[2]) >= 5:
                 possiblefits.append(item)
         if possiblefits == []:
-            novalidpokemon = QMessageBox()
-            novalidpokemon.setWindowTitle("Pokemanki")
-            novalidpokemon.setText(
-                "Sorry, you do not have the Pokemon needed to complete this trade.")
-            novalidpokemon.exec_()
+            showInfo("""Sorry, you do not have the Pokemon needed to complete
+                     this trade.""", parent=mw, title="Pokémanki")
             return
         displaylist = []
         for item in possiblefits:
@@ -608,7 +562,7 @@ class Trades:
             "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
         confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirmation.setDefaultButton(QMessageBox.No)
-        result = confirmation.exec_()
+        result = confirmation.exec()
         if result == QMessageBox.Yes:
             modifieddeckmonlist = []
             for item in deckmonlist:
@@ -623,8 +577,5 @@ class Trades:
                     modifieddeckmonlist.append(item)
             write_json("_pokemanki.json", modifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
-            tradedone = QMessageBox()
-            tradedone.setWindowTitle("Pokemanki")
-            tradedone.setText("You have traded your %s for a %s" %
-                              (displaytext, have[0]))
-            tradedone.exec_()
+            showInfo(f"You have traded your {displaytext} for a {have[0].}",
+                     parent=mw, title="Pokémanki")
