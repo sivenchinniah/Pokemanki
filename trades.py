@@ -6,6 +6,7 @@ from datetime import date as dt
 
 from aqt.qt import *
 from aqt import mw
+from aqt.utils import showInfo
 
 from .utils import *
 
@@ -194,6 +195,7 @@ class Trades:
             elif len(possiblehaves) == 1:
                 have = possiblehaves[0]
             else:
+                i += 1
                 continue
             if have[0].startswith("Eevee") and want[0].startswith("Eevee"):
                 self.trades.append(
@@ -236,6 +238,10 @@ class Trades:
         else:
             self.newTrades()
             tradeData = get_json("_trades.json")
+        if tradeData[1] == []:
+            showInfo(text="No trades are possible at the moment.", parent=mw,
+                     title="Pokémanki")
+            return
         tradewindow = self.tradewindow
         tradewindow.setWindowTitle("Pokemanki")
         tradewindow.setWindowModality(Qt.ApplicationModal)
