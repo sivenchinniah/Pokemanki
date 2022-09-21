@@ -6,6 +6,7 @@ from datetime import date as dt
 
 from aqt.qt import *
 from aqt import mw
+from aqt.utils import showInfo
 
 from .utils import *
 
@@ -238,11 +239,8 @@ class Trades:
             self.newTrades()
             tradeData = get_json("_trades.json")
         if tradeData[1] == []:
-            notrademsg = QMessageBox()
-            notrademsg.setWindowTitle("Pokemanki")
-            notrademsg.setText(
-                "No trades are possible at the moment.")
-            notrademsg.exec()
+            showInfo(text="No trades are possible at the moment.", parent=mw,
+                     title="Pokémanki")
             return
         tradewindow = self.tradewindow
         tradewindow.setWindowTitle("Pokemanki")
