@@ -189,7 +189,7 @@ class Tags:
         btn = QPushButton("OK", parentwindow)
         btn.move(100, 220)
         btn.clicked.connect(self.tagAssign)
-        parentwindow.exec_()
+        parentwindow.exec()
 
     def tagAssign(self):
         checked = self.checked = []
