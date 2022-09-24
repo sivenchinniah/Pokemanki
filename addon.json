@@ -2,14 +2,14 @@
     "display_name": "Pokemanki",
     "module_name": "pokemanki",
     "repo_name": "pokemanki",
-    "ankiweb_id": "633922407",
-    "author": "Siven Chinniah",
-    "contact": "https://github.com/sivenchinniah",
-    "homepage": "https://github.com/sivenchinniah/Pokemanki",
-    "copyright_start": 2019,
-    "tags": "pokemon gamification",
-    "conflicts": [],
+    "ankiweb_id": "",
+    "author": "zjosua",
+    "contact": "https://github.com/zjosua",
+    "homepage": "https://github.com/zjosua/Pokemanki",
+    "copyright_start": 2022,
+    "tags": "pokémon gamification",
+    "conflicts": ["633922407"],
     "targets": [
-        "anki21"
+        "qt6"
     ]
 }
