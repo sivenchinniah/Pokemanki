@@ -1,14 +1,16 @@
 Pokemanki = {}
 
 Pokemanki.addPokemanki = function(){
-    let padDiv = document.createElement("div")
-    padDiv.setAttribute("class", "range-box-pad")
     let divEl = document.createElement("div");
     divEl.setAttribute("id", "pokemanki")
     divEl.className = "pokemanki";
-    let mainEl = document.getElementById('main');
-    mainEl.parentElement.insertBefore(padDiv, mainEl)
-    mainEl.parentElement.insertBefore(divEl, mainEl);
+    let rangeBoxPad = document.querySelector('.range-box-pad');
+    rangeBoxPad.after(divEl);
+
+    link = document.createElement('link');
+    link.href = "/pokemanki_css/view_stats.css";
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
 }
 Pokemanki.setPokemanki = function(html){
     document.getElementById('pokemanki').innerHTML = html;

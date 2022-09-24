@@ -2,7 +2,7 @@ from .utils import *
 from .tags import Tags
 
 from aqt.qt import *
-from aqt.utils import tooltip
+from aqt.utils import showInfo, tooltip
 
 # Nickname Settings
 
@@ -55,30 +55,26 @@ def Nickname():
         if inp:
             nickname = inp
             deckmon = [deckmon[0], deckmon[1], deckmon[2], nickname]
-            newnickname = QMessageBox()
-            newnickname.setWindowTitle("Pokemanki")
             if int(deckmon[2]) < 5:
-                newnickname.setText(
-                    "New nickname given to Egg - %s" % (nickname))
+                showInfo(f"New nickname given to Egg - {nickname}.", parent=mw,
+                         title="Pokémanki")
             elif deckmon[0].startswith("Eevee"):
-                newnickname.setText(
-                    "New nickname given to Eevee - %s" % (nickname))
+                showInfo(f"New nickname given to Eevee - {nickname}.",
+                         parent=mw, title="Pokémanki")
             else:
-                newnickname.setText(
-                    "New nickname given to %s - %s" % (deckmon[0], nickname))
-            newnickname.exec_()
+                showInfo(f"New nickname given to {deckmon[0]} - {nickname}.",
+                         parent=mw, title="Pokémanki")
         else:
             deckmon = [deckmon[0], deckmon[1], deckmon[2]]
-            nicknameremoved = QMessageBox()
-            nicknameremoved.setWindowTitle("Pokemanki")
             if int(deckmon[2]) < 5:
-                nicknameremoved.setText("Nickname removed from Egg")
+                showInfo("Nickname removed from Egg", parent=mw,
+                         title="Pokémanki")
             elif deckmon[0].startswith("Eevee"):
-                nicknameremoved.setText("Nickname removed from Eevee")
+                showInfo("Nickname removed from Eevee", parent=mw,
+                         title="Pokémanki")
             else:
-                nicknameremoved.setText(
-                    "Nickname removed from %s" % deckmon[0])
-            nicknameremoved.exec_()
+                showInfo(f"Nickname removed from {deckmon[0]", parent=mw,
+                         title="Pokémanki")
     modifieddeckmonlist = []
     for item in deckmonlist:
         if item[1] == deckmon[1]:
@@ -105,18 +101,12 @@ def Toggle():
             write_json("_decksortags.json", inp)
             tags = Tags()
             tags.tagMenu()
-            settingschanged = QMessageBox()
-            settingschanged.setWindowTitle("Pokemanki")
-            settingschanged.setText(
-                "Please restart Anki to see your updated Pokémon.")
-            settingschanged.exec_()
+            showInfo("Please restart Anki to see your updated Pokémon.",
+                     parent=mw, title="Pokémanki")
         else:
             write_json("_decksortags.json", "")
-            settingschanged = QMessageBox()
-            settingschanged.setWindowTitle("Pokemanki")
-            settingschanged.setText(
-                "Please restart Anki to see your updated Pokémon.")
-            settingschanged.exec_()
+            showInfo("Please restart Anki to see your updated Pokémon.",
+                     parent=mw, title="Pokémanki")
 
 # Threshold Settings
 
@@ -138,20 +128,16 @@ def ThresholdSettings():
     if ok:
         # Make sure threshold is at least 10
         if inp < 10:
-            error = QMessageBox()
-            error.setWindowTitle("Pokemanki")
-            error.setText("Number must be at least ten")
-            error.exec_()
+            showInfo("Number must be at least ten", parent=mw, type="critical",
+                     title="Pokémanki")
         # Change settings and save them if the threshold is changed
         elif inp != thresholdlist[4]:
             newthresholdlist = [
                 int(0.1*inp), int(0.25*inp), int(0.5*inp), int(0.75*inp), int(inp)]
             write_json("_pokemankisettings.json", newthresholdlist)
             # Message box confirming change
-            settingschanged = QMessageBox()
-            settingschanged.setWindowTitle("Pokemanki")
-            settingschanged.setText("Your settings have been changed")
-            settingschanged.exec_()
+            showInfo("Your settings have been changed", parent=mw,
+                     title="Pokémanki")
     # Show the window
     window.show()
 
@@ -169,7 +155,7 @@ def ResetPokemon():
     )))
     resetwindow.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
     resetwindow.setDefaultButton(QMessageBox.No)
-    resetresult = resetwindow.exec_()
+    resetresult = resetwindow.exec()
     # Clear pokemanki.json if Yes
     if resetresult == QMessageBox.Yes:
         reset_files = [
@@ -181,26 +167,17 @@ def ResetPokemon():
             write_json(fname, {})
         # TODO reset everstone? and other stuff?
         # Message box confirming reset
-        resetdone = QMessageBox()
-        resetdone.setWindowTitle("Pokemanki")
-        resetdone.setText("Pokemon reset")
-        resetdone.exec_()
+        showInfo("Pokemon reset", parent=mw, title="Pokémanki")
 
 
 def MovetoBottom():
-    settingschanged = QMessageBox()
-    settingschanged.setWindowTitle("Pokemanki")
-    settingschanged.setText(
-        "Please restart Anki to see your updated settings.")
-    settingschanged.exec_()
+    showInfo("Please restart Anki to see your updated settings.", parent=mw,
+             title="Pokémanki")
 
 
 def MovetoTop():
-    settingschanged = QMessageBox()
-    settingschanged.setWindowTitle("Pokemanki")
-    settingschanged.setText(
-        "Please restart Anki to see your updated settings.")
-    settingschanged.exec_()
+    showInfo("Please restart Anki to see your updated settings.", parent=mw,
+             title="Pokémanki")
 
 
 def giveEverstone():
@@ -239,10 +216,8 @@ def giveEverstone():
         else:
             everstonelist.append(mw.col.decks.id(item))
             everstonepokemonlist.append(everstone_pokemon_name)
-        settingschanged = QMessageBox()
-        settingschanged.setWindowTitle("Pokemanki")
-        settingschanged.setText("Please restart Anki to see changes.")
-        settingschanged.exec_()
+        showInfo("Please restart Anki to see changes.", parent=mw,
+                 title="Pokémanki")
     write_json("_everstonelist.json", everstonelist)
     write_json("_everstonepokemonlist.json", everstonepokemonlist)
 
@@ -254,10 +229,8 @@ def takeEverstone():
     everstonelist = get_json("_everstonelist.json", [])
     everstonepokemonlist = get_json("_everstonepokemonlist.json", [])
     if not everstonelist:
-        noeverstone = QMessageBox()
-        noeverstone.setWindowTitle("Pokemanki")
-        noeverstone.setText("None of your Pokémon are holding everstones.")
-        noeverstone.exec_()
+        showInfo("None of your Pokémon are holding everstones.", parent=mw,
+                 title="Pokémanki")
         return
     possibleuneverstones = []
     for thing in everstonelist:
@@ -285,10 +258,8 @@ def takeEverstone():
         else:
             everstonelist.remove(mw.col.decks.id(item))
             everstonepokemonlist.remove(textlist[0])
-        settingschanged = QMessageBox()
-        settingschanged.setWindowTitle("Pokemanki")
-        settingschanged.setText("Please restart Anki to see your changes.")
-        settingschanged.exec_()
+        showInfo("Please restart Anki to see your changes.", parent=mw,
+                 title="Pokémanki")
     write_json("_everstonelist.json", everstonelist)
 
 
@@ -326,10 +297,8 @@ def giveMegastone():
             megastonelist.append(item)
         else:
             megastonelist.append(mw.col.decks.id(item))
-        settingschanged = QMessageBox()
-        settingschanged.setWindowTitle("Pokemanki")
-        settingschanged.setText("Please restart Anki to see your changes.")
-        settingschanged.exec_()
+        showInfo("Please restart Anki to see your changes.", parent=mw,
+                 title="Pokémanki")
     write_json("_megastonelist.json", megastonelist)
 
 
@@ -339,10 +308,8 @@ def takeMegastone():
         return
     megastonelist = get_json("_megastonelist.json", [])
     if not megastonelist:
-        nomegastone = QMessageBox()
-        nomegastone.setWindowTitle("Pokemanki")
-        nomegastone.setText("None of your Pokémon are holding mega stones.")
-        nomegastone.exec_()
+        showInfo("None of your Pokémon are holding mega stones.", parent=mw,
+                 title="Pokémanki")
         return
     possibleunmegastones = []
     for thing in megastonelist:
@@ -368,10 +335,8 @@ def takeMegastone():
             megastonelist.remove(item)
         else:
             megastonelist.remove(mw.col.decks.id(item))
-        settingschanged = QMessageBox()
-        settingschanged.setWindowTitle("Pokemanki")
-        settingschanged.setText("Please restart Anki to see your changes.")
-        settingschanged.exec_()
+        showInfo("Please restart Anki to see your changes.", parent=mw,
+                 title="Pokémanki")
     write_json("_megastonelist.json", megastonelist)
 
 
@@ -409,10 +374,8 @@ def giveAlolanPassport():
             alolanlist.append(item)
         else:
             alolanlist.append(mw.col.decks.id(item))
-        settingschanged = QMessageBox()
-        settingschanged.setWindowTitle("Pokemanki")
-        settingschanged.setText("Please restart Anki to see changes.")
-        settingschanged.exec_()
+        showInfo("Please restart Anki to see changes.", parent=mw,
+                 title="Pokémanki")
     write_json("_alolanlist.json", alolanlist)
 
 
@@ -422,11 +385,8 @@ def takeAlolanPassport():
         return
     alolanlist = get_json("_alolanlist.json", [])
     if not alolanlist:
-        noalolan = QMessageBox()
-        noalolan.setWindowTitle("Pokemanki")
-        noalolan.setText(
-            "None of your Pokémon are holding an Alolan Passport.")
-        noalolan.exec_()
+        showInfo("None of your Pokémon are holding an Alolan Passport.",
+                 parent=mw, title="Pokémanki")
         return
     possibleunalolans = []
     for thing in alolanlist:
@@ -452,10 +412,8 @@ def takeAlolanPassport():
             alolanlist.remove(item)
         else:
             alolanlist.remove(mw.col.decks.id(item))
-        settingschanged = QMessageBox()
-        settingschanged.setWindowTitle("Pokemanki")
-        settingschanged.setText("Please restart Anki to see your changes.")
-        settingschanged.exec_()
+        showInfo("Please restart Anki to see your changes.", parent=mw,
+                 title="Pokémanki")
     write_json("_alolanlist.json", alolanlist)
 
 
@@ -493,11 +451,8 @@ def PrestigePokemon():
             prestigelist.append(item)
         else:
             prestigelist.append(mw.col.decks.id(item))
-        settingschanged = QMessageBox()
-        settingschanged.setWindowTitle("Pokemanki")
-        settingschanged.setText(
-            "Please restart Anki to see your prestiged Pokémon.")
-        settingschanged.exec_()
+        showInfo("Please restart Anki to see your prestiged Pokémon.",
+                 parent=mw, title="Pokémanki")
     write_json("_prestigelist.json", prestigelist)
 
 
@@ -507,10 +462,7 @@ def UnprestigePokemon():
         return
     prestigelist = get_json("_prestigelist.json", [])
     if not prestigelist:
-        noprestige = QMessageBox()
-        noprestige.setWindowTitle("Pokemanki")
-        noprestige.setText("You have no prestiged Pokémon.")
-        noprestige.exec_()
+        showInfo("You have no prestiged Pokémon.", parent=mw, title="Pokémanki")
         return
     possibleunprestiges = []
     for thing in prestigelist:
@@ -539,9 +491,6 @@ def UnprestigePokemon():
             prestigelist.remove(item)
         else:
             prestigelist.remove(mw.col.decks.id(item))
-        settingschanged = QMessageBox()
-        settingschanged.setWindowTitle("Pokemanki")
-        settingschanged.setText(
-            "Please restart Anki to see your unprestiged Pokémon.")
-        settingschanged.exec_()
+        showInfo("Please restart Anki to see your unprestiged Pokémon.",
+                 parent=mw, title="Pokémanki")
     write_json("_prestigelist.json", prestigelist)

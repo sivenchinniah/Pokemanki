@@ -6,6 +6,7 @@ from typing import List, Union
 
 from aqt import mw
 from aqt.qt import *
+from aqt.utils import showInfo
 
 config = mw.addonManager.getConfig(__name__)
 
@@ -56,11 +57,8 @@ def write_json(file_name: str, value):
 
 
 def no_pokemon():
-    nopokemon = QMessageBox()
-    nopokemon.setWindowTitle("Pokemanki")
-    nopokemon.setText(
-        "Please open the Stats window to get your Pokémon.")
-    nopokemon.exec_()
+    showInfo("Please open the Stats window to get your Pokémon.", parent=mw,
+             title="Pokémanki")
 
 
 def get_pokemons():

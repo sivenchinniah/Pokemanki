@@ -1,10 +1,11 @@
 import os
+import sys
 
 from aqt import mw, gui_hooks
 from aqt.qt import *
+from bs4 import BeautifulSoup
 
-from .display import pokemonDisplay
-from .tagmon import tagmonDisplay
+from .display import pokemon_display
 from .tags import Tags
 from .trades import Trades
 from .utils import *
@@ -15,6 +16,7 @@ statsDialog = None
 
 # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
 copy_directory("pokemon_images")
+copy_directory("pokemanki_css")
 
 # Download threshold settings (or make from scratch if not already made)
 set_default("_pokemankisettings.json", default=[100, 250, 500, 750, 1000])
@@ -40,21 +42,21 @@ bottomaction = QAction("Move Pokémon to Bottom", mw)
 topaction = QAction("Move Pokémon to Top", mw)
 
 # Connect actions to functions
-nicknameaction.triggered.connect(Nickname)
-resetaction.triggered.connect(ResetPokemon)
-tradeaction.triggered.connect(tradeclass.tradeFunction)
-toggleaction.triggered.connect(Toggle)
-tagsaction.triggered.connect(tags.tagMenu)
-prestigeaction.triggered.connect(PrestigePokemon)
-unprestigeaction.triggered.connect(UnprestigePokemon)
-everstoneaction.triggered.connect(giveEverstone)
-uneverstoneaction.triggered.connect(takeEverstone)
-megastoneaction.triggered.connect(giveMegastone)
-unmegastoneaction.triggered.connect(takeMegastone)
-alolanaction.triggered.connect(giveAlolanPassport)
-unalolanaction.triggered.connect(takeAlolanPassport)
-bottomaction.triggered.connect(MovetoBottom)
-topaction.triggered.connect(MovetoTop)
+qconnect(nicknameaction.triggered, Nickname)
+qconnect(resetaction.triggered, ResetPokemon)
+qconnect(tradeaction.triggered, tradeclass.tradeFunction)
+qconnect(toggleaction.triggered, Toggle)
+qconnect(tagsaction.triggered, tags.tagMenu)
+qconnect(prestigeaction.triggered, PrestigePokemon)
+qconnect(unprestigeaction.triggered, UnprestigePokemon)
+qconnect(everstoneaction.triggered, giveEverstone)
+qconnect(uneverstoneaction.triggered, takeEverstone)
+qconnect(megastoneaction.triggered, giveMegastone)
+qconnect(unmegastoneaction.triggered, takeMegastone)
+qconnect(alolanaction.triggered, giveAlolanPassport)
+qconnect(unalolanaction.triggered, takeAlolanPassport)
+qconnect(bottomaction.triggered, MovetoBottom)
+qconnect(topaction.triggered, MovetoTop)
 
 # Make new Pokemanki menu under tools
 mw.testmenu = QMenu('&Pokemanki', mw)
@@ -87,13 +89,9 @@ else:  # Not yet implemented for tagmon
 mw.testmenu.addAction(resetaction)
 
 
-# Wrap pokemonDisplay function of display.py with the todayStats function of anki.stats.py
+# Wrap pokemon_display function of display.py with the todayStats function of anki.stats.py
 # Note that above comment *may* be outdated
-
-if f:
-    display_func = tagmonDisplay
-else:
-    display_func = pokemonDisplay
+display_func = pokemon_display
 
 
 def message_handler(handled, message, context):
@@ -102,15 +100,9 @@ def message_handler(handled, message, context):
     if not message.startswith("Pokemanki#"):
         return (False, None)
     if message == "Pokemanki#currentDeck":
-        if f:
-            html = tagmonDisplay().replace("`", "'")
-        else:
-            html = pokemonDisplay(wholeCollection=False).replace("`", "'")
+        html = pokemon_display(f, False).replace("`", "'")
     elif message == "Pokemanki#wholeCollection":
-        if f:
-            html = tagmonDisplay().replace("`", "'")
-        else:
-            html = pokemonDisplay(wholeCollection=True).replace("`", "'")
+        html = pokemon_display(f, True).replace("`", "'")
     else:
         starts = "Pokemanki#search#"
         term = message[len(starts):]
@@ -132,6 +124,16 @@ def onStatsOpen(statsDialog):
     statsDialog.form.web.loadFinished.connect(
         lambda _: _onStatsOpen(statsDialog))
 
+def replace_gears(deck_browser, content):
+	pokemons = get_json("_pokemanki.json", None)
+	soup = BeautifulSoup(content.tree, "html.parser")
+	for tr in soup.select('tr[id]'):
+		deck_id = int(tr['id'])
+		name = next((pokemon[0] for pokemon in pokemons if pokemon[1]==deck_id), None)
+		if name:
+			tr.select('img.gears')[0]['src'] = "pokemon_images/" + name + ".png"
+	content.tree = soup
 
 gui_hooks.stats_dialog_will_show.append(onStatsOpen)
 gui_hooks.webview_did_receive_js_message.append(message_handler)
+gui_hooks.deck_browser_will_render_content.append(replace_gears)
