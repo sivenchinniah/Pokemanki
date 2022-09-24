@@ -73,7 +73,7 @@ def Nickname():
                 showInfo("Nickname removed from Eevee", parent=mw,
                          title="Pokémanki")
             else:
-                showInfo(f"Nickname removed from {deckmon[0]", parent=mw,
+                showInfo(f"Nickname removed from {deckmon[0]}", parent=mw,
                          title="Pokémanki")
     modifieddeckmonlist = []
     for item in deckmonlist:

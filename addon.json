@@ -1,0 +1,15 @@
+{
+    "display_name": "Pokemanki",
+    "module_name": "pokemanki",
+    "repo_name": "pokemanki",
+    "ankiweb_id": "633922407",
+    "author": "Siven Chinniah",
+    "contact": "https://github.com/sivenchinniah",
+    "homepage": "https://github.com/sivenchinniah/Pokemanki",
+    "copyright_start": 2019,
+    "tags": "pokemon gamification",
+    "conflicts": [],
+    "targets": [
+        "anki21"
+    ]
+}
