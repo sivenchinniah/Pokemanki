@@ -385,7 +385,7 @@ class Trades:
                     modifieddeckmonlist.append(item)
             write_json("_pokemanki.json", modifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
-            showInfo(f"You have traded your {displaytext} for a {have[0].}",
+            showInfo(f"You have traded your {displaytext} for a {have[0]}",
                      parent=mw, title="Pokémanki")
 
     def trade2(self):
@@ -481,7 +481,7 @@ class Trades:
                     modifieddeckmonlist.append(item)
             write_json("_pokemanki.json", modifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
-            showInfo(f"You have traded your {displaytext} for a {have[0].}",
+            showInfo(f"You have traded your {displaytext} for a {have[0]}",
                      parent=mw, title="Pokémanki")
 
     def trade3(self):
@@ -577,5 +577,5 @@ class Trades:
                     modifieddeckmonlist.append(item)
             write_json("_pokemanki.json", modifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
-            showInfo(f"You have traded your {displaytext} for a {have[0].}",
+            showInfo(f"You have traded your {displaytext} for a {have[0]}",
                      parent=mw, title="Pokémanki")
