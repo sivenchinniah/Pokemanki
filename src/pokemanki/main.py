@@ -25,21 +25,21 @@ tradeclass = Trades()
 tags = Tags()
 
 # Make actions for settings and reset
-nicknameaction = QAction("Nicknames", mw)
-resetaction = QAction("Reset", mw)
-tradeaction = QAction("Trade", mw)
-toggleaction = QAction("Decks vs. Tags", mw)
+nicknameaction = QAction("&Nicknames", mw)
+resetaction = QAction("&Reset", mw)
+tradeaction = QAction("&Trade", mw)
+toggleaction = QAction("&Decks vs. Tags", mw)
 tagsaction = QAction("Tags", mw)
-prestigeaction = QAction("Prestige Pokémon", mw)
-unprestigeaction = QAction("Unprestige Pokémon", mw)
-everstoneaction = QAction("Give Everstone", mw)
-uneverstoneaction = QAction("Take Everstone", mw)
-megastoneaction = QAction("Give Mega Stone", mw)
-unmegastoneaction = QAction("Take Mega Stone", mw)
-alolanaction = QAction("Give Alolan Passport", mw)
-unalolanaction = QAction("Take Alolan Passport", mw)
-bottomaction = QAction("Move Pokémon to Bottom", mw)
-topaction = QAction("Move Pokémon to Top", mw)
+prestigeaction = QAction("&Prestige Pokémon", mw)
+unprestigeaction = QAction("&Unprestige Pokémon", mw)
+everstoneaction = QAction("&Give Everstone", mw)
+uneverstoneaction = QAction("&Take Everstone", mw)
+megastoneaction = QAction("&Give Mega Stone", mw)
+unmegastoneaction = QAction("&Take Mega Stone", mw)
+alolanaction = QAction("&Give Alolan Passport", mw)
+unalolanaction = QAction("&Take Alolan Passport", mw)
+bottomaction = QAction("Move Pokémon to &Bottom", mw)
+topaction = QAction("Move Pokémon to &Top", mw)
 
 # Connect actions to functions
 qconnect(nicknameaction.triggered, Nickname)
@@ -59,34 +59,34 @@ qconnect(bottomaction.triggered, MovetoBottom)
 qconnect(topaction.triggered, MovetoTop)
 
 # Make new Pokémanki menu under tools
-mw.testmenu = QMenu('&Pokémanki', mw)
-mw.form.menubar.addMenu(mw.testmenu)
-mw.testmenu.addAction(toggleaction)
-mw.testmenu.addAction(nicknameaction)
+mw.pokemenu = QMenu('&Pokémanki', mw)
+mw.form.menuTools.addMenu(mw.pokemenu)
+mw.pokemenu.addAction(toggleaction)
+mw.pokemenu.addAction(nicknameaction)
 mw.prestigemenu = QMenu('&Prestige Menu', mw)
-mw.testmenu.addMenu(mw.prestigemenu)
+mw.pokemenu.addMenu(mw.prestigemenu)
 mw.prestigemenu.addAction(prestigeaction)
 mw.prestigemenu.addAction(unprestigeaction)
 
 
 f = get_json("_decksortags.json", "")
 if f:
-    mw.testmenu.addAction(tagsaction)
+    mw.pokemenu.addAction(tagsaction)
 else:  # Not yet implemented for tagmon
     mw.everstonemenu = QMenu('&Everstone', mw)
-    mw.testmenu.addMenu(mw.everstonemenu)
+    mw.pokemenu.addMenu(mw.everstonemenu)
     mw.everstonemenu.addAction(everstoneaction)
     mw.everstonemenu.addAction(uneverstoneaction)
     mw.megastonemenu = QMenu('&Mega Stone', mw)
-    mw.testmenu.addMenu(mw.megastonemenu)
+    mw.pokemenu.addMenu(mw.megastonemenu)
     mw.megastonemenu.addAction(megastoneaction)
     mw.megastonemenu.addAction(unmegastoneaction)
     mw.alolanmenu = QMenu('&Alolan Passport', mw)
-    mw.testmenu.addMenu(mw.alolanmenu)
+    mw.pokemenu.addMenu(mw.alolanmenu)
     mw.alolanmenu.addAction(alolanaction)
     mw.alolanmenu.addAction(unalolanaction)
-    mw.testmenu.addAction(tradeaction)
-mw.testmenu.addAction(resetaction)
+    mw.pokemenu.addAction(tradeaction)
+mw.pokemenu.addAction(resetaction)
 
 
 # Wrap pokemon_display function of display.py with the todayStats function of anki.stats.py
@@ -125,14 +125,14 @@ def onStatsOpen(statsDialog):
         lambda _: _onStatsOpen(statsDialog))
 
 def replace_gears(deck_browser, content):
-	pokemons = get_json("_pokemanki.json", None)
-	soup = BeautifulSoup(content.tree, "html.parser")
-	for tr in soup.select('tr[id]'):
-		deck_id = int(tr['id'])
-		name = next((pokemon[0] for pokemon in pokemons if pokemon[1]==deck_id), None)
-		if name:
-			tr.select('img.gears')[0]['src'] = "pokemon_images/" + name + ".png"
-	content.tree = soup
+    pokemons = get_json("_pokemanki.json", None)
+    soup = BeautifulSoup(content.tree, "html.parser")
+    for tr in soup.select('tr[id]'):
+        deck_id = int(tr['id'])
+        name = next((pokemon[0] for pokemon in pokemons if pokemon[1]==deck_id), None)
+        if name:
+            tr.select('img.gears')[0]['src'] = "pokemon_images/" + name + ".png"
+    content.tree = soup
 
 gui_hooks.stats_dialog_will_show.append(onStatsOpen)
 gui_hooks.webview_did_receive_js_message.append(message_handler)
