@@ -235,7 +235,7 @@ class Trades:
                      title="Pokémanki")
             return
         tradewindow = self.tradewindow
-        tradewindow.setWindowTitle("Pokemanki")
+        tradewindow.setWindowTitle("Pokémanki")
         tradewindow.setWindowModality(Qt.ApplicationModal)
         table = """<table>
                    <tr>
@@ -360,7 +360,7 @@ class Trades:
         totallist = list(zip(possiblefits, displaylist))
         possiblepokemon = QWidget()
         inp, ok = QInputDialog.getItem(
-            possiblepokemon, "Pokemanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
+            possiblepokemon, "Pokémanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
         tradepokemon = []
         if ok and inp:
             for thing in totallist:
@@ -370,7 +370,7 @@ class Trades:
         if not tradepokemon:
             return
         confirmation = QMessageBox()
-        confirmation.setWindowTitle("Pokemanki")
+        confirmation.setWindowTitle("Pokémanki")
         confirmation.setText(
             "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
         confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
@@ -456,7 +456,7 @@ class Trades:
         totallist = list(zip(possiblefits, displaylist))
         possiblepokemon = QWidget()
         inp, ok = QInputDialog.getItem(
-            possiblepokemon, "Pokemanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
+            possiblepokemon, "Pokémanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
         tradepokemon = []
         if ok and inp:
             for thing in totallist:
@@ -466,7 +466,7 @@ class Trades:
         if not tradepokemon:
             return
         confirmation = QMessageBox()
-        confirmation.setWindowTitle("Pokemanki")
+        confirmation.setWindowTitle("Pokémanki")
         confirmation.setText(
             "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
         confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
@@ -552,7 +552,7 @@ class Trades:
         totallist = list(zip(possiblefits, displaylist))
         possiblepokemon = QWidget()
         inp, ok = QInputDialog.getItem(
-            possiblepokemon, "Pokemanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
+            possiblepokemon, "Pokémanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
         tradepokemon = []
         if ok and inp:
             for thing in totallist:
@@ -562,7 +562,7 @@ class Trades:
         if not tradepokemon:
             return
         confirmation = QMessageBox()
-        confirmation.setWindowTitle("Pokemanki")
+        confirmation.setWindowTitle("Pokémanki")
         confirmation.setText(
             "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
         confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)

@@ -9,11 +9,11 @@ def startup():
     global opened
     if opened:
         warning_text = "\n".join((
-            "Pokemanki does not support opening a second profile in one session.",
+            "Pokémanki does not support opening a second profile in one session.",
             "Please close Anki and reopen it again to the desired profile.",
-            "Pokemanki may behave strangely"
+            "Pokémanki may behave strangely"
         ))
-        showWarning(warning_text, title="Pokemanki won't function properly")
+        showWarning(warning_text, title="Pokémanki won't function properly")
         return
 
     opened = True

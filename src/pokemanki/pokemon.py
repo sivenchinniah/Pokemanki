@@ -37,7 +37,7 @@ def Nickname():
     totallist = list(zip(deckmonlist, displaylist))
     nicknamewindow = QWidget()
     inp, ok = QInputDialog.getItem(
-        nicknamewindow, "Pokemanki", "Choose a Pokémon who you would like to give a new nickname", displaylist, 0, False)
+        nicknamewindow, "Pokémanki", "Choose a Pokémon who you would like to give a new nickname", displaylist, 0, False)
     deckmon = []
     nickname = ""
     if ok and inp:
@@ -49,7 +49,7 @@ def Nickname():
         return
     if len(deckmon) == 4:
         nickname = deckmon[3]
-    inp, ok = QInputDialog.getText(nicknamewindow, "Pokemanki", (
+    inp, ok = QInputDialog.getText(nicknamewindow, "Pokémanki", (
         "Enter a new nickname for %s (leave blank to remove nickname)" % displaytext))
     if ok:
         if inp:
@@ -95,7 +95,7 @@ def Toggle():
     if by:
         default = 1
     inp, ok = QInputDialog.getItem(
-        window, "Pokemanki", "Choose how you would like Pokemanki to assign you Pokémon.", items, default, False)
+        window, "Pokémanki", "Choose how you would like Pokémanki to assign you Pokémon.", items, default, False)
     if ok and inp:
         if inp == "Tags":
             write_json("_decksortags.json", inp)
@@ -123,7 +123,7 @@ def ThresholdSettings():
     thresholdlist = get_json("_pokemankisettings.json")
     # Make settings window (input dialog)
     window = QWidget()
-    inp, ok = QInputDialog.getInt(window, "Pokemanki", (
+    inp, ok = QInputDialog.getInt(window, "Pokémanki", (
         "Change number of cards needed in a deck to get a starter Pokémon (recommended %d)" % recommended), value=thresholdlist[4])
     if ok:
         # Make sure threshold is at least 10
@@ -147,7 +147,7 @@ def ThresholdSettings():
 def ResetPokemon():
     # Make message box
     resetwindow = QMessageBox()
-    resetwindow.setWindowTitle("Pokemanki")
+    resetwindow.setWindowTitle("Pokémanki")
     resetwindow.setText("\n".join((
         "Are you sure you want to reset your Pokémon?",
         "This will reset everything including everstone, settings stored in collection.media, etc.",
@@ -205,7 +205,7 @@ def giveEverstone():
         return
     window = QWidget()
     inp, ok = QInputDialog.getItem(
-        window, "Pokemanki", "Select a Pokemon you would like to give an everstone to.", sorted(everstoneables), 0, False)
+        window, "Pokémanki", "Select a Pokemon you would like to give an everstone to.", sorted(everstoneables), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -248,7 +248,7 @@ def takeEverstone():
             continue
     window = QWidget()
     inp, ok = QInputDialog.getItem(
-        window, "Pokemanki", "Select a Pokemon whose everstone you would like to take.", sorted(possibleuneverstones), 0, False)
+        window, "Pokémanki", "Select a Pokemon whose everstone you would like to take.", sorted(possibleuneverstones), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -289,7 +289,7 @@ def giveMegastone():
         return
     window = QWidget()
     inp, ok = QInputDialog.getItem(
-        window, "Pokemanki", "Select a Pokemon you would like to give a mega stone to", sorted(megastoneables), 0, False)
+        window, "Pokémanki", "Select a Pokemon you would like to give a mega stone to", sorted(megastoneables), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -327,7 +327,7 @@ def takeMegastone():
             continue
     window = QWidget()
     inp, ok = QInputDialog.getItem(
-        window, "Pokemanki", "Select a Pokemon whose mega stone you would like to take", sorted(possibleunmegastones), 0, False)
+        window, "Pokémanki", "Select a Pokemon whose mega stone you would like to take", sorted(possibleunmegastones), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -365,7 +365,7 @@ def giveAlolanPassport():
         return
     window = QWidget()
     inp, ok = QInputDialog.getItem(
-        window, "Pokemanki", "Select a Pokemon you would like to give an Alolan Passport to.", sorted(alolanables), 0, False)
+        window, "Pokémanki", "Select a Pokemon you would like to give an Alolan Passport to.", sorted(alolanables), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -404,7 +404,7 @@ def takeAlolanPassport():
             continue
     window = QWidget()
     inp, ok = QInputDialog.getItem(
-        window, "Pokemanki", "Select a Pokemon whose Alolan Passport you would like to take.", sorted(possibleunalolans), 0, False)
+        window, "Pokémanki", "Select a Pokemon whose Alolan Passport you would like to take.", sorted(possibleunalolans), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -443,7 +443,7 @@ def PrestigePokemon():
         tooltip("You don't have any pokemons with level > 60")
         return
     inp, ok = QInputDialog.getItem(
-        window, "Pokemanki", "Select a Pokemon you would like to prestige (decreases level by 50, only availabe for Pokemon with level > 60)", sorted(possibleprestiges), 0, False)
+        window, "Pokémanki", "Select a Pokemon you would like to prestige (decreases level by 50, only availabe for Pokemon with level > 60)", sorted(possibleprestiges), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]
@@ -483,7 +483,7 @@ def UnprestigePokemon():
         return
     window = QWidget()
     inp, ok = QInputDialog.getItem(
-        window, "Pokemanki", "Select a Pokemon you would like to unprestige", sorted(possibleunprestiges), 0, False)
+        window, "Pokémanki", "Select a Pokemon you would like to unprestige", sorted(possibleunprestiges), 0, False)
     if inp and ok:
         textlist = inp.split(" from ")
         item = textlist[1]

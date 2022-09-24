@@ -169,10 +169,10 @@ def FirstPokemon():
     decklist = sorted(decklist)
     window = QWidget()
     inp, ok = QInputDialog.getItem(
-        window, "Pokemanki", "Choose a deck for your starter Pokémon", decklist, 0, False)
+        window, "Pokémanki", "Choose a deck for your starter Pokémon", decklist, 0, False)
     if ok and inp:
         msgbox = QMessageBox()
-        msgbox.setWindowTitle("Pokemanki")
+        msgbox.setWindowTitle("Pokémanki")
         msgbox.setText("Choose a starter Pokémon for %s" % inp)
         msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
         msgbox.addButton("Charmander", QMessageBox.AcceptRole)
@@ -323,7 +323,7 @@ def MultiPokemon(wholeCollection):
             # If starter Pokemon, allow choice
             if pokemontier == "A":
                 msgbox = QMessageBox()
-                msgbox.setWindowTitle("Pokemanki")
+                msgbox.setWindowTitle("Pokémanki")
                 msgbox.setText("Choose a starter Pokémon for the %s deck" %
                                mw.col.decks.name(item[0]))
 
@@ -369,7 +369,7 @@ def MultiPokemon(wholeCollection):
                 name = everstonepokemonlist[idx]
                 assert type(name) is str
             except Exception as e:
-                print("ERROR(Pokemanki): while getting everstone list")
+                print("ERROR(Pokémanki): while getting everstone list")
                 print("Deleting entry from everstonelist")
                 print(e)
                 everstonelist.pop(idx)
@@ -519,7 +519,7 @@ def TagPokemon():
         if tagmon == "":
             if pokemontier == "A":
                 msgbox = QMessageBox()
-                msgbox.setWindowTitle("Pokemanki")
+                msgbox.setWindowTitle("Pokémanki")
                 msgbox.setText(
                     "Choose a starter Pokémon for the %s tag" % item[0])
                 msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)

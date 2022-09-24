@@ -58,8 +58,8 @@ qconnect(unalolanaction.triggered, takeAlolanPassport)
 qconnect(bottomaction.triggered, MovetoBottom)
 qconnect(topaction.triggered, MovetoTop)
 
-# Make new Pokemanki menu under tools
-mw.testmenu = QMenu('&Pokemanki', mw)
+# Make new Pokémanki menu under tools
+mw.testmenu = QMenu('&Pokémanki', mw)
 mw.form.menubar.addMenu(mw.testmenu)
 mw.testmenu.addAction(toggleaction)
 mw.testmenu.addAction(nicknameaction)
