@@ -79,48 +79,50 @@ def alertMsgText(mon: str, id, name: str, level: int, previousLevel: int, nickna
         if name == "Egg":
             if level == 2 and previousLevel < 2:
                 if nickname:
-                    msgtxt = "%s needs more time to hatch." % nickname
+                    msgtxt = f"{nickname} needs more time to hatch."
                 else:
                     msgtxt = "Your egg needs more time to hatch."
             elif level == 3 and previousLevel < 3:
                 if nickname:
-                    msgtxt = "%s moves occasionally. It should hatch soon." % nickname
+                    msgtxt = (f"{nickname} moves occasionally. It should hatch "
+                               "soon.")
                 else:
-                    msgtxt = "Your egg moves occasionally. It should hatch soon."
+                    msgtxt = ("Your egg moves occasionally. It should hatch "
+                              "soon.")
             elif level == 4 and previousLevel < 4:
                 if nickname:
-                    msgtxt = "%s is making sounds! It's about to hatch!" % nickname
+                    msgtxt = (f"{nickname} is making sounds! It's about to "
+                               "hatch!")
                 else:
                     msgtxt = "Your egg is making sounds! It's about to hatch!"
         elif previousLevel < 5:
             if nickname:
-                msgtxt = ("%s has hatched! It's a %s!" %
-                          (nickname, mon))
+                msgtxt = f"{nickname} has hatched! It's a {mon}!"
             else:
-                msgtxt = ("Your egg has hatched! It's a %s!" % mon)
+                msgtxt = f"Your egg has hatched! It's a {mon}!"
             previousLevel = level
         if name != mon and name != "Egg" and previousLevel < level:
             if nickname:
-                msgtxt = ("%s has evolved into a %s (Level %s)! (+%s)" %
-                          (nickname, name, level, (level - previousLevel)))
+                msgtxt = (f"{nickname} has evolved into a {name} "
+                          f"(Level {level})! (+{level - previousLevel})")
             else:
-                msgtxt = ("Your %s has evolved into a %s (Level %s)! (+%s)" %
-                          (mon, name, level, (level - previousLevel)))
+                msgtxt = (f"Your {mon} has evolved into a {name} "
+                          f"(Level {level})! (+{level - previousLevel})")
         elif previousLevel < level and name != "Egg":
             displayName = name
             if nickname:
                 displayName = nickname
             if id in prestigelist:
-                msgtxt = "%s is now level %s! (+%s)" % (
-                    displayName, level - 50, level - previousLevel)
+                msgtxt = (f"{displayName} is now level {level - 50}! "
+                          f"(+{level - previousLevel})")
             else:
-                msgtxt = ("Your %s is now level %s! (+%s)" %
-                          (displayName, level, (level - previousLevel)))
+                msgtxt = (f"Your {displayName} is now level {level}! "
+                          f"(+{level - previousLevel})")
     else:
         if name == "Egg":
             msgtxt = "You found an egg!"
         else:
-            msgtxt = "You caught a %s (Level %s)" % (name, level)
+            msgtxt = f"You caught a {name} (Level {level})"
     if msgtxt:
         return "\n" + msgtxt
     else:
@@ -173,7 +175,7 @@ def FirstPokemon():
     if ok and inp:
         msgbox = QMessageBox()
         msgbox.setWindowTitle("Pokémanki")
-        msgbox.setText("Choose a starter Pokémon for %s" % inp)
+        msgbox.setText(f"Choose a starter Pokémon for {inp}.")
         msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
         msgbox.addButton("Charmander", QMessageBox.AcceptRole)
         msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
@@ -324,8 +326,8 @@ def MultiPokemon(wholeCollection):
             if pokemontier == "A":
                 msgbox = QMessageBox()
                 msgbox.setWindowTitle("Pokémanki")
-                msgbox.setText("Choose a starter Pokémon for the %s deck" %
-                               mw.col.decks.name(item[0]))
+                msgbox.setText(f"Choose a starter Pokémon for the "
+                               f"{mw.col.decks.name(item[0])} deck.")
 
                 starters = randomStarter()
                 for starter in starters:
@@ -521,7 +523,7 @@ def TagPokemon():
                 msgbox = QMessageBox()
                 msgbox.setWindowTitle("Pokémanki")
                 msgbox.setText(
-                    "Choose a starter Pokémon for the %s tag" % item[0])
+                    f"Choose a starter Pokémon for the {item[0]} tag.")
                 msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
                 msgbox.addButton("Charmander", QMessageBox.AcceptRole)
                 msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
