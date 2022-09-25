@@ -7,7 +7,7 @@ As you learn and review the cards in that deck, your Pokémon will level up and 
 Your Pokémon can be accessed by viewing your Stats, where they will be above the rest of your boring charts and figures.
 Here you can see either the Pokémon for the specific deck or for the whole collection by clicking "deck" or "collection" at the top of the Stats screen.
 
-The add-on adds a menu containing its settings and some functions to Anki's main menu bar.
+The settings can be accessed under "Tools".
 
 ### Credits
 
