@@ -197,46 +197,28 @@ def ThresholdSettings():
     window.show()
 
 
-# Reset Pokemon
-
-
-def ResetPokemon():
+def reset_pokemanki():
     # Make message box
     resetwindow = QMessageBox()
     resetwindow.setWindowTitle("Pokémanki")
     resetwindow.setText(
-        "\n".join(
-            (
-                "Are you sure you want to reset your Pokémon?",
-                "This will reset everything including everstone, settings stored in collection.media, etc.",
-                "All your pokemons will be lost - both in deck and tag mode.",
-            )
-        )
+        """
+        Are you sure you want to reset your Pokémon?
+        This will reset all your synced settings.
+        All your Pokémon will be lost - both in deck and tag mode.
+        """
     )
-    resetwindow.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-    resetwindow.setDefaultButton(QMessageBox.No)
+    resetwindow.setStandardButtons(
+        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+    )
+    resetwindow.setDefaultButton(QMessageBox.StandardButton.No)
     resetresult = resetwindow.exec()
-    # Clear pokemanki.json if Yes
-    if resetresult == QMessageBox.Yes:
-        reset_files = [
-            "_pokemanki.json",
-            "_tagmon.json",
-            "_alolanlist.json",
-            "_everstonelist.json",
-            "_everstonepokemonlist.json",
-            "_megastonelist.json",
-            "_pokemankisettings.json",
-            "_tagmonsettings.json",
-            "_prestigelist.json",
-            "_tagmon.json",
-            "_tags.json",
-            "_trades.json",
-        ]
-        for fname in reset_files:
-            write_json(fname, {})
+    # Reset synced Pokémanki config if Yes
+    if resetresult == QMessageBox.StandardButton.Yes:
+        setup_default_synced_conf()
         # TODO reset everstone? and other stuff?
         # Message box confirming reset
-        showInfo("Pokemon reset", parent=mw, title="Pokémanki")
+        showInfo("Pokémanki config reset", parent=mw, title="Pokémanki")
 
 
 def MovetoBottom():
