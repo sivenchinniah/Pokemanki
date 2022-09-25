@@ -25,9 +25,13 @@ def pokemon_display(istagmon, wholecollection=True):
 
     # Move Pokémon Image folder to collection.media folder if not already there
     # (Anki reads from here when running anki.stats.py)
-    if (not os.path.exists(f"{mediafolder}/pokemon_images")) and os.path.exists(pkmnimgfolder):
+    if (not os.path.exists(f"{mediafolder}/pokemon_images")) and os.path.exists(
+        pkmnimgfolder
+    ):
         shutil.copytree(pkmnimgfolder, f"{mediafolder}/pokemon_images")
-    if (not os.path.exists(f"{mediafolder}/progress_bars")) and os.path.exists(progressbarfolder):
+    if (not os.path.exists(f"{mediafolder}/progress_bars")) and os.path.exists(
+        progressbarfolder
+    ):
         shutil.copytree(progressbarfolder, f"{mediafolder}/progress_bars")
 
     # Get list of Pokémon from tags or decks.
@@ -53,8 +57,10 @@ def _show(data):
         return ""
 
     # Pokemanki container header
-    txt = '<h1 style="text-align: center; font-weight: 700; margin-top: 40px;">Pokémon</h1>' \
-          '<div style="text-align: center;">Your Pokémon</div>'
+    txt = (
+        '<h1 style="text-align: center; font-weight: 700; margin-top: 40px;">Pokémon</h1>'
+        '<div style="text-align: center;">Your Pokémon</div>'
+    )
 
     # If single Pokémon, show centered card
     if type(data) == tuple:
@@ -71,10 +77,16 @@ def _show(data):
 
         sortedData = sorted(data, key=lambda k: k[2], reverse=True)
         for pokemon in sortedData:
-            txt += _card_html(pokemon[0], pokemon[1], pokemon[2], pokemon[3] if len(pokemon) == 4 else "", multi)
+            txt += _card_html(
+                pokemon[0],
+                pokemon[1],
+                pokemon[2],
+                pokemon[3] if len(pokemon) == 4 else "",
+                multi,
+            )
 
     # Close cards container
-    txt += '</div>'
+    txt += "</div>"
 
     # Pokémon total
     txt += f'<h4 style="text-align: center; margin-top: 5px;"><b>Total:</b> {len(data)} Pokémon</h4>'
@@ -101,24 +113,29 @@ def _card_html(name, source, level, nickname="", multi=False):
     #############
     # Head info
     #############
-    card += '<div class="pk-st-card-info" style="margin-bottom: auto;">' \
-            '<div class="pk-st-card-top">'
+    card += (
+        '<div class="pk-st-card-info" style="margin-bottom: auto;">'
+        '<div class="pk-st-card-top">'
+    )
     # Name and deck
-    card += '<div class="pk-st-card-name">' \
-            f'<span><b>{nickname if nickname != "" else name}</b></span>' \
-            f'<span><i>{_get_source_name(source)}</i></span>' \
-            '</div>'
+    card += (
+        '<div class="pk-st-card-name">'
+        f'<span><b>{nickname if nickname != "" else name}</b></span>'
+        f"<span><i>{_get_source_name(source)}</i></span>"
+        "</div>"
+    )
     # Level
-    card += '<div class="pk-st-card-lvl">' \
-            '<span style="text-align: right;">Lvl</span>' \
-            '<span style="text-align: right;">' \
-            f'<b>{int(level-50) if _in_list("prestige", source) else int(level)}</b>' \
-            '</span>' \
-            '</div>' \
-            '</div>'
+    card += (
+        '<div class="pk-st-card-lvl">'
+        '<span style="text-align: right;">Lvl</span>'
+        '<span style="text-align: right;">'
+        f'<b>{int(level-50) if _in_list("prestige", source) else int(level)}</b>'
+        "</span>"
+        "</div>"
+        "</div>"
+    )
     # Divider and end of top info
-    card += '<div class="pk-st-divider" style="margin-top: 10px;"></div>' \
-            '</div>'
+    card += '<div class="pk-st-divider" style="margin-top: 10px;"></div>' "</div>"
 
     #############
     # Image
@@ -128,24 +145,25 @@ def _card_html(name, source, level, nickname="", multi=False):
     #############
     # Bottom info
     #############
-    card += '<div class="pk-st-card-info" style="margin-top: auto;">' \
-            '<div class="pk-st-divider" style="margin-bottom: 10px;"></div>'
+    card += (
+        '<div class="pk-st-card-info" style="margin-top: auto;">'
+        '<div class="pk-st-divider" style="margin-bottom: 10px;"></div>'
+    )
     # Held/SP
     held = _held_html(source)
     if held != "":
-        card += '<div class="pk-st-card-sp">' \
-                '<span><b>SP: </b></span>'
+        card += '<div class="pk-st-card-sp">' "<span><b>SP: </b></span>"
         card += held
-        card += '</div>'
+        card += "</div>"
     # Progress bar
     if name == "Egg":
         card += f'<span class="pk-st-card-xp">{_egg_hatch_text(level)}</span>'
     else:
         card += f'<img src="/progress_bars/{_calculate_xp_progress(level)}.png" class="pk-st-card-xp"/>'
-    card += '</div>'
+    card += "</div>"
 
     # End card
-    card += '</div>'
+    card += "</div>"
 
     # TODO: Add # of Pokémon
     # Make bottom line using function from stats.py and assign to text_lines
@@ -240,7 +258,7 @@ def _calculate_xp_progress(level):
     :return: The progress in the xp bar.
     :rtype: int
     """
-    return int(float(20*(float(level) - int(float(level)))))
+    return int(float(20 * (float(level) - int(float(level)))))
 
 
 def _held_html(source):
@@ -258,7 +276,7 @@ def _held_html(source):
     alolan_html = '<img src="/pokemon_images/item_Alolan_Passport.png" height="25px"/>'
 
     if _in_list("prestige", source):
-        held += '<span>Prestiged </span>'
+        held += "<span>Prestiged </span>"
     if _in_list("everstone", source):
         held += everstone_html
     if _in_list("alolan", source):

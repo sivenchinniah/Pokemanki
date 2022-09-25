@@ -13,10 +13,12 @@ def cardIdsFromDeckIds(queryDb, deckIds):
 def cardInterval(queryDb, cid):
     revLogIvl = queryDb.scalar(
         "select ivl from revlog where cid = %s "
-        "order by id desc limit 1 offset 0" % cid)
+        "order by id desc limit 1 offset 0" % cid
+    )
     ctype = queryDb.scalar(
         "select type from cards where id = %s "
-        "order by id desc limit 1 offset 0" % cid)
+        "order by id desc limit 1 offset 0" % cid
+    )
 
     # card interval is "New"
     if ctype == 0:
@@ -35,8 +37,8 @@ def cardInterval(queryDb, cid):
 
 def deckStats(deck_ids):
     """
-        deck_ids: list
-        returns [[card_id, card_interval], ...]
+    deck_ids: list
+    returns [[card_id, card_interval], ...]
     """
     cardIds = cardIdsFromDeckIds(mw.col.db, deck_ids)
 
@@ -90,7 +92,10 @@ def TagStats():
     resultlist = []
     for item in savedtags:
         result = mw.col.db.all(
-            "select c.id, c.ivl from cards c, notes n where c.nid = n.id and n.tags LIKE '%" + item + "%'")
+            "select c.id, c.ivl from cards c, notes n where c.nid = n.id and n.tags LIKE '%"
+            + item
+            + "%'"
+        )
         resultlist.append(result)
     results = list(zip(savedtags, resultlist))
     return results

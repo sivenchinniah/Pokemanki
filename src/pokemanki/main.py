@@ -59,11 +59,11 @@ qconnect(bottomaction.triggered, MovetoBottom)
 qconnect(topaction.triggered, MovetoTop)
 
 # Make new Pokémanki menu under tools
-mw.pokemenu = QMenu('&Pokémanki', mw)
+mw.pokemenu = QMenu("&Pokémanki", mw)
 mw.form.menuTools.addMenu(mw.pokemenu)
 mw.pokemenu.addAction(toggleaction)
 mw.pokemenu.addAction(nicknameaction)
-mw.prestigemenu = QMenu('&Prestige Menu', mw)
+mw.prestigemenu = QMenu("&Prestige Menu", mw)
 mw.pokemenu.addMenu(mw.prestigemenu)
 mw.prestigemenu.addAction(prestigeaction)
 mw.prestigemenu.addAction(unprestigeaction)
@@ -73,15 +73,15 @@ f = get_json("_decksortags.json", "")
 if f:
     mw.pokemenu.addAction(tagsaction)
 else:  # Not yet implemented for tagmon
-    mw.everstonemenu = QMenu('&Everstone', mw)
+    mw.everstonemenu = QMenu("&Everstone", mw)
     mw.pokemenu.addMenu(mw.everstonemenu)
     mw.everstonemenu.addAction(everstoneaction)
     mw.everstonemenu.addAction(uneverstoneaction)
-    mw.megastonemenu = QMenu('&Mega Stone', mw)
+    mw.megastonemenu = QMenu("&Mega Stone", mw)
     mw.pokemenu.addMenu(mw.megastonemenu)
     mw.megastonemenu.addAction(megastoneaction)
     mw.megastonemenu.addAction(unmegastoneaction)
-    mw.alolanmenu = QMenu('&Alolan Passport', mw)
+    mw.alolanmenu = QMenu("&Alolan Passport", mw)
     mw.pokemenu.addMenu(mw.alolanmenu)
     mw.alolanmenu.addAction(alolanaction)
     mw.alolanmenu.addAction(unalolanaction)
@@ -105,7 +105,7 @@ def message_handler(handled, message, context):
         html = pokemon_display(f, True).replace("`", "'")
     else:
         starts = "Pokemanki#search#"
-        term = message[len(starts):]
+        term = message[len(starts) :]
         # Todo: implement selective
         return (True, None)
     statsDialog.form.web.eval("Pokemanki.setPokemanki(`{}`)".format(html))
@@ -121,18 +121,19 @@ def _onStatsOpen(dialog):
 
 def onStatsOpen(statsDialog):
 
-    statsDialog.form.web.loadFinished.connect(
-        lambda _: _onStatsOpen(statsDialog))
+    statsDialog.form.web.loadFinished.connect(lambda _: _onStatsOpen(statsDialog))
+
 
 def replace_gears(deck_browser, content):
     pokemons = get_json("_pokemanki.json", None)
     soup = BeautifulSoup(content.tree, "html.parser")
-    for tr in soup.select('tr[id]'):
-        deck_id = int(tr['id'])
-        name = next((pokemon[0] for pokemon in pokemons if pokemon[1]==deck_id), None)
+    for tr in soup.select("tr[id]"):
+        deck_id = int(tr["id"])
+        name = next((pokemon[0] for pokemon in pokemons if pokemon[1] == deck_id), None)
         if name:
-            tr.select('img.gears')[0]['src'] = "pokemon_images/" + name + ".png"
+            tr.select("img.gears")[0]["src"] = "pokemon_images/" + name + ".png"
     content.tree = soup
+
 
 gui_hooks.stats_dialog_will_show.append(onStatsOpen)
 gui_hooks.webview_did_receive_js_message.append(message_handler)

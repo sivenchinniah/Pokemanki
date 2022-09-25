@@ -57,8 +57,11 @@ def write_json(file_name: str, value):
 
 
 def no_pokemon():
-    showInfo("Please open the Stats window to get your Pokémon.", parent=mw,
-             title="Pokémanki")
+    showInfo(
+        "Please open the Stats window to get your Pokémon.",
+        parent=mw,
+        title="Pokémanki",
+    )
 
 
 def get_pokemons():
@@ -81,9 +84,7 @@ def get_pokemons():
     return (ret_pokemons, f)
 
 
-def line(
-    i: List[str], a: str, b: Union[int, str], bold: bool = True
-) -> None:
+def line(i: List[str], a: str, b: Union[int, str], bold: bool = True) -> None:
     # T: Symbols separating first and second column in a statistics table. Eg in "Total:    3 reviews".
     colon = ":"
     if bold:
@@ -93,8 +94,7 @@ def line(
         )
     else:
         i.append(
-            ("<tr><td width=200 align=right>%s%s</td><td>%s</td></tr>")
-            % (a, colon, b)
+            ("<tr><td width=200 align=right>%s%s</td><td>%s</td></tr>") % (a, colon, b)
         )
 
 
@@ -108,12 +108,13 @@ def table_image_html(image_name, title=None):
     image_el = ""
     if image_name:
         image_el = '<img src="/pokemon_images/{}.png" title="{}">'.format(
-            image_name, title)
-    return '<td height=250 width=250 align=center>{}</td>'.format(image_el)
+            image_name, title
+        )
+    return "<td height=250 width=250 align=center>{}</td>".format(image_el)
 
 
 def table_text_html(main_text, sub_text="", bold=False):
     bolded = "{}".format(main_text)
     if bold:
         bolded = "<b>{}</b>{}".format(main_text, sub_text)
-    return '<td height=30 width=250 align=center>{}</td>'.format(bolded)
+    return "<td height=30 width=250 align=center>{}</td>".format(bolded)

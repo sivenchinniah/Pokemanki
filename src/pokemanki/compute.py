@@ -1,4 +1,3 @@
-
 import random
 import csv
 
@@ -10,7 +9,15 @@ from .utils import *
 from .stats import MultiStats, TagStats, cardInterval, cardIdsFromDeckIds
 
 
-def loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2):
+def loadPokemonGenerations(
+    csv_fpath,
+    pokemonlist,
+    tiers,
+    evolutionLevel1,
+    evolution1,
+    evolutionLevel2,
+    evolution2,
+):
     with open(csv_fpath, "r") as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=",")
         for line in csv_reader:
@@ -42,37 +49,54 @@ def loadPokemonGenerations(csv_fpath, pokemonlist, tiers, evolutionLevel1, evolu
     return
 
 
-def load_pokemon_gen_all(pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2):
+def load_pokemon_gen_all(
+    pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2
+):
     def load_pokemon_gen(csv_name):
         csv_fpath = currentdirname / "pokemon_evolutions" / csv_name
-        loadPokemonGenerations(csv_fpath, pokemonlist, tiers,
-                               evolutionLevel1, evolution1, evolutionLevel2, evolution2)
+        loadPokemonGenerations(
+            csv_fpath,
+            pokemonlist,
+            tiers,
+            evolutionLevel1,
+            evolution1,
+            evolutionLevel2,
+            evolution2,
+        )
 
     load_pokemon_gen("pokemon_gen1.csv")
-    if config['gen2']:
+    if config["gen2"]:
         load_pokemon_gen("pokemon_gen2.csv")
-        if config['gen4_evolutions']:
+        if config["gen4_evolutions"]:
             load_pokemon_gen("pokemon_gen1_plus2_plus4.csv")
             load_pokemon_gen("pokemon_gen2_plus4.csv")
         else:
             load_pokemon_gen("pokemon_gen1_plus2_no4.csv")
             load_pokemon_gen("pokemon_gen2_no4.csv")
     else:
-        if config['gen4_evolutions']:
+        if config["gen4_evolutions"]:
             # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
             # so let's just include gen 2 for these evolution lines
             load_pokemon_gen("pokemon_gen1_plus2_plus4.csv")
         else:
             load_pokemon_gen("pokemon_gen1_no2_no4.csv")
-    if config['gen3']:
+    if config["gen3"]:
         load_pokemon_gen("pokemon_gen3.csv")
-    if config['gen4']:
+    if config["gen4"]:
         load_pokemon_gen("pokemon_gen4.csv")
-    if config['gen5']:
+    if config["gen5"]:
         load_pokemon_gen("pokemon_gen5.csv")
 
 
-def alertMsgText(mon: str, id, name: str, level: int, previousLevel: int, nickname: str, already_assigned: bool):
+def alertMsgText(
+    mon: str,
+    id,
+    name: str,
+    level: int,
+    previousLevel: int,
+    nickname: str,
+    already_assigned: bool,
+):
     prestigelist = get_json("_prestigelist.json", [])
     msgtxt = ""
     if already_assigned == True:
@@ -84,15 +108,12 @@ def alertMsgText(mon: str, id, name: str, level: int, previousLevel: int, nickna
                     msgtxt = "Your egg needs more time to hatch."
             elif level == 3 and previousLevel < 3:
                 if nickname:
-                    msgtxt = (f"{nickname} moves occasionally. It should hatch "
-                               "soon.")
+                    msgtxt = f"{nickname} moves occasionally. It should hatch " "soon."
                 else:
-                    msgtxt = ("Your egg moves occasionally. It should hatch "
-                              "soon.")
+                    msgtxt = "Your egg moves occasionally. It should hatch " "soon."
             elif level == 4 and previousLevel < 4:
                 if nickname:
-                    msgtxt = (f"{nickname} is making sounds! It's about to "
-                               "hatch!")
+                    msgtxt = f"{nickname} is making sounds! It's about to " "hatch!"
                 else:
                     msgtxt = "Your egg is making sounds! It's about to hatch!"
         elif previousLevel < 5:
@@ -103,21 +124,29 @@ def alertMsgText(mon: str, id, name: str, level: int, previousLevel: int, nickna
             previousLevel = level
         if name != mon and name != "Egg" and previousLevel < level:
             if nickname:
-                msgtxt = (f"{nickname} has evolved into a {name} "
-                          f"(Level {level})! (+{level - previousLevel})")
+                msgtxt = (
+                    f"{nickname} has evolved into a {name} "
+                    f"(Level {level})! (+{level - previousLevel})"
+                )
             else:
-                msgtxt = (f"Your {mon} has evolved into a {name} "
-                          f"(Level {level})! (+{level - previousLevel})")
+                msgtxt = (
+                    f"Your {mon} has evolved into a {name} "
+                    f"(Level {level})! (+{level - previousLevel})"
+                )
         elif previousLevel < level and name != "Egg":
             displayName = name
             if nickname:
                 displayName = nickname
             if id in prestigelist:
-                msgtxt = (f"{displayName} is now level {level - 50}! "
-                          f"(+{level - previousLevel})")
+                msgtxt = (
+                    f"{displayName} is now level {level - 50}! "
+                    f"(+{level - previousLevel})"
+                )
             else:
-                msgtxt = (f"Your {displayName} is now level {level}! "
-                          f"(+{level - previousLevel})")
+                msgtxt = (
+                    f"Your {displayName} is now level {level}! "
+                    f"(+{level - previousLevel})"
+                )
     else:
         if name == "Egg":
             msgtxt = "You found an egg!"
@@ -131,13 +160,13 @@ def alertMsgText(mon: str, id, name: str, level: int, previousLevel: int, nickna
 
 def randomStarter():
     available_generations = [1]
-    if config['gen2']:
+    if config["gen2"]:
         available_generations.append(2)
-    if config['gen3']:
+    if config["gen3"]:
         available_generations.append(3)
-    if config['gen4']:
+    if config["gen4"]:
         available_generations.append(4)
-    if config['gen5']:
+    if config["gen5"]:
         available_generations.append(5)
 
     choice_generation = random.choice(available_generations)
@@ -171,7 +200,13 @@ def FirstPokemon():
     decklist = sorted(decklist)
     window = QWidget()
     inp, ok = QInputDialog.getItem(
-        window, "Pokémanki", "Choose a deck for your starter Pokémon", decklist, 0, False)
+        window,
+        "Pokémanki",
+        "Choose a deck for your starter Pokémon",
+        decklist,
+        0,
+        False,
+    )
     if ok and inp:
         msgbox = QMessageBox()
         msgbox.setWindowTitle("Pokémanki")
@@ -182,7 +217,7 @@ def FirstPokemon():
         msgbox.exec()
         deckmon = msgbox.clickedButton().text()
         if deckmon:
-            deck = mw.col.decks.byName(inp)['id']
+            deck = mw.col.decks.byName(inp)["id"]
             # stats = mw.col.db.all("""select id, ivl from cards where did in (%s)""" % deck)
 
             # cardIds = mw.col.db.all("""select id from cards where did in (%s)""" % deck)
@@ -194,10 +229,10 @@ def FirstPokemon():
 
             sumivl = 0
             for id, ivl in stats:
-                adjustedivl = (100 * (ivl/100)**0.5)
+                adjustedivl = 100 * (ivl / 100) ** 0.5
                 sumivl += adjustedivl
             if len(stats) != 0:
-                Level = int(sumivl/len(stats)+0.5)
+                Level = int(sumivl / len(stats) + 0.5)
             else:
                 Level = 0
             deckmondata = [(deckmon, deck, Level)]
@@ -214,11 +249,13 @@ def FirstPokemon():
 
 def getPokemonIndex(pokemon_name, pokemons1, pokemons2, pokemons3):
     "Returns a string of integer because 0 is a falsey value, while '0' is truthy"
+
     def getIndex(pokemons):
         try:
             return str(pokemons.index(pokemon_name))
         except:
             return None
+
     return getIndex(pokemons1) or getIndex(pokemons2) or getIndex(pokemons3)
 
 
@@ -250,8 +287,7 @@ def MultiPokemon(wholeCollection):
             if item[1] in allIds:
                 modifiedpokemontotal.append(item)
     # Download threshold settings if they exist, otherwise make from scratch
-    thresholdsettings = get_json("_pokemankisettings.json", [
-                                 100, 250, 500, 750, 1000])
+    thresholdsettings = get_json("_pokemankisettings.json", [100, 250, 500, 750, 1000])
     pokemonlist = []
     tiers = []
     evolutionLevel1 = []
@@ -259,8 +295,9 @@ def MultiPokemon(wholeCollection):
     evolutionLevel2 = []
     evolution2 = []
 
-    load_pokemon_gen_all(pokemonlist, tiers, evolutionLevel1,
-                         evolution1, evolutionLevel2, evolution2)
+    load_pokemon_gen_all(
+        pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2
+    )
 
     tierdict = {"A": [], "B": [], "C": [], "D": [], "E": [], "F": []}
     for i, tier in enumerate(tiers):
@@ -284,11 +321,11 @@ def MultiPokemon(wholeCollection):
         result = item[1]
         sumivl = 0
         for id, ivl in result:
-            adjustedivl = (100 * (ivl/100)**(0.5))
+            adjustedivl = 100 * (ivl / 100) ** (0.5)
             sumivl += adjustedivl
         if len(result) == 0:
             continue
-        Level = round((sumivl/len(result)+0.5), 2)
+        Level = round((sumivl / len(result) + 0.5), 2)
         if Level < 1:
             continue
 
@@ -321,13 +358,17 @@ def MultiPokemon(wholeCollection):
                 if len(thing) == 4:
                     nickname = thing[3]
         # Assign Deckmon if not already assigned or not valid
-        if deckmon == "" or not getPokemonIndex(deckmon, pokemonlist, evolution1, evolution2):
+        if deckmon == "" or not getPokemonIndex(
+            deckmon, pokemonlist, evolution1, evolution2
+        ):
             # If starter Pokemon, allow choice
             if pokemontier == "A":
                 msgbox = QMessageBox()
                 msgbox.setWindowTitle("Pokémanki")
-                msgbox.setText(f"Choose a starter Pokémon for the "
-                               f"{mw.col.decks.name(item[0])} deck.")
+                msgbox.setText(
+                    f"Choose a starter Pokémon for the "
+                    f"{mw.col.decks.name(item[0])} deck."
+                )
 
                 starters = randomStarter()
                 for starter in starters:
@@ -390,38 +431,55 @@ def MultiPokemon(wholeCollection):
         elif already_assigned == False:
             deckmonData = [deckmon, item[0], Level]
             modifiedpokemontotal.append(deckmonData)
-        msgtxt += alertMsgText(deckmon, item[0], name, int(
-            Level), int(previouslevel), nickname, already_assigned)
+        msgtxt += alertMsgText(
+            deckmon,
+            item[0],
+            name,
+            int(Level),
+            int(previouslevel),
+            nickname,
+            already_assigned,
+        )
         # If already assigned, assign new level/name to modifiedpokemontotal if new level/name
         if already_assigned == True:
             for thing in pokemontotal:
                 if thing[1] == item[0]:
                     if name == "Eevee" or name == "Egg":
                         if nickname:
-                            if (thing[0], thing[1], Level, nickname) in modifiedpokemontotal:
+                            if (
+                                thing[0],
+                                thing[1],
+                                Level,
+                                nickname,
+                            ) in modifiedpokemontotal:
                                 pass
                             else:
                                 modifiedpokemontotal.append(
-                                    [thing[0], thing[1], Level, nickname])
+                                    [thing[0], thing[1], Level, nickname]
+                                )
                         else:
                             if (thing[0], thing[1], Level) in modifiedpokemontotal:
                                 pass
                             else:
-                                modifiedpokemontotal.append(
-                                    [thing[0], thing[1], Level])
+                                modifiedpokemontotal.append([thing[0], thing[1], Level])
                     else:
                         if nickname:
-                            if (name, thing[1], Level, nickname) in modifiedpokemontotal:
+                            if (
+                                name,
+                                thing[1],
+                                Level,
+                                nickname,
+                            ) in modifiedpokemontotal:
                                 pass
                             else:
                                 modifiedpokemontotal.append(
-                                    [name, thing[1], Level, nickname])
+                                    [name, thing[1], Level, nickname]
+                                )
                         else:
                             if (name, thing[1], Level) in modifiedpokemontotal:
                                 pass
                             else:
-                                modifiedpokemontotal.append(
-                                    [name, thing[1], Level])
+                                modifiedpokemontotal.append([name, thing[1], Level])
         if nickname:
             displayData = (name, item[0], Level, nickname)
         else:
@@ -445,15 +503,14 @@ def TagPokemon():
     :rtype: Array
     """
 
-    tagmonlist = get_json('_tagmon.json', [])
+    tagmonlist = get_json("_tagmon.json", [])
     savedtags = get_json("_tags.json", [])
     modifiedtagmon = []
     for item in reversed(tagmonlist):
         if item[1] in savedtags:
             modifiedtagmon.append(item)
 
-    thresholdsettings = get_json("_tagmonsettings.json", [
-        50, 125, 250, 375, 500])
+    thresholdsettings = get_json("_tagmonsettings.json", [50, 125, 250, 375, 500])
 
     pokemonlist = []
     tiers = []
@@ -461,11 +518,15 @@ def TagPokemon():
     evolution1 = []
     evolutionLevel2 = []
     evolution2 = []
-    load_pokemon_gen_all(pokemonlist, tiers, evolutionLevel1,
-                         evolution1, evolutionLevel2, evolution2)
+    load_pokemon_gen_all(
+        pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2
+    )
 
     pokemon_tuple = tuple(
-        zip(pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2))
+        zip(
+            pokemonlist, tiers, evolutionLevel1, evolution1, evolutionLevel2, evolution2
+        )
+    )
     tierdict = {"A": [], "B": [], "C": [], "D": [], "E": [], "F": []}
 
     for pokemon, tier, firstEL, firstEvol, secondEL, secondEvol in pokemon_tuple:
@@ -484,11 +545,11 @@ def TagPokemon():
         result = item[1]
         sumivl = 0
         for id, ivl in result:
-            adjustedivl = (100 * (ivl/100)**(0.5))
+            adjustedivl = 100 * (ivl / 100) ** (0.5)
             sumivl += adjustedivl
         if len(result) == 0:
             continue
-        Level = round((sumivl/len(result)+0.5), 2)
+        Level = round((sumivl / len(result) + 0.5), 2)
 
         pokemontier = ""
 
@@ -522,8 +583,7 @@ def TagPokemon():
             if pokemontier == "A":
                 msgbox = QMessageBox()
                 msgbox.setWindowTitle("Pokémanki")
-                msgbox.setText(
-                    f"Choose a starter Pokémon for the {item[0]} tag.")
+                msgbox.setText(f"Choose a starter Pokémon for the {item[0]} tag.")
                 msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
                 msgbox.addButton("Charmander", QMessageBox.AcceptRole)
                 msgbox.addButton("Squirtle", QMessageBox.AcceptRole)
@@ -567,8 +627,15 @@ def TagPokemon():
         elif already_assigned == False:
             tagmonData = (tagmon, item[0], Level)
             modifiedtagmon.append(tagmonData)
-        msgtxt += alertMsgText(tagmon, item[0], name, int(Level),
-                               int(previouslevel), nickname, already_assigned)
+        msgtxt += alertMsgText(
+            tagmon,
+            item[0],
+            name,
+            int(Level),
+            int(previouslevel),
+            nickname,
+            already_assigned,
+        )
         if already_assigned == True:
             for thing in tagmonlist:
                 if thing[1] == item[0]:
@@ -578,20 +645,19 @@ def TagPokemon():
                                 pass
                             else:
                                 modifiedtagmon.append(
-                                    (thing[0], thing[1], Level, nickname))
+                                    (thing[0], thing[1], Level, nickname)
+                                )
                         else:
                             if (thing[0], thing[1], Level) in modifiedtagmon:
                                 pass
                             else:
-                                modifiedtagmon.append(
-                                    (thing[0], thing[1], Level))
+                                modifiedtagmon.append((thing[0], thing[1], Level))
                     else:
                         if nickname:
                             if (name, thing[1], Level, nickname) in modifiedtagmon:
                                 pass
                             else:
-                                modifiedtagmon.append(
-                                    (name, thing[1], Level, nickname))
+                                modifiedtagmon.append((name, thing[1], Level, nickname))
                         else:
                             if (name, thing[1], Level) in modifiedtagmon:
                                 pass

@@ -63,44 +63,61 @@ def pokemonLevelRangesFromCsv(csv_fpath):
 class Trades:
     def __init__(self):
         self.tradewindow = QDialog()
-        self.dirname = os.path.dirname(os.path.abspath(
-            inspect.getfile(inspect.currentframe())))
+        self.dirname = os.path.dirname(
+            os.path.abspath(inspect.getfile(inspect.currentframe()))
+        )
         self.mediafolder = mediafolder
 
         pokemon_records = []
         csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1.csv"
         pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-        if config['gen2']:
+        if config["gen2"]:
             csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen2.csv"
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
 
-            if config['gen4_evolutions']:
-                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_plus4.csv"
+            if config["gen4_evolutions"]:
+                csv_fpath = (
+                    currentdirname
+                    / "pokemon_evolutions"
+                    / "pokemon_gen1_plus2_plus4.csv"
+                )
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen2_plus4.csv"
+                csv_fpath = (
+                    currentdirname / "pokemon_evolutions" / "pokemon_gen2_plus4.csv"
+                )
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
             else:
-                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_no4.csv"
+                csv_fpath = (
+                    currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_no4.csv"
+                )
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen2_no4.csv"
+                csv_fpath = (
+                    currentdirname / "pokemon_evolutions" / "pokemon_gen2_no4.csv"
+                )
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
         else:
-            if config['gen4_evolutions']:
+            if config["gen4_evolutions"]:
                 # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
                 # so let's just include gen 2 for these evolution lines
-                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_plus4.csv"
+                csv_fpath = (
+                    currentdirname
+                    / "pokemon_evolutions"
+                    / "pokemon_gen1_plus2_plus4.csv"
+                )
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
             else:
-                csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1_no2_no4.csv"
+                csv_fpath = (
+                    currentdirname / "pokemon_evolutions" / "pokemon_gen1_no2_no4.csv"
+                )
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
 
-        if config['gen3']:
+        if config["gen3"]:
             csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen3.csv"
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-        if config['gen4']:
+        if config["gen4"]:
             csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen4.csv"
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-        if config['gen5']:
+        if config["gen5"]:
             csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen5.csv"
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
 
@@ -151,7 +168,7 @@ class Trades:
                 return
         possiblehaveslist = []
         while i < 3:
-            randno = random.randint(0, len(deckmonlist)-1)
+            randno = random.randint(0, len(deckmonlist) - 1)
             pokemon = deckmonlist[randno]
             for item in self.allpokemon:
                 if pokemon[0] == item[0]:
@@ -159,30 +176,42 @@ class Trades:
             possiblehaves = []
             if want[1] == "F":
                 for item in self.allpokemon:
-                    if (item[1] == "F" or item[1] == "E") and (item[2] < int(pokemon[2]) < item[3]):
+                    if (item[1] == "F" or item[1] == "E") and (
+                        item[2] < int(pokemon[2]) < item[3]
+                    ):
                         possiblehaves.append(item)
             elif want[1] == "E":
                 for item in self.allpokemon:
-                    if (item[1] == "F" or item[1] == "E" or item[1] == "D") and (item[2] < int(pokemon[2]) < item[3]):
+                    if (item[1] == "F" or item[1] == "E" or item[1] == "D") and (
+                        item[2] < int(pokemon[2]) < item[3]
+                    ):
                         possiblehaves.append(item)
             elif want[1] == "D":
                 for item in self.allpokemon:
-                    if (item[1] == "C" or item[1] == "E" or item[1] == "D") and (item[2] < int(pokemon[2]) < item[3]):
+                    if (item[1] == "C" or item[1] == "E" or item[1] == "D") and (
+                        item[2] < int(pokemon[2]) < item[3]
+                    ):
                         possiblehaves.append(item)
             elif want[1] == "C":
                 for item in self.allpokemon:
-                    if (item[1] == "C" or item[1] == "B" or item[1] == "D") and (item[2] < int(pokemon[2]) < item[3]):
+                    if (item[1] == "C" or item[1] == "B" or item[1] == "D") and (
+                        item[2] < int(pokemon[2]) < item[3]
+                    ):
                         possiblehaves.append(item)
             elif want[1] == "B":
                 for item in self.allpokemon:
-                    if (item[1] == "C" or item[1] == "B" or item[1] == "A") and (item[2] < int(pokemon[2]) < item[3]):
+                    if (item[1] == "C" or item[1] == "B" or item[1] == "A") and (
+                        item[2] < int(pokemon[2]) < item[3]
+                    ):
                         possiblehaves.append(item)
             elif want[1] == "A":
                 for item in self.allpokemon:
-                    if (item[1] == "B" or item[1] == "A") and (item[2] < int(pokemon[2]) < item[3]):
+                    if (item[1] == "B" or item[1] == "A") and (
+                        item[2] < int(pokemon[2]) < item[3]
+                    ):
                         possiblehaves.append(item)
             if len(possiblehaves) > 1:
-                randno = random.randint(0, len(possiblehaves)-1)
+                randno = random.randint(0, len(possiblehaves) - 1)
                 have = possiblehaves[randno]
             elif len(possiblehaves) == 1:
                 have = possiblehaves[0]
@@ -191,13 +220,15 @@ class Trades:
                 continue
             if have[0].startswith("Eevee") and want[0].startswith("Eevee"):
                 self.trades.append(
-                    (("Eevee", have[1], have[2], have[3]), ("Eevee", want[1], want[2], want[3])))
+                    (
+                        ("Eevee", have[1], have[2], have[3]),
+                        ("Eevee", want[1], want[2], want[3]),
+                    )
+                )
             elif have[0].startswith("Eevee"):
-                self.trades.append(
-                    (("Eevee", have[1], have[2], have[3]), want))
+                self.trades.append((("Eevee", have[1], have[2], have[3]), want))
             elif want[0].startswith("Eevee"):
-                self.trades.append(
-                    (have, ("Eevee", want[1], want[2], want[3])))
+                self.trades.append((have, ("Eevee", want[1], want[2], want[3])))
             else:
                 self.trades.append((have, want))
             possiblehaveslist.append(possiblehaves)
@@ -231,8 +262,11 @@ class Trades:
             self.newTrades()
             tradeData = get_json("_trades.json")
         if tradeData[1] == []:
-            showInfo(text="No trades are possible at the moment.", parent=mw,
-                     title="Pokémanki")
+            showInfo(
+                text="No trades are possible at the moment.",
+                parent=mw,
+                title="Pokémanki",
+            )
             return
         tradewindow = self.tradewindow
         tradewindow.setWindowTitle("Pokémanki")
@@ -281,7 +315,26 @@ class Trades:
                    <td height = 30 width = 150 align = center><b>%s</b></td>
                    <td height = 30 width = 150 align = center><b>%s</b></td>
                    </tr>
-                   </table>""" % (self.dirname, self.trades[0][0][0], self.dirname, self.trades[1][0][0], self.dirname, self.trades[2][0][0], self.trades[0][0][0], self.trades[1][0][0], self.trades[2][0][0], self.mediafolder, self.trades[0][1][0], self.mediafolder, self.trades[1][1][0], self.mediafolder, self.trades[2][1][0], self.trades[0][1][0], self.trades[1][1][0], self.trades[2][1][0])
+                   </table>""" % (
+            self.dirname,
+            self.trades[0][0][0],
+            self.dirname,
+            self.trades[1][0][0],
+            self.dirname,
+            self.trades[2][0][0],
+            self.trades[0][0][0],
+            self.trades[1][0][0],
+            self.trades[2][0][0],
+            self.mediafolder,
+            self.trades[0][1][0],
+            self.mediafolder,
+            self.trades[1][1][0],
+            self.mediafolder,
+            self.trades[2][1][0],
+            self.trades[0][1][0],
+            self.trades[1][1][0],
+            self.trades[2][1][0],
+        )
         lbl1 = QLabel(table, tradewindow)
         lbl1.move(0, 0)
         lbl2 = QLabel("", tradewindow)
@@ -333,11 +386,18 @@ class Trades:
                 no_pokemon()
                 return
         for item in deckmonlist:
-            if item[0] == want[0] or (item[0].startswith("Eevee") and want[0] == "Eevee") and int(item[2]) >= 5:
+            if (
+                item[0] == want[0]
+                or (item[0].startswith("Eevee") and want[0] == "Eevee")
+                and int(item[2]) >= 5
+            ):
                 possiblefits.append(item)
         if possiblefits == []:
-            showInfo("Sorry, you do not have the Pokemon needed to complete this trade.",
-                     parent=mw, title="Pokémanki")
+            showInfo(
+                "Sorry, you do not have the Pokemon needed to complete this trade.",
+                parent=mw,
+                title="Pokémanki",
+            )
             return
         displaylist = []
         for item in possiblefits:
@@ -345,22 +405,37 @@ class Trades:
             if len(item) == 4:
                 if item[0].startswith("Eevee"):
                     displaytext = "%s - Eevee (Level %s) from %s" % (
-                        item[3], int(item[2]), deckname)
+                        item[3],
+                        int(item[2]),
+                        deckname,
+                    )
                 else:
                     displaytext = "%s - %s (Level %s) from %s" % (
-                        item[3], item[0], int(item[2]), deckname)
+                        item[3],
+                        item[0],
+                        int(item[2]),
+                        deckname,
+                    )
             else:
                 if item[0].startswith("Eevee"):
-                    displaytext = "Eevee (Level %s) from %s" % (
-                        int(item[2]), deckname)
+                    displaytext = "Eevee (Level %s) from %s" % (int(item[2]), deckname)
                 else:
                     displaytext = "%s (Level %s) from %s" % (
-                        item[0], int(item[2]), deckname)
+                        item[0],
+                        int(item[2]),
+                        deckname,
+                    )
             displaylist.append(displaytext)
         totallist = list(zip(possiblefits, displaylist))
         possiblepokemon = QWidget()
         inp, ok = QInputDialog.getItem(
-            possiblepokemon, "Pokémanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
+            possiblepokemon,
+            "Pokémanki",
+            "Choose a Pokemon to trade for %s" % have[0],
+            displaylist,
+            0,
+            False,
+        )
         tradepokemon = []
         if ok and inp:
             for thing in totallist:
@@ -372,7 +447,8 @@ class Trades:
         confirmation = QMessageBox()
         confirmation.setWindowTitle("Pokémanki")
         confirmation.setText(
-            "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
+            "Are you sure you want to trade your %s for a %s" % (displaytext, have[0])
+        )
         confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirmation.setDefaultButton(QMessageBox.No)
         result = confirmation.exec()
@@ -390,8 +466,11 @@ class Trades:
                     modifieddeckmonlist.append(item)
             write_json("_pokemanki.json", modifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
-            showInfo(f"You have traded your {displaytext} for a {have[0]}",
-                     parent=mw, title="Pokémanki")
+            showInfo(
+                f"You have traded your {displaytext} for a {have[0]}",
+                parent=mw,
+                title="Pokémanki",
+            )
 
     def trade2(self):
         have = self.trades[1][0]
@@ -429,11 +508,19 @@ class Trades:
                 no_pokemon()
                 return
         for item in deckmonlist:
-            if item[0] == want[0] or (item[0].startswith("Eevee") and want[0] == "Eevee") and int(item[2]) >= 5:
+            if (
+                item[0] == want[0]
+                or (item[0].startswith("Eevee") and want[0] == "Eevee")
+                and int(item[2]) >= 5
+            ):
                 possiblefits.append(item)
         if possiblefits == []:
-            showInfo("""Sorry, you do not have the Pokémon needed to complete
-                     this trade.""", parent=mw, title="Pokémanki")
+            showInfo(
+                """Sorry, you do not have the Pokémon needed to complete
+                     this trade.""",
+                parent=mw,
+                title="Pokémanki",
+            )
             return
         displaylist = []
         for item in possiblefits:
@@ -441,22 +528,37 @@ class Trades:
             if len(item) == 4:
                 if item[0].startswith("Eevee"):
                     displaytext = "%s - Eevee (Level %s) from %s" % (
-                        item[3], int(item[2]), deckname)
+                        item[3],
+                        int(item[2]),
+                        deckname,
+                    )
                 else:
                     displaytext = "%s - %s (Level %s) from %s" % (
-                        item[3], item[0], int(item[2]), deckname)
+                        item[3],
+                        item[0],
+                        int(item[2]),
+                        deckname,
+                    )
             else:
                 if item[0].startswith("Eevee"):
-                    displaytext = "Eevee (Level %s) from %s" % (
-                        int(item[2]), deckname)
+                    displaytext = "Eevee (Level %s) from %s" % (int(item[2]), deckname)
                 else:
                     displaytext = "%s (Level %s) from %s" % (
-                        item[0], int(item[2]), deckname)
+                        item[0],
+                        int(item[2]),
+                        deckname,
+                    )
             displaylist.append(displaytext)
         totallist = list(zip(possiblefits, displaylist))
         possiblepokemon = QWidget()
         inp, ok = QInputDialog.getItem(
-            possiblepokemon, "Pokémanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
+            possiblepokemon,
+            "Pokémanki",
+            "Choose a Pokemon to trade for %s" % have[0],
+            displaylist,
+            0,
+            False,
+        )
         tradepokemon = []
         if ok and inp:
             for thing in totallist:
@@ -468,7 +570,8 @@ class Trades:
         confirmation = QMessageBox()
         confirmation.setWindowTitle("Pokémanki")
         confirmation.setText(
-            "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
+            "Are you sure you want to trade your %s for a %s" % (displaytext, have[0])
+        )
         confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirmation.setDefaultButton(QMessageBox.No)
         result = confirmation.exec()
@@ -486,8 +589,11 @@ class Trades:
                     modifieddeckmonlist.append(item)
             write_json("_pokemanki.json", modifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
-            showInfo(f"You have traded your {displaytext} for a {have[0]}",
-                     parent=mw, title="Pokémanki")
+            showInfo(
+                f"You have traded your {displaytext} for a {have[0]}",
+                parent=mw,
+                title="Pokémanki",
+            )
 
     def trade3(self):
         have = self.trades[2][0]
@@ -525,11 +631,19 @@ class Trades:
                 no_pokemon()
                 return
         for item in deckmonlist:
-            if item[0] == want[0] or (item[0].startswith("Eevee") and want[0] == "Eevee") and int(item[2]) >= 5:
+            if (
+                item[0] == want[0]
+                or (item[0].startswith("Eevee") and want[0] == "Eevee")
+                and int(item[2]) >= 5
+            ):
                 possiblefits.append(item)
         if possiblefits == []:
-            showInfo("""Sorry, you do not have the Pokemon needed to complete
-                     this trade.""", parent=mw, title="Pokémanki")
+            showInfo(
+                """Sorry, you do not have the Pokemon needed to complete
+                     this trade.""",
+                parent=mw,
+                title="Pokémanki",
+            )
             return
         displaylist = []
         for item in possiblefits:
@@ -537,22 +651,37 @@ class Trades:
             if len(item) == 4:
                 if item[0].startswith("Eevee"):
                     displaytext = "%s - Eevee (Level %s) from %s" % (
-                        item[3], int(item[2]), deckname)
+                        item[3],
+                        int(item[2]),
+                        deckname,
+                    )
                 else:
                     displaytext = "%s - %s (Level %s) from %s" % (
-                        item[3], item[0], int(item[2]), deckname)
+                        item[3],
+                        item[0],
+                        int(item[2]),
+                        deckname,
+                    )
             else:
                 if item[0].startswith("Eevee"):
-                    displaytext = "Eevee (Level %s) from %s" % (
-                        int(item[2]), deckname)
+                    displaytext = "Eevee (Level %s) from %s" % (int(item[2]), deckname)
                 else:
                     displaytext = "%s (Level %s) from %s" % (
-                        item[0], int(item[2]), deckname)
+                        item[0],
+                        int(item[2]),
+                        deckname,
+                    )
             displaylist.append(displaytext)
         totallist = list(zip(possiblefits, displaylist))
         possiblepokemon = QWidget()
         inp, ok = QInputDialog.getItem(
-            possiblepokemon, "Pokémanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
+            possiblepokemon,
+            "Pokémanki",
+            "Choose a Pokemon to trade for %s" % have[0],
+            displaylist,
+            0,
+            False,
+        )
         tradepokemon = []
         if ok and inp:
             for thing in totallist:
@@ -564,7 +693,8 @@ class Trades:
         confirmation = QMessageBox()
         confirmation.setWindowTitle("Pokémanki")
         confirmation.setText(
-            "Are you sure you want to trade your %s for a %s" % (displaytext, have[0]))
+            "Are you sure you want to trade your %s for a %s" % (displaytext, have[0])
+        )
         confirmation.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirmation.setDefaultButton(QMessageBox.No)
         result = confirmation.exec()
@@ -582,5 +712,8 @@ class Trades:
                     modifieddeckmonlist.append(item)
             write_json("_pokemanki.json", modifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
-            showInfo(f"You have traded your {displaytext} for a {have[0]}",
-                     parent=mw, title="Pokémanki")
+            showInfo(
+                f"You have traded your {displaytext} for a {have[0]}",
+                parent=mw,
+                title="Pokémanki",
+            )
