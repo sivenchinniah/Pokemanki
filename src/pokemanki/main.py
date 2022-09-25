@@ -30,7 +30,7 @@ nicknameaction = QAction("&Nicknames", mw)
 resetaction = QAction("&Reset", mw)
 tradeaction = QAction("&Trade", mw)
 toggleaction = QAction("&Decks vs. Tags", mw)
-tagsaction = QAction("Tags", mw)
+tagsaction = QAction("&Tags", mw)
 prestigeaction = QAction("&Prestige Pokémon", mw)
 unprestigeaction = QAction("&Unprestige Pokémon", mw)
 everstoneaction = QAction("&Give Everstone", mw)
@@ -59,35 +59,37 @@ qconnect(unalolanaction.triggered, takeAlolanPassport)
 qconnect(bottomaction.triggered, MovetoBottom)
 qconnect(topaction.triggered, MovetoTop)
 
-# Make new Pokémanki menu under tools
-mw.pokemenu = QMenu("&Pokémanki", mw)
-mw.form.menuTools.addMenu(mw.pokemenu)
-mw.pokemenu.addAction(toggleaction)
-mw.pokemenu.addAction(nicknameaction)
-mw.prestigemenu = QMenu("&Prestige Menu", mw)
-mw.pokemenu.addMenu(mw.prestigemenu)
-mw.prestigemenu.addAction(prestigeaction)
-mw.prestigemenu.addAction(unprestigeaction)
 
+def build_menu():
+    mw.pokemenu.clear()
 
-f = get_synced_conf()["decks_or_tags"]
-if f == "tags":
-    mw.pokemenu.addAction(tagsaction)
-else:  # Not yet implemented for tagmon
-    mw.everstonemenu = QMenu("&Everstone", mw)
-    mw.pokemenu.addMenu(mw.everstonemenu)
-    mw.everstonemenu.addAction(everstoneaction)
-    mw.everstonemenu.addAction(uneverstoneaction)
-    mw.megastonemenu = QMenu("&Mega Stone", mw)
-    mw.pokemenu.addMenu(mw.megastonemenu)
-    mw.megastonemenu.addAction(megastoneaction)
-    mw.megastonemenu.addAction(unmegastoneaction)
-    mw.alolanmenu = QMenu("&Alolan Passport", mw)
-    mw.pokemenu.addMenu(mw.alolanmenu)
-    mw.alolanmenu.addAction(alolanaction)
-    mw.alolanmenu.addAction(unalolanaction)
-    mw.pokemenu.addAction(tradeaction)
-mw.pokemenu.addAction(resetaction)
+    mw.form.menuTools.addMenu(mw.pokemenu)
+    mw.pokemenu.addAction(toggleaction)
+    mw.pokemenu.addAction(nicknameaction)
+    mw.prestigemenu = QMenu("&Prestige Menu", mw)
+    mw.pokemenu.addMenu(mw.prestigemenu)
+    mw.prestigemenu.addAction(prestigeaction)
+    mw.prestigemenu.addAction(unprestigeaction)
+
+    f = get_synced_conf()["decks_or_tags"]
+    if f == "tags":
+        mw.pokemenu.addAction(tagsaction)
+    else:  # Not yet implemented for tagmon
+        mw.everstonemenu = QMenu("&Everstone", mw)
+        mw.pokemenu.addMenu(mw.everstonemenu)
+        mw.everstonemenu.addAction(everstoneaction)
+        mw.everstonemenu.addAction(uneverstoneaction)
+        mw.megastonemenu = QMenu("&Mega Stone", mw)
+        mw.pokemenu.addMenu(mw.megastonemenu)
+        mw.megastonemenu.addAction(megastoneaction)
+        mw.megastonemenu.addAction(unmegastoneaction)
+        mw.alolanmenu = QMenu("&Alolan Passport", mw)
+        mw.pokemenu.addMenu(mw.alolanmenu)
+        mw.alolanmenu.addAction(alolanaction)
+        mw.alolanmenu.addAction(unalolanaction)
+        mw.pokemenu.addAction(tradeaction)
+
+    mw.pokemenu.addAction(resetaction)
 
 
 # Wrap pokemon_display function of display.py with the todayStats function of anki.stats.py
@@ -100,6 +102,7 @@ def message_handler(handled, message, context):
     # maybe Anki bug?
     if not message.startswith("Pokemanki#"):
         return (False, None)
+    f = get_synced_conf()["decks_or_tags"]
     if message == "Pokemanki#currentDeck":
         html = pokemon_display(f, False).replace("`", "'")
     elif message == "Pokemanki#wholeCollection":
@@ -136,6 +139,8 @@ def replace_gears(deck_browser, content):
     content.tree = soup
 
 
+mw.pokemenu = QMenu("&Pokémanki", mw)
+build_menu()
 gui_hooks.stats_dialog_will_show.append(onStatsOpen)
 gui_hooks.webview_did_receive_js_message.append(message_handler)
 gui_hooks.deck_browser_will_render_content.append(replace_gears)

@@ -138,18 +138,12 @@ def Toggle():
             save_synced_conf("decks_or_tags", "tags")
             tags = Tags()
             tags.tagMenu()
-            showInfo(
-                "Please restart Anki to see your updated Pokémon.",
-                parent=mw,
-                title="Pokémanki",
-            )
         else:
             save_synced_conf("decks_or_tags", "decks")
-            showInfo(
-                "Please restart Anki to see your updated Pokémon.",
-                parent=mw,
-                title="Pokémanki",
-            )
+
+        from .main import build_menu
+
+        build_menu()
 
 
 # Threshold Settings
