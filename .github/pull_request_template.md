@@ -1,8 +1,8 @@
-**Description**
+#### Description
 
 *Provide concise summary of your change.*
 
-**Checklist**
+#### Checklist
 - [ ] I've read the [contribution guideline](./docs/contributing.md)
 - [ ] I've tested my change with the following Anki version:
 - [ ] I've tested my change on the following operating system(s):
