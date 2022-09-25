@@ -1,10 +1,11 @@
-import random
 import csv
+import random
 
 from aqt import mw
 from aqt.qt import *
 from aqt.utils import showInfo
 
+from .config import get_local_conf, get_synced_conf, save_synced_conf
 from .utils import *
 from .stats import MultiStats, TagStats, cardInterval, cardIdsFromDeckIds
 
@@ -65,26 +66,26 @@ def load_pokemon_gen_all(
         )
 
     load_pokemon_gen("pokemon_gen1.csv")
-    if config["gen2"]:
+    if get_local_conf()["gen2"]:
         load_pokemon_gen("pokemon_gen2.csv")
-        if config["gen4_evolutions"]:
+        if get_local_conf()["gen4_evolutions"]:
             load_pokemon_gen("pokemon_gen1_plus2_plus4.csv")
             load_pokemon_gen("pokemon_gen2_plus4.csv")
         else:
             load_pokemon_gen("pokemon_gen1_plus2_no4.csv")
             load_pokemon_gen("pokemon_gen2_no4.csv")
     else:
-        if config["gen4_evolutions"]:
+        if get_local_conf()["gen4_evolutions"]:
             # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
             # so let's just include gen 2 for these evolution lines
             load_pokemon_gen("pokemon_gen1_plus2_plus4.csv")
         else:
             load_pokemon_gen("pokemon_gen1_no2_no4.csv")
-    if config["gen3"]:
+    if get_local_conf()["gen3"]:
         load_pokemon_gen("pokemon_gen3.csv")
-    if config["gen4"]:
+    if get_local_conf()["gen4"]:
         load_pokemon_gen("pokemon_gen4.csv")
-    if config["gen5"]:
+    if get_local_conf()["gen5"]:
         load_pokemon_gen("pokemon_gen5.csv")
 
 
@@ -97,7 +98,7 @@ def alertMsgText(
     nickname: str,
     already_assigned: bool,
 ):
-    prestigelist = get_json("_prestigelist.json", [])
+    prestigelist = get_synced_conf()["prestigelist"]
     msgtxt = ""
     if already_assigned == True:
         if name == "Egg":
@@ -160,13 +161,13 @@ def alertMsgText(
 
 def randomStarter():
     available_generations = [1]
-    if config["gen2"]:
+    if get_local_conf()["gen2"]:
         available_generations.append(2)
-    if config["gen3"]:
+    if get_local_conf()["gen3"]:
         available_generations.append(3)
-    if config["gen4"]:
+    if get_local_conf()["gen4"]:
         available_generations.append(4)
-    if config["gen5"]:
+    if get_local_conf()["gen5"]:
         available_generations.append(5)
 
     choice_generation = random.choice(available_generations)
@@ -185,7 +186,7 @@ def randomStarter():
 def FirstPokemon():
     deckmonlist = []
     deckmon = ""
-    deckmonlist = get_json("_pokemanki.json")
+    deckmonlist = get_synced_conf()["pokemon_list"]
     if deckmonlist:
         return
     alldecks = mw.col.decks.all_names_and_ids()
@@ -236,7 +237,7 @@ def FirstPokemon():
             else:
                 Level = 0
             deckmondata = [(deckmon, deck, Level)]
-            write_json("_pokemanki.json", deckmondata)
+            save_synced_conf("pokemon_list", deckmondata)
             if Level < 5:
                 showInfo(f"You've found a {deckmon} egg.")
             else:
@@ -269,7 +270,7 @@ def MultiPokemon(wholeCollection):
     """
 
     FirstPokemon()
-    pokemontotal = get_json("_pokemanki.json", None)
+    pokemontotal = get_synced_conf()["pokemon_list"]
     if not pokemontotal:
         return  # If no pokemanki.json, make empty pokemontotal and modifiedpokemontotal lists
 
@@ -287,7 +288,7 @@ def MultiPokemon(wholeCollection):
             if item[1] in allIds:
                 modifiedpokemontotal.append(item)
     # Download threshold settings if they exist, otherwise make from scratch
-    thresholdsettings = get_json("_pokemankisettings.json", [100, 250, 500, 750, 1000])
+    thresholdsettings = get_synced_conf()["evolution_thresholds"]["decks"]
     pokemonlist = []
     tiers = []
     evolutionLevel1 = []
@@ -313,9 +314,9 @@ def MultiPokemon(wholeCollection):
     # If no results, return
     if len(results) == 0:
         return
-    prestigelist = get_json("_prestigelist.json", [])
-    everstonelist = get_json("_everstonelist.json", [])
-    everstonepokemonlist = get_json("_everstonepokemonlist.json", [])
+    prestigelist = get_synced_conf()["prestigelist"]
+    everstonelist = get_synced_conf()["everstonelist"]
+    everstonepokemonlist = get_synced_conf()["everstonepokemonlist"]
     # Determine level of Pokemon (if zero, do not assign Pokemon)
     for item in results:
         result = item[1]
@@ -486,8 +487,7 @@ def MultiPokemon(wholeCollection):
             displayData = (name, item[0], Level)
         multiData.append(displayData)
 
-    # After iterating through each deck, store data into pokemanki.json
-    write_json("_pokemanki.json", modifiedpokemontotal)
+    save_synced_conf("pokemon_list", modifiedpokemontotal)
     # Only display message if changes
     if msgtxt != "Hello Pokémon Trainer!":
         showInfo(msgtxt, parent=mw, title="Pokémanki")
@@ -503,14 +503,14 @@ def TagPokemon():
     :rtype: Array
     """
 
-    tagmonlist = get_json("_tagmon.json", [])
-    savedtags = get_json("_tags.json", [])
+    tagmonlist = get_synced_conf()["tagmon_list"]
+    savedtags = get_synced_conf()["tags"]
     modifiedtagmon = []
     for item in reversed(tagmonlist):
         if item[1] in savedtags:
             modifiedtagmon.append(item)
 
-    thresholdsettings = get_json("_tagmonsettings.json", [50, 125, 250, 375, 500])
+    thresholdsettings = get_synced_conf()["evolution_thresholds"]["tags"]
 
     pokemonlist = []
     tiers = []
@@ -540,7 +540,7 @@ def TagPokemon():
     results = TagStats()
     if len(results) == 0:
         return
-    prestigelist = get_json("_prestigelist.json", [])
+    prestigelist = get_synced_conf()["prestigelist"]
     for item in results:
         result = item[1]
         sumivl = 0
@@ -666,8 +666,7 @@ def TagPokemon():
         displayData = (name, item[0], Level)
         multiData.append(displayData)
 
-    # After iterating through each deck, store data into pokemanki.json
-    write_json("_tagmon.json", modifiedtagmon)
+    save_synced_conf("tagmon_list", modifiedtagmon)
     # Only display message if changes
     if msgtxt != "Hello Pokémon Trainer!":
         showInfo(msgtxt, parent=mw, title="Pokémanki")

@@ -88,7 +88,7 @@ def MultiStats(wholeCollection):
 
 def TagStats():
     "Returns List[[tag_name, card_id, card_interval], ...]"
-    savedtags = get_json("_tags.json", [])
+    savedtags = get_synced_conf()["tags"]
     resultlist = []
     for item in savedtags:
         result = mw.col.db.all(

@@ -8,7 +8,7 @@ from aqt import mw
 from aqt.qt import *
 from aqt.utils import showInfo
 
-config = mw.addonManager.getConfig(__name__)
+from .config import get_synced_conf
 
 # Find current directory
 addon_dir = Path(__file__).parents[0]
@@ -65,11 +65,11 @@ def no_pokemon():
 
 
 def get_pokemons():
-    f = get_json("_decksortags.json", "")
-    if f:
-        pokemons = get_json("_tagmon.json", None)
+    f = get_synced_conf()["decks_or_tags"]
+    if f == "tags":
+        pokemons = get_synced_conf()["tagmon_list"]
     else:
-        pokemons = get_json("_pokemanki.json", None)
+        pokemons = get_synced_conf()["pokemon_list"]
     if pokemons is None:
         no_pokemon()
         return (None, None)

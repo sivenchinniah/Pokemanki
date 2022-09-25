@@ -1,6 +1,7 @@
 from aqt.qt import *
 from aqt import mw
 
+from .config import save_synced_conf
 from .utils import *
 
 
@@ -10,7 +11,7 @@ class Tags:
         self.alltags = []
 
     def tagMenu(self):
-        self.savedtags = get_json("_tags.json", [])
+        self.savedtags = get_synced_conf()["tags"]
         rawtags = mw.col.tags.all()
         alltags = self.alltags
         for item in rawtags:
@@ -227,5 +228,5 @@ class Tags:
                                             + ltem[0].text(0)
                                         )
 
-        write_json("_tags.json", checked)
+        save_synced_conf("tags", checked)
         self.parentwindow.done(QDialog.Accepted)

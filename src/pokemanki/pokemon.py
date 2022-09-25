@@ -1,8 +1,13 @@
-from .utils import *
-from .tags import Tags
-
 from aqt.qt import *
 from aqt.utils import showInfo, tooltip
+
+from .config import (
+    get_synced_conf,
+    save_synced_conf,
+    setup_default_synced_conf,
+)
+from .tags import Tags
+from .utils import *
 
 # Nickname Settings
 
@@ -107,18 +112,18 @@ def Nickname():
             modifieddeckmonlist.append(deckmon)
         else:
             modifieddeckmonlist.append(item)
-    if f:
-        write_json("_tagmon.json", modifieddeckmonlist)
+    if f == "tags":
+        save_synced_conf("tagmon_list", modifieddeckmonlist)
     else:
-        write_json("_pokemanki.json", modifieddeckmonlist)
+        save_synced_conf("pokemanki_list", modifieddeckmonlist)
 
 
 def Toggle():
     window = QWidget()
     items = ("Decks (Default)", "Tags")
-    by = get_json("_decksortags.json")
+    by = get_synced_conf()["decks_or_tags"]
     default = 0
-    if by:
+    if by == "tags":
         default = 1
     inp, ok = QInputDialog.getItem(
         window,
@@ -130,7 +135,7 @@ def Toggle():
     )
     if ok and inp:
         if inp == "Tags":
-            write_json("_decksortags.json", inp)
+            save_synced_conf("decks_or_tags", "tags")
             tags = Tags()
             tags.tagMenu()
             showInfo(
@@ -139,7 +144,7 @@ def Toggle():
                 title="Pokémanki",
             )
         else:
-            write_json("_decksortags.json", "")
+            save_synced_conf("decks_or_tags", "decks")
             showInfo(
                 "Please restart Anki to see your updated Pokémon.",
                 parent=mw,
@@ -159,7 +164,7 @@ def ThresholdSettings():
         sumlist.append(len(mw.col.decks.cids(deck)))
     recommended = 0.797 * max(sumlist)
     # Refresh threshold settings
-    thresholdlist = get_json("_pokemankisettings.json")
+    thresholdlist = get_synced_conf()["evolution_thresholds"]["decks"]
     # Make settings window (input dialog)
     window = QWidget()
     inp, ok = QInputDialog.getInt(
@@ -189,7 +194,9 @@ def ThresholdSettings():
                 int(0.75 * inp),
                 int(inp),
             ]
-            write_json("_pokemankisettings.json", newthresholdlist)
+            conf = get_synced_conf()["evolution_thresholds"]
+            conf["decks"] = newthresholdlist
+            save_synced_conf("evolution_thresholds", conf)
             # Message box confirming change
             showInfo("Your settings have been changed", parent=mw, title="Pokémanki")
     # Show the window
@@ -258,8 +265,8 @@ def giveEverstone():
     pokemon, f = get_pokemons()
     if pokemon is None:
         return
-    everstonelist = get_json("_everstonelist.json", default=[])
-    everstonepokemonlist = get_json("_everstonepokemonlist.json", default=[])
+    everstonelist = get_synced_conf()["everstonelist"]
+    everstonepokemonlist = get_synced_conf()["everstonepokemonlist"]
 
     everstoneables = []
     for item in pokemon:
@@ -300,16 +307,16 @@ def giveEverstone():
             everstonelist.append(mw.col.decks.id(item))
             everstonepokemonlist.append(everstone_pokemon_name)
         showInfo("Please restart Anki to see changes.", parent=mw, title="Pokémanki")
-    write_json("_everstonelist.json", everstonelist)
-    write_json("_everstonepokemonlist.json", everstonepokemonlist)
+    save_synced_conf("everstonelist", everstonelist)
+    save_synced_conf("everstonepokemonlist", everstonepokemonlist)
 
 
 def takeEverstone():
     pokemon, f = get_pokemons()
     if pokemon is None:
         return
-    everstonelist = get_json("_everstonelist.json", [])
-    everstonepokemonlist = get_json("_everstonepokemonlist.json", [])
+    everstonelist = get_synced_conf()["everstonelist"]
+    everstonepokemonlist = get_synced_conf()["everstonepokemonlist"]
     if not everstonelist:
         showInfo(
             "None of your Pokémon are holding everstones.", parent=mw, title="Pokémanki"
@@ -350,14 +357,14 @@ def takeEverstone():
         showInfo(
             "Please restart Anki to see your changes.", parent=mw, title="Pokémanki"
         )
-    write_json("_everstonelist.json", everstonelist)
+    save_synced_conf("everstonelist", everstonelist)
 
 
 def giveMegastone():
     pokemon, f = get_pokemons()
     if pokemon is None:
         return
-    megastonelist = get_json("_megastonelist.json", [])
+    megastonelist = get_synced_conf()["megastonelist"]
     megastoneables = []
     for item in pokemon:
         if item[2] >= 70:
@@ -399,14 +406,14 @@ def giveMegastone():
         showInfo(
             "Please restart Anki to see your changes.", parent=mw, title="Pokémanki"
         )
-    write_json("_megastonelist.json", megastonelist)
+    save_synced_conf("megastonelist", megastonelist)
 
 
 def takeMegastone():
     pokemon, f = get_pokemons()
     if pokemon is None:
         return
-    megastonelist = get_json("_megastonelist.json", [])
+    megastonelist = get_synced_conf()["megastonelist"]
     if not megastonelist:
         showInfo(
             "None of your Pokémon are holding mega stones.",
@@ -447,14 +454,14 @@ def takeMegastone():
         showInfo(
             "Please restart Anki to see your changes.", parent=mw, title="Pokémanki"
         )
-    write_json("_megastonelist.json", megastonelist)
+    save_synced_conf("megastonelist", megastonelist)
 
 
 def giveAlolanPassport():
     pokemon, f = get_pokemons()
     if pokemon is None:
         return
-    alolanlist = get_json("_alolanlist.json", [])
+    alolanlist = get_synced_conf()["alolanlist"]
 
     alolanables = []
     for item in pokemon:
@@ -494,14 +501,14 @@ def giveAlolanPassport():
         else:
             alolanlist.append(mw.col.decks.id(item))
         showInfo("Please restart Anki to see changes.", parent=mw, title="Pokémanki")
-    write_json("_alolanlist.json", alolanlist)
+    save_synced_conf("alolanlist", alolanlist)
 
 
 def takeAlolanPassport():
     pokemon, f = get_pokemons()
     if pokemon is None:
         return
-    alolanlist = get_json("_alolanlist.json", [])
+    alolanlist = get_synced_conf()["alolanlist"]
     if not alolanlist:
         showInfo(
             "None of your Pokémon are holding an Alolan Passport.",
@@ -542,14 +549,14 @@ def takeAlolanPassport():
         showInfo(
             "Please restart Anki to see your changes.", parent=mw, title="Pokémanki"
         )
-    write_json("_alolanlist.json", alolanlist)
+    save_synced_conf("alolanlist", alolanlist)
 
 
 def PrestigePokemon():
     pokemon, f = get_pokemons()
     if pokemon is None:
         return
-    prestigelist = get_json("_prestigelist.json", [])
+    prestigelist = get_synced_conf()["prestigelist"]
     possibleprestiges = []
     for item in pokemon:
         if item[2] >= 60:
@@ -593,14 +600,14 @@ def PrestigePokemon():
             parent=mw,
             title="Pokémanki",
         )
-    write_json("_prestigelist.json", prestigelist)
+    save_synced_conf("prestigelist", prestigelist)
 
 
 def UnprestigePokemon():
     pokemon, f = get_pokemons()
     if pokemon is None:
         return
-    prestigelist = get_json("_prestigelist.json", [])
+    prestigelist = get_synced_conf()["prestigelist"]
     if not prestigelist:
         showInfo("You have no prestiged Pokémon.", parent=mw, title="Pokémanki")
         return
@@ -642,4 +649,4 @@ def UnprestigePokemon():
             parent=mw,
             title="Pokémanki",
         )
-    write_json("_prestigelist.json", prestigelist)
+    save_synced_conf("prestigelist", prestigelist)

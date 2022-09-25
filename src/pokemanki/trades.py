@@ -4,10 +4,11 @@ import random
 import csv
 from datetime import date as dt
 
-from aqt.qt import *
 from aqt import mw
 from aqt.utils import showInfo
+from aqt.qt import *
 
+from .config import get_local_conf, get_synced_conf, save_synced_conf
 from .utils import *
 
 
@@ -71,11 +72,11 @@ class Trades:
         pokemon_records = []
         csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen1.csv"
         pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-        if config["gen2"]:
+        if get_local_conf()["gen2"]:
             csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen2.csv"
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
 
-            if config["gen4_evolutions"]:
+            if get_local_conf()["gen4_evolutions"]:
                 csv_fpath = (
                     currentdirname
                     / "pokemon_evolutions"
@@ -96,7 +97,7 @@ class Trades:
                 )
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
         else:
-            if config["gen4_evolutions"]:
+            if get_local_conf()["gen4_evolutions"]:
                 # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
                 # so let's just include gen 2 for these evolution lines
                 csv_fpath = (
@@ -111,26 +112,26 @@ class Trades:
                 )
                 pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
 
-        if config["gen3"]:
+        if get_local_conf()["gen3"]:
             csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen3.csv"
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-        if config["gen4"]:
+        if get_local_conf()["gen4"]:
             csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen4.csv"
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-        if config["gen5"]:
+        if get_local_conf()["gen5"]:
             csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen5.csv"
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
 
         self.allpokemon = pokemon_records
-        self.f = get_json("_decksortags.json", "")
+        self.f = get_synced_conf()["decks_or_tags"]
 
     def newTrades(self):
         self.trades = []
         i = 0
         f = self.f
-        if f:
+        if f == "tags":
             if os.path.exists("%s/_tagmon.json" % self.mediafolder):
-                deckmonlist = get_json("_tagmon.json", [])
+                deckmonlist = get_synced_conf()["tagmon_list"]
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 noeggslist = []
                 for item in sorteddeckmonlist:
@@ -148,7 +149,7 @@ class Trades:
                 no_pokemon()
                 return
         else:
-            deckmonlist = get_json("_pokemanki.json", None)
+            deckmonlist = get_synced_conf()["pokemon_list"]
             if deckmonlist:
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 noeggslist = []
@@ -234,17 +235,17 @@ class Trades:
             possiblehaveslist.append(possiblehaves)
             i += 1
         date = dt.today().strftime("%d/%m/%Y")
-        if f:
+        if f == "tags":
             tradeData = [date, self.trades, "tags"]
         else:
             tradeData = [date, self.trades, "decks"]
         testData = [date, self.trades, possiblehaveslist]
-        write_json("_trades.json", tradeData)
+        save_synced_conf("trades", tradeData)
 
     def tradeFunction(self):
         # show a message box
         f = self.f
-        tradeData = get_json("_trades.json", None)
+        tradeData = get_synced_conf()["trades"]
         if tradeData:
             date = dt.today().strftime("%d/%m/%Y")
             if date == tradeData[0] and len(tradeData) == 3:
@@ -254,14 +255,14 @@ class Trades:
                     self.trades = tradeData[1]
                 else:
                     self.newTrades()
-                    tradeData = get_json("_trades.json")
+                    tradeData = get_synced_conf()["trades"]
             else:
                 self.newTrades()
-                tradeData = get_json("_trades.json")
+                tradeData = get_synced_conf()["trades"]
         else:
             self.newTrades()
-            tradeData = get_json("_trades.json")
-        if tradeData[1] == []:
+            tradeData = get_synced_conf()["trades"]
+        if tradeData == [] or tradeData[1] == []:
             showInfo(
                 text="No trades are possible at the moment.",
                 parent=mw,
@@ -355,8 +356,8 @@ class Trades:
         want = self.trades[0][1]
         possiblefits = []
         f = self.f
-        if f:
-            deckmonlist = get_json("_tagmon.json")
+        if f == "tags":
+            deckmonlist = get_synced_conf()["tagmon_list"]
             if deckmonlist:
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
@@ -371,7 +372,7 @@ class Trades:
                 no_pokemon()
                 return
         else:
-            deckmonlist = get_json("_pokemanki.json", None)
+            deckmonlist = get_synced_conf()["pokemon_list"]
             if deckmonlist:
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
@@ -464,7 +465,7 @@ class Trades:
                     modifieddeckmonlist.append(newpokemon)
                 else:
                     modifieddeckmonlist.append(item)
-            write_json("_pokemanki.json", modifieddeckmonlist)
+            save_synced_conf("pokemon_list", modifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
             showInfo(
                 f"You have traded your {displaytext} for a {have[0]}",
@@ -477,8 +478,8 @@ class Trades:
         want = self.trades[1][1]
         possiblefits = []
         f = self.f
-        if f:
-            deckmonlist = get_json("_tagmon.json")
+        if f == "tags":
+            deckmonlist = get_synced_conf()["tagmon_list"]
             if deckmonlist:
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
@@ -493,7 +494,7 @@ class Trades:
                 no_pokemon()
                 return
         else:
-            deckmonlist = get_json("_pokemanki.json", None)
+            deckmonlist = get_synced_conf()["pokemon_list"]
             if deckmonlist:
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
@@ -587,7 +588,7 @@ class Trades:
                     modifieddeckmonlist.append(newpokemon)
                 else:
                     modifieddeckmonlist.append(item)
-            write_json("_pokemanki.json", modifieddeckmonlist)
+            save_synced_conf("pokemon_list", medifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
             showInfo(
                 f"You have traded your {displaytext} for a {have[0]}",
@@ -600,8 +601,8 @@ class Trades:
         want = self.trades[2][1]
         possiblefits = []
         f = self.f
-        if f:
-            deckmonlist = get_json("_tagmon.json", None)
+        if f == "tags":
+            deckmonlist = get_synced_conf()["tagmon_list"]
             if deckmonlist:
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
@@ -616,7 +617,7 @@ class Trades:
                 no_pokemon()
                 return
         else:
-            deckmonlist = get_json("_pokemanki.json", None)
+            deckmonlist = get_synced_conf()["pokemon_list"]
             if deckmonlist:
                 sorteddeckmonlist = list(reversed(deckmonlist))
                 deckmons = []
@@ -710,7 +711,7 @@ class Trades:
                     modifieddeckmonlist.append(newpokemon)
                 else:
                     modifieddeckmonlist.append(item)
-            write_json("_pokemanki.json", modifieddeckmonlist)
+            save_synced_conf("pokemon_list", modifieddeckmolist)
             self.tradewindow.done(QDialog.Accepted)
             showInfo(
                 f"You have traded your {displaytext} for a {have[0]}",

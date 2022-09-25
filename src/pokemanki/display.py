@@ -37,7 +37,10 @@ def pokemon_display(istagmon, wholecollection=True):
     # Get list of Pokémon from tags or decks.
     #   For decks, if wholeCollection, get all assigned Pokémon and assign to Pokémon,
     #   else, show Pokémon for either single deck or all subdecks and store in Pokémon
-    pokemon = TagPokemon() if istagmon else MultiPokemon(wholecollection)
+    if istagmon == "tags":
+        pokemon = TagPokemon()
+    else:
+        pokemon = MultiPokemon(wholecollection)
 
     result = _show(pokemon)
 
@@ -200,7 +203,7 @@ def _in_list(listname, item):
     if listname not in ["prestige", "everstone", "megastone", "alolan"]:
         return False
 
-    return item in get_json(f"_{listname}list.json", [])
+    return item in get_synced_conf()[f"{listname}list"]
 
 
 def _image_name(name, source):

@@ -1,15 +1,16 @@
 import os
 import sys
+from bs4 import BeautifulSoup
 
 from aqt import mw, gui_hooks
 from aqt.qt import *
-from bs4 import BeautifulSoup
 
+from .config import get_synced_conf, setup_default_synced_conf
 from .display import pokemon_display
+from .pokemon import *
 from .tags import Tags
 from .trades import Trades
 from .utils import *
-from .pokemon import *
 
 
 statsDialog = None
@@ -18,8 +19,8 @@ statsDialog = None
 copy_directory("pokemon_images")
 copy_directory("pokemanki_css")
 
-# Download threshold settings (or make from scratch if not already made)
-set_default("_pokemankisettings.json", default=[100, 250, 500, 750, 1000])
+if not get_synced_conf():
+    setup_default_synced_conf()
 
 tradeclass = Trades()
 tags = Tags()
@@ -69,8 +70,8 @@ mw.prestigemenu.addAction(prestigeaction)
 mw.prestigemenu.addAction(unprestigeaction)
 
 
-f = get_json("_decksortags.json", "")
-if f:
+f = get_synced_conf()["decks_or_tags"]
+if f == "tags":
     mw.pokemenu.addAction(tagsaction)
 else:  # Not yet implemented for tagmon
     mw.everstonemenu = QMenu("&Everstone", mw)
@@ -125,7 +126,7 @@ def onStatsOpen(statsDialog):
 
 
 def replace_gears(deck_browser, content):
-    pokemons = get_json("_pokemanki.json", None)
+    pokemons = get_synced_conf()["pokemon_list"]
     soup = BeautifulSoup(content.tree, "html.parser")
     for tr in soup.select("tr[id]"):
         deck_id = int(tr["id"])
