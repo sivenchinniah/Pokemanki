@@ -133,7 +133,10 @@ def onStatsOpen(statsDialog):
 
 
 def replace_gears(deck_browser, content):
-    pokemons = get_synced_conf()["pokemon_list"]
+    conf = get_synced_conf()
+    if not conf:
+        return
+    pokemons = conf["pokemon_list"]
     soup = BeautifulSoup(content.tree, "html.parser")
     for tr in soup.select("tr[id]"):
         deck_id = int(tr["id"])
