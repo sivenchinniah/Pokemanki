@@ -7,6 +7,7 @@ from aqt.qt import *
 
 from .config import get_synced_conf, setup_default_synced_conf
 from .display import pokemon_display
+from .legacy import LegacyImporter
 from .pokemon import *
 from .tags import Tags
 from .trades import Trades
@@ -20,7 +21,10 @@ copy_directory("pokemon_images")
 copy_directory("pokemanki_css")
 
 if not get_synced_conf():
-    setup_default_synced_conf()
+    importer = LegacyImporter()
+    importer.import_legacy_conf()
+    if not get_synced_conf():
+        setup_default_synced_conf()
 
 tradeclass = Trades()
 tags = Tags()
