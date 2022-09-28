@@ -44,7 +44,7 @@ topaction = QAction("Move Pokémon to &Top", mw)
 
 # Connect actions to functions
 qconnect(nicknameaction.triggered, Nickname)
-qconnect(resetaction.triggered, ResetPokemon)
+qconnect(resetaction.triggered, reset_pokemanki)
 qconnect(tradeaction.triggered, tradeclass.tradeFunction)
 qconnect(toggleaction.triggered, Toggle)
 qconnect(tagsaction.triggered, tags.tagMenu)
