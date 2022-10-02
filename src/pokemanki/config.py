@@ -5,6 +5,17 @@ from typing import Any
 from aqt import mw
 
 
+def init_config():
+    if not get_synced_conf():
+
+        from .legacy import LegacyImporter
+
+        importer = LegacyImporter()
+        importer.import_legacy_conf()
+        if not get_synced_conf():
+            setup_default_synced_conf()
+
+
 def get_local_conf() -> dict:
     return mw.addonManager.getConfig(__name__)
 

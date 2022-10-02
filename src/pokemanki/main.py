@@ -5,66 +5,60 @@ from bs4 import BeautifulSoup
 from aqt import mw, gui_hooks
 from aqt.qt import *
 
-from .config import get_synced_conf, setup_default_synced_conf
+from .config import get_synced_conf, init_config
 from .display import pokemon_display
-from .legacy import LegacyImporter
 from .pokemon import *
 from .tags import Tags
 from .trades import Trades
-from .utils import *
+from .utils import copy_directory
 
 
 statsDialog = None
+
+tradeclass = Trades()
+tags = Tags()
 
 # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
 copy_directory("pokemon_images")
 copy_directory("pokemanki_css")
 
-if not get_synced_conf():
-    importer = LegacyImporter()
-    importer.import_legacy_conf()
-    if not get_synced_conf():
-        setup_default_synced_conf()
-
-tradeclass = Trades()
-tags = Tags()
-
-# Make actions for settings and reset
-nicknameaction = QAction("&Nicknames", mw)
-resetaction = QAction("&Reset", mw)
-tradeaction = QAction("&Trade", mw)
-toggleaction = QAction("&Decks vs. Tags", mw)
-tagsaction = QAction("&Tags", mw)
-prestigeaction = QAction("&Prestige Pokémon", mw)
-unprestigeaction = QAction("&Unprestige Pokémon", mw)
-everstoneaction = QAction("&Give Everstone", mw)
-uneverstoneaction = QAction("&Take Everstone", mw)
-megastoneaction = QAction("&Give Mega Stone", mw)
-unmegastoneaction = QAction("&Take Mega Stone", mw)
-alolanaction = QAction("&Give Alolan Passport", mw)
-unalolanaction = QAction("&Take Alolan Passport", mw)
-bottomaction = QAction("Move Pokémon to &Bottom", mw)
-topaction = QAction("Move Pokémon to &Top", mw)
-
-# Connect actions to functions
-qconnect(nicknameaction.triggered, Nickname)
-qconnect(resetaction.triggered, reset_pokemanki)
-qconnect(tradeaction.triggered, tradeclass.tradeFunction)
-qconnect(toggleaction.triggered, Toggle)
-qconnect(tagsaction.triggered, tags.tagMenu)
-qconnect(prestigeaction.triggered, PrestigePokemon)
-qconnect(unprestigeaction.triggered, UnprestigePokemon)
-qconnect(everstoneaction.triggered, giveEverstone)
-qconnect(uneverstoneaction.triggered, takeEverstone)
-qconnect(megastoneaction.triggered, giveMegastone)
-qconnect(unmegastoneaction.triggered, takeMegastone)
-qconnect(alolanaction.triggered, giveAlolanPassport)
-qconnect(unalolanaction.triggered, takeAlolanPassport)
-qconnect(bottomaction.triggered, MovetoBottom)
-qconnect(topaction.triggered, MovetoTop)
-
 
 def build_menu():
+
+    # Make actions for settings and reset
+    nicknameaction = QAction("&Nicknames", mw)
+    resetaction = QAction("&Reset", mw)
+    tradeaction = QAction("&Trade", mw)
+    toggleaction = QAction("&Decks vs. Tags", mw)
+    tagsaction = QAction("&Tags", mw)
+    prestigeaction = QAction("&Prestige Pokémon", mw)
+    unprestigeaction = QAction("&Unprestige Pokémon", mw)
+    everstoneaction = QAction("&Give Everstone", mw)
+    uneverstoneaction = QAction("&Take Everstone", mw)
+    megastoneaction = QAction("&Give Mega Stone", mw)
+    unmegastoneaction = QAction("&Take Mega Stone", mw)
+    alolanaction = QAction("&Give Alolan Passport", mw)
+    unalolanaction = QAction("&Take Alolan Passport", mw)
+    bottomaction = QAction("Move Pokémon to &Bottom", mw)
+    topaction = QAction("Move Pokémon to &Top", mw)
+
+    # Connect actions to functions
+    qconnect(nicknameaction.triggered, Nickname)
+    qconnect(resetaction.triggered, reset_pokemanki)
+    qconnect(tradeaction.triggered, tradeclass.tradeFunction)
+    qconnect(toggleaction.triggered, Toggle)
+    qconnect(tagsaction.triggered, tags.tagMenu)
+    qconnect(prestigeaction.triggered, PrestigePokemon)
+    qconnect(unprestigeaction.triggered, UnprestigePokemon)
+    qconnect(everstoneaction.triggered, giveEverstone)
+    qconnect(uneverstoneaction.triggered, takeEverstone)
+    qconnect(megastoneaction.triggered, giveMegastone)
+    qconnect(unmegastoneaction.triggered, takeMegastone)
+    qconnect(alolanaction.triggered, giveAlolanPassport)
+    qconnect(unalolanaction.triggered, takeAlolanPassport)
+    qconnect(bottomaction.triggered, MovetoBottom)
+    qconnect(topaction.triggered, MovetoTop)
+
     mw.pokemenu.clear()
 
     mw.form.menuTools.addMenu(mw.pokemenu)
@@ -146,8 +140,13 @@ def replace_gears(deck_browser, content):
     content.tree = soup
 
 
-mw.pokemenu = QMenu("&Pokémanki", mw)
-build_menu()
+def pokemanki_init():
+    init_config()
+    mw.pokemenu = QMenu("&Pokémanki", mw)
+    build_menu()
+
+
+gui_hooks.profile_did_open.append(pokemanki_init)
 gui_hooks.stats_dialog_will_show.append(onStatsOpen)
 gui_hooks.webview_did_receive_js_message.append(message_handler)
 gui_hooks.deck_browser_will_render_content.append(replace_gears)

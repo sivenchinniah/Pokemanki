@@ -24,14 +24,38 @@ class LegacyImporter(object):
             "_tags.json",
             "_trades.json",
         ]
+        self.default_conf = {
+            "alolanlist": [],
+            "decks_or_tags": "decks",
+            "everstonelist": [],
+            "everstonepokemonlist": [],
+            "evolution_thresholds": {
+                "decks": [100, 250, 500, 750, 1000],
+                "tags": [50, 125, 250, 375, 500],
+            },
+            "megastonelist": [],
+            "pokemon_list": [],
+            "prestigelist": [],
+            "tagmon_list": [],
+            "tags": [],
+            "trades": [],
+        }
 
     def import_legacy_conf(self) -> None:
-        """Import legacy config and progress directly to collection"""
+        """Import legacy config and progress directly to collection
+
+        Set missing keys to default value in case of partial import.
+        """
 
         self._conf_from_legacy_files()
         if self.conf != {}:
+            for key, val in self.default_conf.items():
+                self.conf.setdefault(key, val)
+            for key, val in self.default_conf["evolution_thresholds"].items():
+                self.conf["evolution_thresholds"].setdefault(key, val)
             mw.col.set_config(self.conf_key, self.conf)
             tooltip("Legacy Pokémanki settings and progress imported.")
+            print("Legacy Pokémanki settings and progress imported.")
 
     def _conf_from_legacy_files(self) -> None:
         for lfile in self.legacy_files:
