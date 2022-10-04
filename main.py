@@ -20,7 +20,7 @@ copy_directory("pokemanki_css")
 # Download threshold settings (or make from scratch if not already made)
 set_default("_pokemankisettings.json", default=[100, 250, 500, 750, 1000])
 
-trades = Trades()
+trades = Trades(mw)
 tags = Tags()
 
 # Make actions for settings and reset

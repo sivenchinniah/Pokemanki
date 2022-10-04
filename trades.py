@@ -1,83 +1,108 @@
 import os
+import ctypes
 import inspect
 import random
 import csv
 from datetime import date as dt
 
-from aqt.qt import *
 from aqt.webview import AnkiWebView
-from aqt import mw
 
 from .utils import *
 
 
-class Trades(QDialog):
-    def __init__(self):
-        super().__init__(None, Qt.WindowType.Window)
-        self.tradewindow = QDialog()
+class Trades:
+    _trade_window = None
+
+    def __init__(self, mw):
+        self.mw = mw
         self.dirname = os.path.dirname(os.path.abspath(
             inspect.getfile(inspect.currentframe())))
         self.mediafolder = mediafolder
-        self.setWindowTitle("Trades")
-
         self.allpokemon = get_pokemon_records()
         self.f = get_json("_decksortags.json", "")
-        self.tradeFunction()
 
     def open(self):
+        """
+        Set up and open a new Trade QDialog
+        """
+        self._trade_window = QDialog()
+        self.mw.garbage_collect_on_dialog_finish(self._trade_window)
+        self._update_trades()
         self._create_gui()
         self._setup_web_view()
-        self.tradeFunction()
-        self.show()
+        self._trade_window.show()
 
     def _create_gui(self):
         """
-        Create the basic trade gui. Follows the code of the Previewer
+        Create the basic trade gui.
         """
-        self.setWindowTitle("Trade Pokémon")
+        width = 800
+        height = 600
+
+        self._trade_window.setWindowTitle("Trade Pokémon")
 
         self.vbox = QVBoxLayout()
         self.vbox.setContentsMargins(0, 0, 0, 0)
-        self._web = AnkiWebView(title="pokemanki-trades")
+        self._web = AnkiWebView(title="pokemanki trades")
         self.vbox.addWidget(self._web)
-        self.setLayout(self.vbox)
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self._trade_window.setLayout(self.vbox)
+        self._trade_window.setWindowModality(Qt.WindowModality.ApplicationModal)
+
+        user32 = ctypes.windll.user32
+        self._trade_window.setGeometry(
+            user32.GetSystemMetrics(0)/2 - width/2,
+            user32.GetSystemMetrics(1)/2 - height/2,
+            width, height)
+        self._trade_window.setMinimumWidth(250)
+        self._trade_window.setMinimumHeight(100)
+
+        qconnect(self._trade_window.finished, self._on_finished)
+
+    def _on_finished(self):
+        """
+        Clean up after the trade is finished to avoid having copies of the object remaining.
+        """
+        self._web.cleanup()
+        self._web = None
 
     def _setup_web_view(self):
-        # TODO: May have ot replace quotes
         self._web.stdHtml(
-            body=self.trades_html(),
+            body=self._trades_html(),
             css=["/pokemanki_css/view_trade.css", "/pokemanki_css/main.css"],
             context=self)
         self._web.set_bridge_command(self._on_bridge_cmd, self)
 
     def _on_bridge_cmd(self, cmd):
         if cmd in ["0", "1", "2"]:
-            self.make_trade(self.trades[int(cmd)][0], self.trades[int(cmd)][1])
+            self._make_trade(self.trades[int(cmd)][0], self.trades[int(cmd)][1])
 
-    def tradeFunction(self):
-        # show a message box
+    def _update_trades(self):
+        """
+        Update the trades if the date has changed since the last call.
+        """
         f = self.f
         tradeData = get_json("_trades.json", None)
         if tradeData:
             date = dt.today().strftime("%d/%m/%Y")
             if date == tradeData[0] and len(tradeData) == 3:
-                # TODO: To simplify
                 if f == tradeData[2]:
                     self.trades = tradeData[1]
                 elif f == "" and tradeData[2] == "decks":
                     self.trades = tradeData[1]
                 else:
-                    self.newTrades()
+                    self._get_new_trades()
                     tradeData = get_json("_trades.json")
             else:
-                self.newTrades()
+                self._get_new_trades()
                 tradeData = get_json("_trades.json")
         else:
-            self.newTrades()
+            self._get_new_trades()
             tradeData = get_json("_trades.json")
 
-    def newTrades(self):
+    def _get_new_trades(self):
+        """
+        Get new trades.
+        """
         self.trades = []
         i = 0
         f = self.f
@@ -187,9 +212,16 @@ class Trades(QDialog):
         testData = [date, self.trades, possiblehaveslist]
         write_json("_trades.json", tradeData)
 
-    def make_trade(self, have, want):
+    def _make_trade(self, have, want):
+        """
+        Make a trade.
+
+        :param list have: Pokémon available to trade.
+        :param list want: Pokémon wanted for trade.
+        """
         possiblefits = []
         f = self.f
+
         if f:
             deckmonlist = get_json("_tagmon.json")
             if deckmonlist:
@@ -228,9 +260,11 @@ class Trades(QDialog):
                     "Please open the Stats window to get your Pokémon.")
                 nopokemon.exec()
                 return
+
         for item in deckmonlist:
             if item[0] == want[0] or (item[0].startswith("Eevee") and want[0] == "Eevee") and int(item[2]) >= 5:
                 possiblefits.append(item)
+
         if possiblefits == []:
             novalidpokemon = QMessageBox()
             novalidpokemon.setWindowTitle("Pokemanki")
@@ -238,6 +272,7 @@ class Trades(QDialog):
                 "Sorry, you do not have the Pokemon needed to complete this trade.")
             novalidpokemon.exec()
             return
+
         displaylist = []
         for item in possiblefits:
             deckname = mw.col.decks.name(item[1])
@@ -256,11 +291,15 @@ class Trades(QDialog):
                     displaytext = "%s (Level %s) from %s" % (
                         item[0], int(item[2]), deckname)
             displaylist.append(displaytext)
+
         totallist = list(zip(possiblefits, displaylist))
         possiblepokemon = QWidget()
+
         inp, ok = QInputDialog.getItem(
             possiblepokemon, "Pokemanki", "Choose a Pokemon to trade for %s" % have[0], displaylist, 0, False)
+
         tradepokemon = []
+
         if ok and inp:
             for thing in totallist:
                 if inp in thing:
@@ -268,6 +307,7 @@ class Trades(QDialog):
                     displaytext = inp
         if not tradepokemon:
             return
+
         confirmation = QMessageBox()
         confirmation.setWindowTitle("Pokemanki")
         confirmation.setText(
@@ -275,6 +315,7 @@ class Trades(QDialog):
         confirmation.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         confirmation.setDefaultButton(QMessageBox.StandardButton.No)
         result = confirmation.exec()
+
         if result == QMessageBox.StandardButton.Yes:
             modifieddeckmonlist = []
             for item in deckmonlist:
@@ -288,21 +329,20 @@ class Trades(QDialog):
                 else:
                     modifieddeckmonlist.append(item)
             write_json("_pokemanki.json", modifieddeckmonlist)
-            self.tradewindow.done(QDialog.DialogCode.Accepted)
+            self._trade_window.done(QDialog.DialogCode.Accepted)
             tradedone = QMessageBox()
             tradedone.setWindowTitle("Pokemanki")
             tradedone.setText("You have traded your %s for a %s" %
                               (displaytext, have[0]))
             tradedone.exec()
 
-    def trades_html(self):
+    def _trades_html(self):
         """
         Generate the html code for the trades window.
 
         :return: The html code.
         :rtype: str
         """
-
         # Header
         txt = '<h1 style="text-align: center;">Today\'s Trades</h1>'
 
@@ -311,14 +351,14 @@ class Trades(QDialog):
 
         # Generate each of the trades
         for i in range(0, 3):
-            txt += self.trade_html(i)
+            txt += self._trade_html(i)
 
         # Close trades container
         txt += '</div>'
 
         return txt
 
-    def trade_html(self, i):
+    def _trade_html(self, i):
         """
         Generate the html code for a trade.
 
@@ -387,7 +427,7 @@ class Trades(QDialog):
 
 def get_pokemon_records():
     """
-    Generate a list of all Pokémons based on the user's generation configuration.
+    Generate a list of all Pokémon based on the user's generation configuration.
 
     :return: List of pokemon records.
     :rtype: List
