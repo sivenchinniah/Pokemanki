@@ -117,7 +117,7 @@ def _card_html(name, source, level, nickname="", multi=False):
             '</div>' \
             '</div>'
     # Divider and end of top info
-    card += '<div class="pk-st-divider" style="margin-top: 10px;"></div>' \
+    card += '<div class="pk-divider" style="margin-top: 10px;"></div>' \
             '</div>'
 
     #############
@@ -129,7 +129,7 @@ def _card_html(name, source, level, nickname="", multi=False):
     # Bottom info
     #############
     card += '<div class="pk-st-card-info" style="margin-top: auto;">' \
-            '<div class="pk-st-divider" style="margin-bottom: 10px;"></div>'
+            '<div class="pk-divider" style="margin-bottom: 10px;"></div>'
     # Held/SP
     held = _held_html(source)
     if held != "":
@@ -146,10 +146,6 @@ def _card_html(name, source, level, nickname="", multi=False):
 
     # End card
     card += '</div>'
-
-    # TODO: Add # of Pokémon
-    # Make bottom line using function from stats.py and assign to text_lines
-    # line( text_lines, "<b>Total</b>", "</b>%s Pokémon<b>" % _num_pokemon)
 
     return card
 

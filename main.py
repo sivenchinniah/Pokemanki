@@ -20,7 +20,7 @@ copy_directory("pokemanki_css")
 # Download threshold settings (or make from scratch if not already made)
 set_default("_pokemankisettings.json", default=[100, 250, 500, 750, 1000])
 
-tradeclass = Trades()
+trades = Trades(mw)
 tags = Tags()
 
 # Make actions for settings and reset
@@ -43,7 +43,7 @@ topaction = QAction("Move Pokémon to Top", mw)
 # Connect actions to functions
 qconnect(nicknameaction.triggered, Nickname)
 qconnect(resetaction.triggered, ResetPokemon)
-qconnect(tradeaction.triggered, tradeclass.tradeFunction)
+qconnect(tradeaction.triggered, trades.open)
 qconnect(toggleaction.triggered, Toggle)
 qconnect(tagsaction.triggered, tags.tagMenu)
 qconnect(prestigeaction.triggered, PrestigePokemon)
@@ -100,6 +100,8 @@ def message_handler(handled, message, context):
         html = pokemon_display(f, False).replace("`", "'")
     elif message == "Pokemanki#wholeCollection":
         html = pokemon_display(f, True).replace("`", "'")
+    elif message == "TEST":
+        tradeclass.test()
     else:
         starts = "Pokemanki#search#"
         term = message[len(starts):]

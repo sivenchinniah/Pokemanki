@@ -37,10 +37,6 @@
 	margin-top: auto;
 	margin-bottom: 10px;
 }
-.pk-st-divider {
-    background-color: #777;
-    height: 1px;
-}
 .pk-st-card-top {
     display: flex;
     justify-content: space-between;
