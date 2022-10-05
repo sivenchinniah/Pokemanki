@@ -15,8 +15,8 @@ from .utils import copy_directory
 
 statsDialog = None
 
-tradeclass = Trades()
-tags = Tags()
+tradeclass = object()
+tags = object()
 
 # Move Pokemon Image folder to collection.media folder if not already there (Anki reads from here when running anki.stats.py)
 copy_directory("pokemon_images")
@@ -43,6 +43,8 @@ def build_menu():
     topaction = QAction("Move Pokémon to &Top", mw)
 
     # Connect actions to functions
+    tradeclass = Trades()
+    tags = Tags()
     qconnect(nicknameaction.triggered, Nickname)
     qconnect(resetaction.triggered, reset_pokemanki)
     qconnect(tradeaction.triggered, tradeclass.tradeFunction)
@@ -144,9 +146,13 @@ def pokemanki_init():
     init_config()
     mw.pokemenu = QMenu("&Pokémanki", mw)
     build_menu()
+    gui_hooks.deck_browser_will_render_content.append(replace_gears)
 
 
-gui_hooks.profile_did_open.append(pokemanki_init)
+def delayed_init():
+    mw.progress.single_shot(50, pokemanki_init)
+
+
+gui_hooks.profile_did_open.append(delayed_init)
 gui_hooks.stats_dialog_will_show.append(onStatsOpen)
 gui_hooks.webview_did_receive_js_message.append(message_handler)
-gui_hooks.deck_browser_will_render_content.append(replace_gears)
