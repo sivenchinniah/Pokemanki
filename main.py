@@ -101,7 +101,7 @@ def message_handler(handled, message, context):
     elif message == "Pokemanki#wholeCollection":
         html = pokemon_display(f, True).replace("`", "'")
     elif message == "TEST":
-        tradeclass.test()
+        trades.test()
     else:
         starts = "Pokemanki#search#"
         term = message[len(starts):]
