@@ -5,6 +5,7 @@ import random
 import csv
 from datetime import date as dt
 
+from aqt.utils import showInfo
 from aqt.webview import AnkiWebView
 
 from .utils import *
@@ -123,11 +124,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec()
+                no_pokemon()
                 return
         else:
             deckmonlist = get_json("_pokemanki.json", None)
@@ -146,11 +143,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec()
+                no_pokemon()
                 return
         possiblehaveslist = []
         while i < 3:
@@ -235,11 +228,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec()
+                no_pokemon()
                 return
         else:
             deckmonlist = get_json("_pokemanki.json", None)
@@ -254,11 +243,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec()
+                no_pokemon()
                 return
 
         for item in deckmonlist:
@@ -266,11 +251,8 @@ class Trades:
                 possiblefits.append(item)
 
         if possiblefits == []:
-            novalidpokemon = QMessageBox()
-            novalidpokemon.setWindowTitle("Pokemanki")
-            novalidpokemon.setText(
-                "Sorry, you do not have the Pokemon needed to complete this trade.")
-            novalidpokemon.exec()
+            showInfo("Sorry, you do not have the Pokémon needed to complete this trade.",
+                     parent=mw, title="Pokémanki")
             return
 
         displaylist = []
@@ -330,11 +312,8 @@ class Trades:
                     modifieddeckmonlist.append(item)
             write_json("_pokemanki.json", modifieddeckmonlist)
             self._trade_window.done(QDialog.DialogCode.Accepted)
-            tradedone = QMessageBox()
-            tradedone.setWindowTitle("Pokemanki")
-            tradedone.setText("You have traded your %s for a %s" %
-                              (displaytext, have[0]))
-            tradedone.exec()
+            showInfo(f"You have traded your {displaytext} for a {have[0]}",
+                     parent=mw, title="Pokémanki")
 
     def _trades_html(self):
         """
