@@ -83,6 +83,7 @@ class Trades:
         self._web = None
 
     def _setup_web_view(self):
+        print(self.trades)
         self._web.stdHtml(
             body=self._trades_html(),
             css=["/pokemanki_css/view_trade.css", "/pokemanki_css/main.css"],
@@ -383,7 +384,7 @@ class Trades:
         txt += '<div class="pk-td-container">'
 
         # Generate each of the trades
-        for i in range(0, 3):
+        for i in range(len(self.trades)):
             txt += self._trade_html(i)
 
         # Close trades container
