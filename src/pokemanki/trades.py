@@ -86,7 +86,8 @@ class Trades:
         self._web.stdHtml(
             body=self._trades_html(),
             css=["/pokemanki_css/view_trade.css", "/pokemanki_css/main.css"],
-            context=self)
+            context=self,
+        )
         self._web.set_bridge_command(self._on_bridge_cmd, self)
 
     def _on_bridge_cmd(self, cmd):
@@ -344,7 +345,9 @@ class Trades:
             "Are you sure you want to trade your %s for a %s" % (displaytext, have[0])
         )
 
-        confirmation.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        confirmation.setStandardButtons(
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
         confirmation.setDefaultButton(QMessageBox.StandardButton.No)
         result = confirmation.exec()
         if result == QMessageBox.StandardButton.Yes:
@@ -384,21 +387,20 @@ class Trades:
             txt += self._trade_html(i)
 
         # Close trades container
-        txt += '</div>'
+        txt += "</div>"
 
         return txt
 
     def _trade_html(self, i):
         """
         Generate the html code for a trade.
+
         :param int i: Trade number.
         :return: Trade's html.
         :rtype: str
         """
 
-        trade = '<script>' \
-                'function callTrade(n) { pycmd(n); }' \
-                '</script>'
+        trade = "<script>" "function callTrade(n) { pycmd(n); }" "</script>"
 
         # Open trade container
         trade += '<div class="pk-td-trade">'
@@ -406,43 +408,51 @@ class Trades:
         ###########
         # Head info
         ###########
-        trade += '<div class="pk-td-trainer" style="margin-bottom: auto;">' \
-                 f'<h2 style="text-align: center;"><b>Trainer {i + 1}</b></h2>' \
-                 '<div class="pk-divider" style="margin-top: 10px;"></div>' \
-                 '</div>'
+        trade += (
+            '<div class="pk-td-trainer" style="margin-bottom: auto;">'
+            f'<h2 style="text-align: center;"><b>Trainer {i + 1}</b></h2>'
+            '<div class="pk-divider" style="margin-top: 10px;"></div>'
+            "</div>"
+        )
 
         ##########
         # Has
         ##########
-        trade += '<div class="pk-td-offer">' \
-                 '<div class="pk-td-offer-txt">' \
-                 '<span class="pk-td-offer-txt-title"><b>Has:</b></span>' \
-                 f'<span class="pk-td-offer-txt-name"><b>{self.trades[i][0][0]}</b></span>' \
-                 '</div>' \
-                 f'<img src="pokemon_images/{self.trades[i][0][0]}.png" class="pk-td-offer-img"/>' \
-                 '</div>'
+        trade += (
+            '<div class="pk-td-offer">'
+            '<div class="pk-td-offer-txt">'
+            '<span class="pk-td-offer-txt-title"><b>Has:</b></span>'
+            f'<span class="pk-td-offer-txt-name"><b>{self.trades[i][0][0]}</b></span>'
+            "</div>"
+            f'<img src="pokemon_images/{self.trades[i][0][0]}.png" class="pk-td-offer-img"/>'
+            "</div>"
+        )
 
         ##########
         # Wants
         ##########
-        trade += '<div class="pk-td-offer">' \
-                 '<div class="pk-td-offer-txt">' \
-                 '<span class="pk-td-offer-txt-title"><b>Wants:</b></span>' \
-                 f'<span class="pk-td-offer-txt-name"><b>{self.trades[i][1][0]}</b></span>' \
-                 '</div>' \
-                 f'<img src="pokemon_images/{self.trades[i][1][0]}.png" class="pk-td-offer-img"/>' \
-                 '</div>'
+        trade += (
+            '<div class="pk-td-offer">'
+            '<div class="pk-td-offer-txt">'
+            '<span class="pk-td-offer-txt-title"><b>Wants:</b></span>'
+            f'<span class="pk-td-offer-txt-name"><b>{self.trades[i][1][0]}</b></span>'
+            "</div>"
+            f'<img src="pokemon_images/{self.trades[i][1][0]}.png" class="pk-td-offer-img"/>'
+            "</div>"
+        )
 
         ##########
         # Bottom
         ##########
-        trade += '<div class="pk-td-bottom">' \
-                 '<div class="pk-divider" style="margin-bottom: 10px"></div>' \
-                 f'<button class"pk-button" onclick="callTrade({i})">Trade</button>' \
-                 '</div>'
+        trade += (
+            '<div class="pk-td-bottom">'
+            '<div class="pk-divider" style="margin-bottom: 10px"></div>'
+            f'<button class"pk-button" onclick="callTrade({i})">Trade</button>'
+            "</div>"
+        )
 
         # Close trade
-        trade += '</div>'
+        trade += "</div>"
 
         return trade
 
@@ -463,37 +473,29 @@ def get_pokemon_records():
 
         if get_local_conf()["gen4_evolutions"]:
             csv_fpath = (
-                    currentdirname
-                    / "pokemon_evolutions"
-                    / "pokemon_gen1_plus2_plus4.csv"
+                currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_plus4.csv"
             )
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-            csv_fpath = (
-                    currentdirname / "pokemon_evolutions" / "pokemon_gen2_plus4.csv"
-            )
+            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen2_plus4.csv"
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
         else:
             csv_fpath = (
-                    currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_no4.csv"
+                currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_no4.csv"
             )
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
-            csv_fpath = (
-                    currentdirname / "pokemon_evolutions" / "pokemon_gen2_no4.csv"
-            )
+            csv_fpath = currentdirname / "pokemon_evolutions" / "pokemon_gen2_no4.csv"
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
     else:
         if get_local_conf()["gen4_evolutions"]:
             # a lot of gen 4 evolutions that affect gen 1 also include gen 2 evolutions
             # so let's just include gen 2 for these evolution lines
             csv_fpath = (
-                    currentdirname
-                    / "pokemon_evolutions"
-                    / "pokemon_gen1_plus2_plus4.csv"
+                currentdirname / "pokemon_evolutions" / "pokemon_gen1_plus2_plus4.csv"
             )
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
         else:
             csv_fpath = (
-                    currentdirname / "pokemon_evolutions" / "pokemon_gen1_no2_no4.csv"
+                currentdirname / "pokemon_evolutions" / "pokemon_gen1_no2_no4.csv"
             )
             pokemon_records.extend(pokemonLevelRangesFromCsv(csv_fpath))
 
