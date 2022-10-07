@@ -24,6 +24,7 @@ copy_directory("pokemanki_css")
 
 
 def build_menu():
+    global tradeclass
 
     # Make actions for settings and reset
     nicknameaction = QAction("&Nicknames", mw)
@@ -43,11 +44,11 @@ def build_menu():
     topaction = QAction("Move Pokémon to &Top", mw)
 
     # Connect actions to functions
-    tradeclass = Trades()
+    tradeclass = Trades(mw)
     tags = Tags()
     qconnect(nicknameaction.triggered, Nickname)
     qconnect(resetaction.triggered, reset_pokemanki)
-    qconnect(tradeaction.triggered, tradeclass.tradeFunction)
+    qconnect(tradeaction.triggered, tradeclass.open)
     qconnect(toggleaction.triggered, Toggle)
     qconnect(tagsaction.triggered, tags.tagMenu)
     qconnect(prestigeaction.triggered, PrestigePokemon)

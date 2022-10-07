@@ -1,0 +1,50 @@
+.pk-td-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    padding: 10px;
+}
+.pk-td-trade {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 15px;
+    border: #777;
+    border-width: 1px;
+    border-style: solid;
+}
+.pk-td-offer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 10px 0px;
+    width: 100%;
+}
+.pk-td-offer-txt {
+    display: flex;
+}
+.pk-td-offer-txt-title {
+    margin-right: 5px;
+}
+.pk-td-offer-txt-name {
+    flex-grow:1;
+    text-align: center;
+}
+.pk-td-offer-img {
+    height: 150px;
+    width: auto;
+    margin-top: 10px;
+}
+.pk-td-trainer {
+    margin-top: -10px;
+    width: 100%;
+}
+.pk-td-bottom {
+    margin-top: auto;
+    width: 100%;
+    text-align: center;
+}
+.pk-button {
+    margin: 5px auto;
+}
