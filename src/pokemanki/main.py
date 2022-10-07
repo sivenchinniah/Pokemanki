@@ -139,6 +139,10 @@ def replace_gears(deck_browser, content):
         name = next((pokemon[0] for pokemon in pokemons if pokemon[1] == deck_id), None)
         if name:
             tr.select("img.gears")[0]["src"] = "pokemon_images/" + name + ".png"
+            tr.select("img.gears")[0]["class"] = "gears pokemon"
+    style = soup.new_tag("style")
+    style.string = ".gears.pokemon{filter:none;opacity:1}"
+    soup.append(style)
     content.tree = soup
 
 
