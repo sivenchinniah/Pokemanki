@@ -13,10 +13,12 @@ def cardIdsFromDeckIds(queryDb, deckIds):
 def cardInterval(queryDb, cid):
     revLogIvl = queryDb.scalar(
         "select ivl from revlog where cid = %s "
-        "order by id desc limit 1 offset 0" % cid)
+        "order by id desc limit 1 offset 0" % cid
+    )
     ctype = queryDb.scalar(
         "select type from cards where id = %s "
-        "order by id desc limit 1 offset 0" % cid)
+        "order by id desc limit 1 offset 0" % cid
+    )
 
     # card interval is "New"
     if ctype == 0:
@@ -35,8 +37,8 @@ def cardInterval(queryDb, cid):
 
 def deckStats(deck_ids):
     """
-        deck_ids: list
-        returns [[card_id, card_interval], ...]
+    deck_ids: list
+    returns [[card_id, card_interval], ...]
     """
     cardIds = cardIdsFromDeckIds(mw.col.db, deck_ids)
 
@@ -59,8 +61,13 @@ def MultiStats(wholeCollection):
         # Determine which subdecks do not have their own subdecks
         nograndchildren = []
         for item in alldecks:
+<<<<<<< HEAD:stats.py
             if len(mw.col.decks.children(item.id)) == 0:
                 nograndchildren.append(item.id)
+=======
+            if len(mw.col.decks.children(int(item.id))) == 0:
+                nograndchildren.append(int(item.id))
+>>>>>>> main:src/pokemanki/stats.py
     else:
         # Get results only for all subdecks of selected deck
         curr_deck = mw.col.decks.active()[0]
@@ -86,11 +93,14 @@ def MultiStats(wholeCollection):
 
 def TagStats():
     "Returns List[[tag_name, card_id, card_interval], ...]"
-    savedtags = get_json("_tags.json", [])
+    savedtags = get_synced_conf()["tags"]
     resultlist = []
     for item in savedtags:
         result = mw.col.db.all(
-            "select c.id, c.ivl from cards c, notes n where c.nid = n.id and n.tags LIKE '%" + item + "%'")
+            "select c.id, c.ivl from cards c, notes n where c.nid = n.id and n.tags LIKE '%"
+            + item
+            + "%'"
+        )
         resultlist.append(result)
     results = list(zip(savedtags, resultlist))
     return results

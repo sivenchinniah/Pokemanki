@@ -6,8 +6,9 @@ from typing import List, Union
 
 from aqt import mw
 from aqt.qt import *
+from aqt.utils import showInfo
 
-config = mw.addonManager.getConfig(__name__)
+from .config import get_synced_conf
 
 # Find current directory
 addon_dir = Path(__file__).parents[0]
@@ -56,19 +57,27 @@ def write_json(file_name: str, value):
 
 
 def no_pokemon():
+<<<<<<< HEAD:utils.py
     nopokemon = QMessageBox()
     nopokemon.setWindowTitle("Pokemanki")
     nopokemon.setText(
         "Please open the Stats window to get your Pokémon.")
     nopokemon.exec()
+=======
+    showInfo(
+        "Please open the Stats window to get your Pokémon.",
+        parent=mw,
+        title="Pokémanki",
+    )
+>>>>>>> main:src/pokemanki/utils.py
 
 
 def get_pokemons():
-    f = get_json("_decksortags.json", "")
-    if f:
-        pokemons = get_json("_tagmon.json", None)
+    f = get_synced_conf()["decks_or_tags"]
+    if f == "tags":
+        pokemons = get_synced_conf()["tagmon_list"]
     else:
-        pokemons = get_json("_pokemanki.json", None)
+        pokemons = get_synced_conf()["pokemon_list"]
     if pokemons is None:
         no_pokemon()
         return (None, None)
@@ -83,9 +92,7 @@ def get_pokemons():
     return (ret_pokemons, f)
 
 
-def line(
-    i: List[str], a: str, b: Union[int, str], bold: bool = True
-) -> None:
+def line(i: List[str], a: str, b: Union[int, str], bold: bool = True) -> None:
     # T: Symbols separating first and second column in a statistics table. Eg in "Total:    3 reviews".
     colon = ":"
     if bold:
@@ -95,8 +102,7 @@ def line(
         )
     else:
         i.append(
-            ("<tr><td width=200 align=right>%s%s</td><td>%s</td></tr>")
-            % (a, colon, b)
+            ("<tr><td width=200 align=right>%s%s</td><td>%s</td></tr>") % (a, colon, b)
         )
 
 
@@ -110,12 +116,13 @@ def table_image_html(image_name, title=None):
     image_el = ""
     if image_name:
         image_el = '<img src="/pokemon_images/{}.png" title="{}">'.format(
-            image_name, title)
-    return '<td height=250 width=250 align=center>{}</td>'.format(image_el)
+            image_name, title
+        )
+    return "<td height=250 width=250 align=center>{}</td>".format(image_el)
 
 
 def table_text_html(main_text, sub_text="", bold=False):
     bolded = "{}".format(main_text)
     if bold:
         bolded = "<b>{}</b>{}".format(main_text, sub_text)
-    return '<td height=30 width=250 align=center>{}</td>'.format(bolded)
+    return "<td height=30 width=250 align=center>{}</td>".format(bolded)

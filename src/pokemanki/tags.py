@@ -1,6 +1,7 @@
 from aqt.qt import *
 from aqt import mw
 
+from .config import save_synced_conf
 from .utils import *
 
 
@@ -10,7 +11,7 @@ class Tags:
         self.alltags = []
 
     def tagMenu(self):
-        self.savedtags = get_json("_tags.json", [])
+        self.savedtags = get_synced_conf()["tags"]
         rawtags = mw.col.tags.all()
         alltags = self.alltags
         for item in rawtags:
@@ -53,8 +54,7 @@ class Tags:
                             if item[3] in tagdict[item[0]][item[1]][item[2]]:
                                 continue
                             else:
-                                tagdict[item[0]][item[1]
-                                                 ][item[2]][item[3]] = {}
+                                tagdict[item[0]][item[1]][item[2]][item[3]] = {}
                         else:
                             tagdict[item[0]][item[1]][item[2]] = {}
                             tagdict[item[0]][item[1]][item[2]][item[3]] = {}
@@ -86,10 +86,12 @@ class Tags:
                                 for l in tagdict[i][j][k]:
                                     greatgrandchildlist.append([l, []])
                                 greatgrandchildlist = sorted(
-                                    greatgrandchildlist, key=lambda x: x[0].lower())
+                                    greatgrandchildlist, key=lambda x: x[0].lower()
+                                )
                                 grandchildlist.append([k, greatgrandchildlist])
                         grandchildlist = sorted(
-                            grandchildlist, key=lambda x: x[0].lower())
+                            grandchildlist, key=lambda x: x[0].lower()
+                        )
                         childlist.append([j, grandchildlist])
                 childlist = sorted(childlist, key=lambda x: x[0].lower())
                 taglist.append([i, childlist])
@@ -98,7 +100,9 @@ class Tags:
         parentwindow.setMinimumWidth(255)
         parentwindow.setMinimumHeight(192)
         lbl = QLabel(
-            "Please select the tags for which you would like Pokemon assigned.", parentwindow)
+            "Please select the tags for which you would like Pokemon assigned.",
+            parentwindow,
+        )
         lbl.move(5, 5)
         widget = QWidget(parentwindow)
         widget.resize(255, 192)
@@ -151,7 +155,8 @@ class Tags:
                             if not k[1]:
                                 grandchild = QTreeWidgetItem(child)
                                 grandchild.setFlags(
-                                    grandchild.flags() | Qt.ItemIsUserCheckable)
+                                    grandchild.flags() | Qt.ItemIsUserCheckable
+                                )
                                 grandchild.setText(0, k[0])
                                 if i[0] + "::" + j[0] + "::" + k[0] in self.savedtags:
                                     grandchild.setCheckState(0, Qt.Checked)
@@ -161,7 +166,8 @@ class Tags:
                             else:
                                 grandchild = QTreeWidgetItem(child)
                                 grandchild.setFlags(
-                                    grandchild.flags() | Qt.ItemIsUserCheckable)
+                                    grandchild.flags() | Qt.ItemIsUserCheckable
+                                )
                                 grandchild.setText(0, k[0])
                                 if i[0] + "::" + j[0] + "::" + k[0] in self.savedtags:
                                     grandchild.setCheckState(0, Qt.Checked)
@@ -169,21 +175,20 @@ class Tags:
                                     grandchild.setCheckState(0, Qt.Unchecked)
                                 greatgrandchildlist = []
                                 for l in k[1]:
-                                    greatgrandchild = QTreeWidgetItem(
-                                        grandchild)
+                                    greatgrandchild = QTreeWidgetItem(grandchild)
                                     greatgrandchild.setFlags(
-                                        greatgrandchild.flags() | Qt.ItemIsUserCheckable)
+                                        greatgrandchild.flags() | Qt.ItemIsUserCheckable
+                                    )
                                     greatgrandchild.setText(0, l[0])
-                                    if i[0] + "::" + j[0] + "::" + k[0] + "::" + l[0] in self.savedtags:
-                                        greatgrandchild.setCheckState(
-                                            0, Qt.Checked)
+                                    if (
+                                        i[0] + "::" + j[0] + "::" + k[0] + "::" + l[0]
+                                        in self.savedtags
+                                    ):
+                                        greatgrandchild.setCheckState(0, Qt.Checked)
                                     else:
-                                        greatgrandchild.setCheckState(
-                                            0, Qt.Unchecked)
-                                    greatgrandchildlist.append(
-                                        [greatgrandchild, []])
-                                grandchildlist.append(
-                                    [grandchild, greatgrandchildlist])
+                                        greatgrandchild.setCheckState(0, Qt.Unchecked)
+                                    greatgrandchildlist.append([greatgrandchild, []])
+                                grandchildlist.append([grandchild, greatgrandchildlist])
                         childlist.append([child, grandchildlist])
                 parentlist.append([parent, childlist])
         btn = QPushButton("OK", parentwindow)
@@ -199,18 +204,29 @@ class Tags:
             if item[1]:
                 for jtem in item[1]:
                     if jtem[0].checkState(0) == Qt.Checked:
-                        checked.append(item[0].text(
-                            0) + "::" + jtem[0].text(0))
+                        checked.append(item[0].text(0) + "::" + jtem[0].text(0))
                     if jtem[1]:
                         for ktem in jtem[1]:
                             if ktem[0].checkState(0) == Qt.Checked:
-                                checked.append(item[0].text(
-                                    0) + "::" + jtem[0].text(0) + "::" + ktem[0].text(0))
+                                checked.append(
+                                    item[0].text(0)
+                                    + "::"
+                                    + jtem[0].text(0)
+                                    + "::"
+                                    + ktem[0].text(0)
+                                )
                             if ktem[1]:
                                 for ltem in ktem[1]:
                                     if ltem[0].checkState(0) == Qt.Checked:
-                                        checked.append(item[0].text(
-                                            0) + "::" + jtem[0].text(0) + "::" + ktem[0].text(0) + "::" + ltem[0].text(0))
+                                        checked.append(
+                                            item[0].text(0)
+                                            + "::"
+                                            + jtem[0].text(0)
+                                            + "::"
+                                            + ktem[0].text(0)
+                                            + "::"
+                                            + ltem[0].text(0)
+                                        )
 
-        write_json("_tags.json", checked)
+        save_synced_conf("tags", checked)
         self.parentwindow.done(QDialog.Accepted)
