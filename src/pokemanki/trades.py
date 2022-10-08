@@ -1,3 +1,21 @@
+# -*- coding: utf-8 -*-
+
+# Pokémanki
+# Copyright (C) 2022 Exkywor and zjosua
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import os
 import inspect
 import random
@@ -146,15 +164,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-<<<<<<< HEAD:trades.py
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec()
-=======
                 no_pokemon()
->>>>>>> main:src/pokemanki/trades.py
                 return
         else:
             deckmonlist = get_synced_conf()["pokemon_list"]
@@ -173,15 +183,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-<<<<<<< HEAD:trades.py
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec()
-=======
                 no_pokemon()
->>>>>>> main:src/pokemanki/trades.py
                 return
         possiblehaveslist = []
         while i < 3:
@@ -385,15 +387,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-<<<<<<< HEAD:trades.py
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec()
-=======
                 no_pokemon()
->>>>>>> main:src/pokemanki/trades.py
                 return
         else:
             deckmonlist = get_synced_conf()["pokemon_list"]
@@ -408,15 +402,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-<<<<<<< HEAD:trades.py
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec()
-=======
                 no_pokemon()
->>>>>>> main:src/pokemanki/trades.py
                 return
         for item in deckmonlist:
             if (
@@ -426,19 +412,11 @@ class Trades:
             ):
                 possiblefits.append(item)
         if possiblefits == []:
-<<<<<<< HEAD:trades.py
-            novalidpokemon = QMessageBox()
-            novalidpokemon.setWindowTitle("Pokemanki")
-            novalidpokemon.setText(
-                "Sorry, you do not have the Pokemon needed to complete this trade.")
-            novalidpokemon.exec()
-=======
             showInfo(
                 "Sorry, you do not have the Pokemon needed to complete this trade.",
                 parent=mw,
                 title="Pokémanki",
             )
->>>>>>> main:src/pokemanki/trades.py
             return
         displaylist = []
         for item in possiblefits:
@@ -507,19 +485,11 @@ class Trades:
                     modifieddeckmonlist.append(item)
             save_synced_conf("pokemon_list", modifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
-<<<<<<< HEAD:trades.py
-            tradedone = QMessageBox()
-            tradedone.setWindowTitle("Pokemanki")
-            tradedone.setText("You have traded your %s for a %s" %
-                              (displaytext, have[0]))
-            tradedone.exec()
-=======
             showInfo(
                 f"You have traded your {displaytext} for a {have[0]}",
                 parent=mw,
                 title="Pokémanki",
             )
->>>>>>> main:src/pokemanki/trades.py
 
     def trade2(self):
         have = self.trades[1][0]
@@ -539,15 +509,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-<<<<<<< HEAD:trades.py
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec()
-=======
                 no_pokemon()
->>>>>>> main:src/pokemanki/trades.py
                 return
         else:
             deckmonlist = get_synced_conf()["pokemon_list"]
@@ -562,15 +524,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-<<<<<<< HEAD:trades.py
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec()
-=======
                 no_pokemon()
->>>>>>> main:src/pokemanki/trades.py
                 return
         for item in deckmonlist:
             if (
@@ -580,20 +534,12 @@ class Trades:
             ):
                 possiblefits.append(item)
         if possiblefits == []:
-<<<<<<< HEAD:trades.py
-            novalidpokemon = QMessageBox()
-            novalidpokemon.setWindowTitle("Pokemanki")
-            novalidpokemon.setText(
-                "Sorry, you do not have the Pokémon needed to complete this trade.")
-            novalidpokemon.exec()
-=======
             showInfo(
                 """Sorry, you do not have the Pokémon needed to complete
                      this trade.""",
                 parent=mw,
                 title="Pokémanki",
             )
->>>>>>> main:src/pokemanki/trades.py
             return
         displaylist = []
         for item in possiblefits:
@@ -662,19 +608,11 @@ class Trades:
                     modifieddeckmonlist.append(item)
             save_synced_conf("pokemon_list", medifieddeckmonlist)
             self.tradewindow.done(QDialog.Accepted)
-<<<<<<< HEAD:trades.py
-            tradedone = QMessageBox()
-            tradedone.setWindowTitle("Pokemanki")
-            tradedone.setText("You have traded your %s for a %s" %
-                              (displaytext, have[0]))
-            tradedone.exec()
-=======
             showInfo(
                 f"You have traded your {displaytext} for a {have[0]}",
                 parent=mw,
                 title="Pokémanki",
             )
->>>>>>> main:src/pokemanki/trades.py
 
     def trade3(self):
         have = self.trades[2][0]
@@ -694,15 +632,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-<<<<<<< HEAD:trades.py
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec()
-=======
                 no_pokemon()
->>>>>>> main:src/pokemanki/trades.py
                 return
         else:
             deckmonlist = get_synced_conf()["pokemon_list"]
@@ -717,15 +647,7 @@ class Trades:
                         deckmons.append(item)
                 deckmonlist = deckmons
             else:
-<<<<<<< HEAD:trades.py
-                nopokemon = QMessageBox()
-                nopokemon.setWindowTitle("Pokemanki")
-                nopokemon.setText(
-                    "Please open the Stats window to get your Pokémon.")
-                nopokemon.exec()
-=======
                 no_pokemon()
->>>>>>> main:src/pokemanki/trades.py
                 return
         for item in deckmonlist:
             if (
@@ -735,20 +657,12 @@ class Trades:
             ):
                 possiblefits.append(item)
         if possiblefits == []:
-<<<<<<< HEAD:trades.py
-            novalidpokemon = QMessageBox()
-            novalidpokemon.setWindowTitle("Pokemanki")
-            novalidpokemon.setText(
-                "Sorry, you do not have the Pokemon needed to complete this trade.")
-            novalidpokemon.exec()
-=======
             showInfo(
                 """Sorry, you do not have the Pokemon needed to complete
                      this trade.""",
                 parent=mw,
                 title="Pokémanki",
             )
->>>>>>> main:src/pokemanki/trades.py
             return
         displaylist = []
         for item in possiblefits:
@@ -817,16 +731,8 @@ class Trades:
                     modifieddeckmonlist.append(item)
             save_synced_conf("pokemon_list", modifieddeckmolist)
             self.tradewindow.done(QDialog.Accepted)
-<<<<<<< HEAD:trades.py
-            tradedone = QMessageBox()
-            tradedone.setWindowTitle("Pokemanki")
-            tradedone.setText("You have traded your %s for a %s" %
-                              (displaytext, have[0]))
-            tradedone.exec()
-=======
             showInfo(
                 f"You have traded your {displaytext} for a {have[0]}",
                 parent=mw,
                 title="Pokémanki",
             )
->>>>>>> main:src/pokemanki/trades.py

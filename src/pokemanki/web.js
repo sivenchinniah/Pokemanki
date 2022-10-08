@@ -1,22 +1,26 @@
+/* Pokémanki
+ * Copyright (C) 2022 Exkywor and zjosua
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 Pokemanki = {}
 
 Pokemanki.addPokemanki = function(){
-<<<<<<< HEAD:web.js
-    let padDiv = document.createElement("div");
-    // Set height manually because the scss rules somehow can't be loaded
-    padDiv.setAttribute("style", "height: 5em;");
-=======
->>>>>>> main:src/pokemanki/web.js
     let divEl = document.createElement("div");
-    divEl.setAttribute("id", "pokemanki");
-    divEl.setAttribute("style",
-                       "margin: auto; text-align: center; width: fit-content");
+    divEl.setAttribute("id", "pokemanki")
     divEl.className = "pokemanki";
-<<<<<<< HEAD:web.js
-    let mainEl = document.getElementsByTagName("div")[0];
-    mainEl.parentElement.insertBefore(padDiv, mainEl);
-    mainEl.parentElement.insertBefore(divEl, mainEl);
-=======
     let rangeBoxPad = document.querySelector('.range-box-pad');
     rangeBoxPad.after(divEl);
 
@@ -24,7 +28,6 @@ Pokemanki.addPokemanki = function(){
     link.href = "/pokemanki_css/view_stats.css";
     link.rel = 'stylesheet';
     document.head.appendChild(link);
->>>>>>> main:src/pokemanki/web.js
 }
 Pokemanki.setPokemanki = function(html){
     document.getElementById('pokemanki').innerHTML = html;

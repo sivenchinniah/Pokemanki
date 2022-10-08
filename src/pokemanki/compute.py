@@ -1,3 +1,21 @@
+# -*- coding: utf-8 -*-
+
+# Pokémanki
+# Copyright (C) 2022 Exkywor and zjosua
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import csv
 import random
 
@@ -189,21 +207,12 @@ def FirstPokemon():
     deckmonlist = get_synced_conf()["pokemon_list"]
     if deckmonlist:
         return
-<<<<<<< HEAD:compute.py
-    alldecks = mw.col.decks.all_names_and_ids(skip_empty_default=True)
-    # Determine which subdecks do not have their own subdecks
-    nograndchildren = []
-    for item in alldecks:
-        if len(mw.col.decks.children(item.id)) == 0:
-            nograndchildren.append(item.id)
-=======
     alldecks = mw.col.decks.all_names_and_ids()
     # Determine which subdecks do not have their own subdecks
     nograndchildren = []
     for item in alldecks:
         if len(mw.col.decks.children(int(item.id))) == 0:
             nograndchildren.append(int(item.id))
->>>>>>> main:src/pokemanki/compute.py
     decklist = []
     for item in nograndchildren:
         decklist.append(mw.col.decks.name(item))
@@ -219,17 +228,6 @@ def FirstPokemon():
     )
     if ok and inp:
         msgbox = QMessageBox()
-<<<<<<< HEAD:compute.py
-        msgbox.setWindowTitle("Pokemanki")
-        msgbox.setText("Choose a starter Pokémon for %s" % inp)
-        msgbox.addButton("Bulbasaur", QMessageBox.ButtonRole.AcceptRole)
-        msgbox.addButton("Charmander", QMessageBox.ButtonRole.AcceptRole)
-        msgbox.addButton("Squirtle", QMessageBox.ButtonRole.AcceptRole)
-        msgbox.exec()
-        deckmon = msgbox.clickedButton().text()
-        if deckmon:
-            deck = mw.col.decks.by_name(inp)['id']
-=======
         msgbox.setWindowTitle("Pokémanki")
         msgbox.setText(f"Choose a starter Pokémon for {inp}.")
         msgbox.addButton("Bulbasaur", QMessageBox.AcceptRole)
@@ -239,7 +237,6 @@ def FirstPokemon():
         deckmon = msgbox.clickedButton().text()
         if deckmon:
             deck = mw.col.decks.byName(inp)["id"]
->>>>>>> main:src/pokemanki/compute.py
             # stats = mw.col.db.all("""select id, ivl from cards where did in (%s)""" % deck)
 
             # cardIds = mw.col.db.all("""select id from cards where did in (%s)""" % deck)
@@ -262,12 +259,7 @@ def FirstPokemon():
             if Level < 5:
                 showInfo(f"You've found a {deckmon} egg.")
             else:
-<<<<<<< HEAD:compute.py
-                firstpokemon.setText("You've caught a %s!" % deckmon)
-            firstpokemon.exec()
-=======
                 showInfo(f"You've caught a {deckmon}!")
->>>>>>> main:src/pokemanki/compute.py
         else:
             FirstPokemon()
     else:
@@ -310,12 +302,8 @@ def MultiPokemon(wholeCollection):
             if item[1] == thing[1]:
                 break
         else:
-<<<<<<< HEAD:compute.py
-            if item[1] in [d.id for d in mw.col.decks.all_names_and_ids()]:
-=======
             allIds = [deck.id for deck in mw.col.decks.all_names_and_ids()]
             if item[1] in allIds:
->>>>>>> main:src/pokemanki/compute.py
                 modifiedpokemontotal.append(item)
     # Download threshold settings if they exist, otherwise make from scratch
     thresholdsettings = get_synced_conf()["evolution_thresholds"]["decks"]
@@ -520,12 +508,6 @@ def MultiPokemon(wholeCollection):
     save_synced_conf("pokemon_list", modifiedpokemontotal)
     # Only display message if changes
     if msgtxt != "Hello Pokémon Trainer!":
-<<<<<<< HEAD:compute.py
-        msgbox2 = QMessageBox()
-        msgbox2.setWindowTitle("Pokemanki")
-        msgbox2.setText(msgtxt)
-        msgbox2.exec()
-=======
         showInfo(msgtxt, parent=mw, title="Pokémanki")
     # Return multiData
     return multiData
@@ -707,6 +689,5 @@ def TagPokemon():
     if msgtxt != "Hello Pokémon Trainer!":
         showInfo(msgtxt, parent=mw, title="Pokémanki")
 
->>>>>>> main:src/pokemanki/compute.py
     # Return multiData
     return multiData
