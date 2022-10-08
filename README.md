@@ -47,3 +47,6 @@ Siven created the add-on and managed its development 2019 - 2021.
 
 Consult the [list of contributors](https://github.com/zjosua/Pokemanki/graphs/contributors) for a full list of people
 involved in the development of Pokémanki.
+
+Pokémanki uses [Libaddon](https://github.com/glutanimate/anki-libaddon/) by Glutanimate.
+[Click here to support Glutanimate's work.](https://glutanimate.com/support-my-work/)
