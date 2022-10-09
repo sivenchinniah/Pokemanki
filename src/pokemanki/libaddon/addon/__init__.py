@@ -31,6 +31,8 @@
 
 import os
 
+from ..._version import __version__
+
 from .._wrappers.typing import NamedTuple
 
 from ..anki import ANKI
@@ -42,16 +44,36 @@ __all__ = ["__version__", "AddonData", "ADDON"]
 class AddonData(NamedTuple):
 
     # Set by add-on
-    NAME: str = ""
-    DEFAULT_MODULE: str = ""  # != actual module name in AnkiWeb releases
-    REPO: str = ""
-    ID: str = ""
-    VERSION: str = ""
-    LICENSE: str = ""
-    AUTHORS: tuple = ()
-    AUTHOR_MAIL: str = ""
-    LIBRARIES: tuple = ()
-    CONTRIBUTORS: tuple = ()
+    NAME: str = "Pokémanki"
+    DEFAULT_MODULE: str = "pokemanki"  # != actual module name in AnkiWeb releases
+    REPO: str = "https://github.com/zjosua/Pokemanki"
+    ID = "1041307953"
+    VERSION = __version__
+    LICENSE = "GNU AGPLv3"
+    AUTHORS = (
+        {
+            "name": "Exkywor",
+            "years": "2022",
+            "contact": "https://github.com/Exkywor",
+        },
+        {
+            "name": "sivenchinniah",
+            "years": "2019 - 2021",
+            "contact": "https://github.com/sivenchinniah",
+        },
+        {
+            "name": "zjosua",
+            "years": "2022",
+            "contact": "https://github.com/zjosua",
+        },
+    )
+    AUTHOR_MAIL = ""
+    LIBRARIES = ()
+    CONTRIBUTORS = (
+        "andyxang",
+        "Kyle Mills (khonkhortisan)",
+        "Yoonchae Lee (BlueGreenMagick)",
+    )
     SPONSORS: tuple = ()
     MEMBERS_CREDITED: tuple = ()
     MEMBERS_TOP: tuple = ()
@@ -72,7 +94,7 @@ class AddonData(NamedTuple):
 
 
 # add-on properties "singleton"
-ADDON = AddonData("ADDON")
+ADDON = AddonData("Pokémanki")
 
 
 def registerAddon(addon: AddonData):

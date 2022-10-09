@@ -36,14 +36,14 @@ Code primarily interacting with Anki
 from aqt import mw
 
 from anki import version as anki_version
-from anki.utils import isMac, isWin
+from anki.utils import is_mac, is_win
 
 from .._wrappers.typing import Optional
 
 
 class AnkiData:
 
-    PLATFORM = "win" if isWin else "mac" if isMac else "lin"
+    PLATFORM = "win" if is_win else "mac" if is_mac else "lin"
     VERSION = anki_version
     JSBRIDGE = "pycmd"
 

@@ -25,6 +25,7 @@ from aqt.qt import *
 
 from .config import get_synced_conf, init_config
 from .display import pokemon_display
+from .gui.pokemanki_options import invoke_pokemanki_options
 from .pokemon import *
 from .tags import Tags
 from .trades import Trades
@@ -59,6 +60,7 @@ def build_menu():
     unalolanaction = QAction("&Take Alolan Passport", mw)
     bottomaction = QAction("Move Pokémon to &Bottom", mw)
     topaction = QAction("Move Pokémon to &Top", mw)
+    aAbout = QAction("About", mw)
 
     # Connect actions to functions
     tradeclass = Trades()
@@ -78,6 +80,7 @@ def build_menu():
     qconnect(unalolanaction.triggered, takeAlolanPassport)
     qconnect(bottomaction.triggered, MovetoBottom)
     qconnect(topaction.triggered, MovetoTop)
+    qconnect(aAbout.triggered, invoke_pokemanki_options)
 
     mw.pokemenu.clear()
 
@@ -108,6 +111,7 @@ def build_menu():
         mw.pokemenu.addAction(tradeaction)
 
     mw.pokemenu.addAction(resetaction)
+    mw.pokemenu.addAction(aAbout)
 
 
 # Wrap pokemon_display function of display.py with the todayStats function of anki.stats.py

@@ -60,16 +60,10 @@ html_template = """\
     {authors_string}
     {libs_string}
     
-    <p><img src="qrc:/{qrc_prefix}/icons/heart_small.svg"/><span style=" font-weight:600;"> Thank you!</span></p>
-    <p>My heartfelt thanks go out to everyone who has <b>supported</b> this add-on through their tips,
-        contributions, or any other means. You guys rock!</p>
-    <p>In particular I would like to thank all of the awesome people who support me
-        on <b><a href="https://www.patreon.com/glutanimate">Patreon</a></b>, including:</p>
-    <div style="color:#aa2a4c;">{members_string}</div>
-    <p><i>Want to be listed here?
-        <b><a href="https://www.patreon.com/bePatron?u=7522179">Pledge your support on Patreon now</a></b>
-        to receive all kinds of exclusive goodies!
-    </i></p>
+    <p><i>{display_name}</i> uses <a href="https://github.com/glutanimate/anki-libaddon/">Libaddon</a> by Glutanimate.
+    <a href="https://glutanimate.com/support-my-work/">Click here to support Glutanimate's work.</a></p>
+    <p>Parts of the config dialog are based on the Anki add-on <a href="https://github.com/glutanimate/cloze-overlapper/">Cloze Overlapper</a> by Glutanimate.
+    <a href="https://glutanimate.com/support-my-work/">Click here to support Glutanimate's work.</a></p>
     
     <p><span style="font-weight:600;">License</span></p>
     <p><i>{display_name}</i> is <b>free and open-source</b> software. The add-on code that runs within
