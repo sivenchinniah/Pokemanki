@@ -3,7 +3,7 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 15px;
-    padding: 10px;
+    margin: -20px;
 }
 .pk-td-trade {
     display: flex;

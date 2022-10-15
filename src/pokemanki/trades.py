@@ -12,6 +12,8 @@ from aqt.webview import AnkiWebView
 from .config import get_local_conf, get_synced_conf, save_synced_conf
 from .utils import *
 
+from .gui.pokemanki_trade import *
+
 
 class Trades:
     _trade_window = None
@@ -25,9 +27,11 @@ class Trades:
         self.allpokemon = get_pokemon_records()
         self.f = get_synced_conf()["decks_or_tags"]
 
+        self._trade_window = TradeWindow(mw, self)
+
     def open(self):
         """
-        Set up and open a new Trade QDialog
+        Open the Trade window
         """
         updated_trades = self._update_trades()
         if not updated_trades:
@@ -37,61 +41,9 @@ class Trades:
                 title="Pokémanki",
             )
             return
+        self._trade_window.open(self.trades)
 
-        self._trade_window = QDialog()
-        self.mw.garbage_collect_on_dialog_finish(self._trade_window)
-        self._create_gui()
-        self._setup_web_view()
-        self._trade_window.show()
-
-    def _create_gui(self):
-        """
-        Create the basic trade gui.
-        """
-        width = 800
-        height = 600
-
-        self._trade_window.setWindowTitle("Trade Pokémon")
-
-        self.vbox = QVBoxLayout()
-        self.vbox.setContentsMargins(0, 0, 0, 0)
-        self._web = AnkiWebView(title="pokémanki trades")
-        self.vbox.addWidget(self._web)
-        self._trade_window.setLayout(self.vbox)
-        self._trade_window.setWindowModality(Qt.WindowModality.ApplicationModal)
-
-        # Set in the middle of the screen
-        if platform.system() == "Windows":
-            user32 = ctypes.windll.user32
-            posX = int(user32.GetSystemMetrics(0) / 2 - width / 2)
-            posY = int(user32.GetSystemMetrics(1) / 2 - height / 2)
-        else:
-            posX = int(mw.frameGeometry().width() / 2 - width / 2)
-            posY = int(mw.frameGeometry().height() / 2 - height / 2)
-
-        self._trade_window.setGeometry(posX, posY, width, height)
-        self._trade_window.setMinimumWidth(250)
-        self._trade_window.setMinimumHeight(100)
-
-        qconnect(self._trade_window.finished, self._on_finished)
-
-    def _on_finished(self):
-        """
-        Clean up after the trade is finished to avoid having copies of the object remaining.
-        """
-        self._web.cleanup()
-        self._web = None
-
-    def _setup_web_view(self):
-        print(self.trades)
-        self._web.stdHtml(
-            body=self._trades_html(),
-            css=["/pokemanki_css/view_trade.css", "/pokemanki_css/main.css"],
-            context=self,
-        )
-        self._web.set_bridge_command(self._on_bridge_cmd, self)
-
-    def _on_bridge_cmd(self, cmd):
+    def on_bridge_cmd(self, cmd):
         if cmd in ["0", "1", "2"]:
             self._make_trade(self.trades[int(cmd)][0], self.trades[int(cmd)][1])
 
@@ -364,98 +316,12 @@ class Trades:
                 else:
                     modifieddeckmonlist.append(item)
             save_synced_conf("pokemon_list", modifieddeckmonlist)
-            self._trade_window.done(QDialog.Accepted)
+            self._trade_window.done()
             showInfo(
                 f"You have traded your {displaytext} for a {have[0]}",
                 parent=mw,
                 title="Pokémanki",
             )
-
-    def _trades_html(self):
-        """
-        Generate the html code for the trades window.
-        :return: The html code.
-        :rtype: str
-        """
-        # Header
-        txt = '<h1 style="text-align: center;">Today\'s Trades</h1>'
-
-        # Open trades container
-        txt += '<div class="pk-td-container">'
-
-        # Generate each of the trades
-        for i in range(len(self.trades)):
-            txt += self._trade_html(i)
-
-        # Close trades container
-        txt += "</div>"
-
-        return txt
-
-    def _trade_html(self, i):
-        """
-        Generate the html code for a trade.
-
-        :param int i: Trade number.
-        :return: Trade's html.
-        :rtype: str
-        """
-
-        trade = "<script>" "function callTrade(n) { pycmd(n); }" "</script>"
-
-        # Open trade container
-        trade += '<div class="pk-td-trade">'
-
-        ###########
-        # Head info
-        ###########
-        trade += (
-            '<div class="pk-td-trainer" style="margin-bottom: auto;">'
-            f'<h2 style="text-align: center;"><b>Trainer {i + 1}</b></h2>'
-            '<div class="pk-divider" style="margin-top: 10px;"></div>'
-            "</div>"
-        )
-
-        ##########
-        # Has
-        ##########
-        trade += (
-            '<div class="pk-td-offer">'
-            '<div class="pk-td-offer-txt">'
-            '<span class="pk-td-offer-txt-title"><b>Has:</b></span>'
-            f'<span class="pk-td-offer-txt-name"><b>{self.trades[i][0][0]}</b></span>'
-            "</div>"
-            f'<img src="pokemon_images/{self.trades[i][0][0]}.png" class="pk-td-offer-img"/>'
-            "</div>"
-        )
-
-        ##########
-        # Wants
-        ##########
-        trade += (
-            '<div class="pk-td-offer">'
-            '<div class="pk-td-offer-txt">'
-            '<span class="pk-td-offer-txt-title"><b>Wants:</b></span>'
-            f'<span class="pk-td-offer-txt-name"><b>{self.trades[i][1][0]}</b></span>'
-            "</div>"
-            f'<img src="pokemon_images/{self.trades[i][1][0]}.png" class="pk-td-offer-img"/>'
-            "</div>"
-        )
-
-        ##########
-        # Bottom
-        ##########
-        trade += (
-            '<div class="pk-td-bottom">'
-            '<div class="pk-divider" style="margin-bottom: 10px"></div>'
-            f'<button class"pk-button" onclick="callTrade({i})">Trade</button>'
-            "</div>"
-        )
-
-        # Close trade
-        trade += "</div>"
-
-        return trade
 
 
 def get_pokemon_records():
