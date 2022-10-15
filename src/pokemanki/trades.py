@@ -116,7 +116,7 @@ class Trades:
             possiblehaves = []
             for item in self.allpokemon:
                 if item[1] in graderanges[want[1]] and (
-                    item[2] < int(pokemon[2]) <= item[3]
+                    item[2] < int(pokemon[2]) < item[3]
                 ):
                     possiblehaves.append(item)
 
