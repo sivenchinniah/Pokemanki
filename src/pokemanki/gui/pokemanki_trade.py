@@ -66,7 +66,7 @@ class TradeWindow(object):
         QtCore.QMetaObject.connectSlotsByName(self.dialog)
 
         # Set in the middle of the screen
-        width = self.dialog.width()
+        width = 800
         height = self.dialog.height() + 150
 
         if platform.system() == "Windows":
@@ -106,7 +106,7 @@ class TradeWindow(object):
         self.dialog.show()
 
     def done(self):
-        self.dialog.done(QDialog.Accepted)
+        self.dialog.done(QDialog.DialogCode.Accepted)
 
 
 def _trades_html(trades):

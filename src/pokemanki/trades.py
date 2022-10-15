@@ -73,89 +73,53 @@ class Trades:
         self.trades = []
         i = 0
         f = self.f
-        if f == "tags":
-            if os.path.exists("%s/_tagmon.json" % self.mediafolder):
-                deckmonlist = get_synced_conf()["tagmon_list"]
-                sorteddeckmonlist = list(reversed(deckmonlist))
-                noeggslist = []
-                for item in sorteddeckmonlist:
-                    if int(item[2]) >= 5:
-                        noeggslist.append(item)
-                deckmons = []
-                for item in noeggslist:
-                    for thing in deckmons:
-                        if item[1] == thing[1]:
-                            break
-                    else:
-                        deckmons.append(item)
-                deckmonlist = deckmons
-            else:
-                no_pokemon()
-                return
+        want = []
+
+        deckmonlist = get_synced_conf()[
+            "tagmon_list" if f == "tags" else "pokemon_list"
+        ]
+        if deckmonlist:
+            sorteddeckmonlist = list(reversed(deckmonlist))
+            noeggslist = []
+            for item in sorteddeckmonlist:
+                if int(item[2]) >= 5:
+                    noeggslist.append(item)
+            deckmons = []
+            # Avoid duplicate Pokémon
+            for item in noeggslist:
+                for thing in deckmons:
+                    if item[1] == thing[1]:
+                        break
+                else:
+                    deckmons.append(item)
+            deckmonlist = deckmons
         else:
-            deckmonlist = get_synced_conf()["pokemon_list"]
-            if deckmonlist:
-                sorteddeckmonlist = list(reversed(deckmonlist))
-                noeggslist = []
-                for item in sorteddeckmonlist:
-                    if int(item[2]) >= 5:
-                        noeggslist.append(item)
-                deckmons = []
-                for item in noeggslist:
-                    for thing in deckmons:
-                        if item[1] == thing[1]:
-                            break
-                    else:
-                        deckmons.append(item)
-                deckmonlist = deckmons
-            else:
-                no_pokemon()
-                return
+            no_pokemon()
+            return
 
         possiblehaveslist = []
+        graderanges = {
+            "F": ["E", "F"],
+            "E": ["D", "E", "F"],
+            "D": ["C", "D", "E"],
+            "C": ["B", "C", "D"],
+            "B": ["A", "B", "C"],
+            "A": ["A", "B"],
+        }
         while i < 3:
             randno = random.randint(0, len(deckmonlist) - 1)
             pokemon = deckmonlist[randno]
             for item in self.allpokemon:
                 if pokemon[0] == item[0]:
                     want = item
+
             possiblehaves = []
-            if want[1] == "F":
-                for item in self.allpokemon:
-                    if (item[1] == "F" or item[1] == "E") and (
-                        item[2] < int(pokemon[2]) < item[3]
-                    ):
-                        possiblehaves.append(item)
-            elif want[1] == "E":
-                for item in self.allpokemon:
-                    if (item[1] == "F" or item[1] == "E" or item[1] == "D") and (
-                        item[2] < int(pokemon[2]) < item[3]
-                    ):
-                        possiblehaves.append(item)
-            elif want[1] == "D":
-                for item in self.allpokemon:
-                    if (item[1] == "C" or item[1] == "E" or item[1] == "D") and (
-                        item[2] < int(pokemon[2]) < item[3]
-                    ):
-                        possiblehaves.append(item)
-            elif want[1] == "C":
-                for item in self.allpokemon:
-                    if (item[1] == "C" or item[1] == "B" or item[1] == "D") and (
-                        item[2] < int(pokemon[2]) < item[3]
-                    ):
-                        possiblehaves.append(item)
-            elif want[1] == "B":
-                for item in self.allpokemon:
-                    if (item[1] == "C" or item[1] == "B" or item[1] == "A") and (
-                        item[2] < int(pokemon[2]) < item[3]
-                    ):
-                        possiblehaves.append(item)
-            elif want[1] == "A":
-                for item in self.allpokemon:
-                    if (item[1] == "B" or item[1] == "A") and (
-                        item[2] < int(pokemon[2]) < item[3]
-                    ):
-                        possiblehaves.append(item)
+            for item in self.allpokemon:
+                if item[1] in graderanges[want[1]] and (
+                    item[2] < int(pokemon[2]) <= item[3]
+                ):
+                    possiblehaves.append(item)
+
             if len(possiblehaves) > 1:
                 randno = random.randint(0, len(possiblehaves) - 1)
                 have = possiblehaves[randno]
@@ -164,6 +128,7 @@ class Trades:
             else:
                 i += 1
                 continue
+
             if have[0].startswith("Eevee") and want[0].startswith("Eevee"):
                 self.trades.append(
                     (
@@ -177,6 +142,7 @@ class Trades:
                 self.trades.append((have, ("Eevee", want[1], want[2], want[3])))
             else:
                 self.trades.append((have, want))
+
             possiblehaveslist.append(possiblehaves)
             i += 1
 
@@ -189,15 +155,14 @@ class Trades:
         save_synced_conf("trades", tradeData)
 
     def _update_trades(self):
-        # show a message box
         f = self.f
         tradeData = get_synced_conf()["trades"]
         if tradeData:
             date = dt.today().strftime("%d/%m/%Y")
-            if date == tradeData[0] and len(tradeData) == 3:
+
+            # Get new trades if either the date or "decks vs tags" mode have changed
+            if len(tradeData) == 3 and date == tradeData[0]:
                 if f == tradeData[2]:
-                    self.trades = tradeData[1]
-                elif f == "" and tradeData[2] == "decks":
                     self.trades = tradeData[1]
                 else:
                     self._get_new_trades()
