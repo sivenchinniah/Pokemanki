@@ -1,3 +1,21 @@
+# -*- coding: utf-8 -*-
+
+# Pokémanki
+# Copyright (C) 2022 Exkywor and zjosua
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import os
 import sys
 from bs4 import BeautifulSoup
@@ -7,6 +25,7 @@ from aqt.qt import *
 
 from .config import get_synced_conf, init_config
 from .display import pokemon_display
+from .gui.pokemanki_options import invoke_pokemanki_options
 from .pokemon import *
 from .tags import Tags
 from .trades import Trades
@@ -42,6 +61,7 @@ def build_menu():
     unalolanaction = QAction("&Take Alolan Passport", mw)
     bottomaction = QAction("Move Pokémon to &Bottom", mw)
     topaction = QAction("Move Pokémon to &Top", mw)
+    aAbout = QAction("About", mw)
 
     # Connect actions to functions
     tradeclass = Trades()
@@ -61,6 +81,7 @@ def build_menu():
     qconnect(unalolanaction.triggered, takeAlolanPassport)
     qconnect(bottomaction.triggered, MovetoBottom)
     qconnect(topaction.triggered, MovetoTop)
+    qconnect(aAbout.triggered, invoke_pokemanki_options)
 
     mw.pokemenu.clear()
 
@@ -91,6 +112,7 @@ def build_menu():
         mw.pokemenu.addAction(tradeaction)
 
     mw.pokemenu.addAction(resetaction)
+    mw.pokemenu.addAction(aAbout)
 
 
 # Wrap pokemon_display function of display.py with the todayStats function of anki.stats.py
@@ -140,6 +162,10 @@ def replace_gears(deck_browser, content):
         name = next((pokemon[0] for pokemon in pokemons if pokemon[1] == deck_id), None)
         if name:
             tr.select("img.gears")[0]["src"] = "pokemon_images/" + name + ".png"
+            tr.select("img.gears")[0]["class"] = "gears pokemon"
+    style = soup.new_tag("style")
+    style.string = ".gears.pokemon{filter:none;opacity:1}"
+    soup.append(style)
     content.tree = soup
 
 
