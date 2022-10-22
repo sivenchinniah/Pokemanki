@@ -44,7 +44,7 @@ def build_menu():
     topaction = QAction("Move Pokémon to &Top", mw)
 
     # Connect actions to functions
-    tradeclass = Trades(mw)
+    tradeclass = Trades()
     tags = Tags()
     qconnect(nicknameaction.triggered, Nickname)
     qconnect(resetaction.triggered, reset_pokemanki)

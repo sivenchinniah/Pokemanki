@@ -16,17 +16,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import os
-import ctypes
 import csv
 import inspect
-import platform
 import random
 from datetime import date as dt
-
-from aqt.utils import showInfo
-from aqt.qt import *
-from aqt.webview import AnkiWebView
 
 from .config import get_local_conf, get_synced_conf, save_synced_conf
 from .utils import *
@@ -37,21 +30,18 @@ from .gui.pokemanki_trade import *
 class Trades:
     _trade_window = None
 
-    def __init__(self, mw):
-        self.mw = mw
+    def __init__(self):
         self.dirname = os.path.dirname(
             os.path.abspath(inspect.getfile(inspect.currentframe()))
         )
         self.mediafolder = mediafolder
         self.allpokemon = get_pokemon_records()
         self.f = get_synced_conf()["decks_or_tags"]
-
-        self._trade_window = TradeWindow(mw, self)
+        self._trade_window = TradeWindow(self, mw)
 
     def open(self):
-        """
-        Open the Trade window
-        """
+        """Open the Trade window"""
+
         updated_trades = self._update_trades()
         if not updated_trades:
             showInfo(
@@ -60,16 +50,15 @@ class Trades:
                 title="Pokémanki",
             )
             return
-        self._trade_window.open(self.trades)
+        self._trade_window.open_trades(self.trades)
 
     def on_bridge_cmd(self, cmd):
         if cmd in ["0", "1", "2"]:
             self._make_trade(self.trades[int(cmd)][0], self.trades[int(cmd)][1])
 
     def _get_new_trades(self):
-        """
-        Get new trades.
-        """
+        """Get new trades."""
+
         self.trades = []
         i = 0
         f = self.f
@@ -155,6 +144,8 @@ class Trades:
         save_synced_conf("trades", tradeData)
 
     def _update_trades(self):
+        """Update the trades if the date or mode have changed."""
+
         f = self.f
         tradeData = get_synced_conf()["trades"]
         if tradeData:
@@ -177,8 +168,8 @@ class Trades:
         return not (tradeData == [] or tradeData[1] == [])
 
     def _make_trade(self, have, want):
-        """
-        Make a trade.
+        """Make a trade.
+
         :param tuple have: Pokémon available to trade.
         :param tuple want: Pokémon wanted for trade.
         """
@@ -300,7 +291,7 @@ class Trades:
                 else:
                     modifieddeckmonlist.append(item)
             save_synced_conf("pokemon_list", modifieddeckmonlist)
-            self._trade_window.done()
+            self._trade_window.finished_trade()
             showInfo(
                 f"You have traded your {displaytext} for a {have[0]}",
                 parent=mw,
@@ -309,8 +300,8 @@ class Trades:
 
 
 def get_pokemon_records():
-    """
-    Generate a list of all Pokémon based on the user's generation configuration.
+    """Generate a list of all Pokémon based on the user's generation configuration.
+
     :return: List of pokemon records.
     :rtype: List
     """
@@ -364,8 +355,8 @@ def get_pokemon_records():
 
 
 def pokemonLevelRangesFromCsv(csv_fpath):
-    """
-    Get the list of evolution level ranges for all Pokémon.
+    """Get the list of evolution level ranges for all Pokémon.
+
     :param str csv_fpath: Path of the csv containing the evolution list
     :return: List of pokemon ranges.
     :rtype: List
