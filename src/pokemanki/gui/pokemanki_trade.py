@@ -20,6 +20,8 @@ import ctypes
 import platform
 
 from aqt import QDialog
+from aqt.webview import AnkiWebView
+from PyQt6 import QtCore, QtWidgets
 
 from .forms.qt6 import pokemanki_trade
 
@@ -32,11 +34,25 @@ class TradeWindow(QDialog):
         self.setupUi(parentObj, mw)
 
     def setupUi(self, parent, mw):
+        self.dialog.webEngineView = AnkiWebView(parent=self, title="pokémanki trades")
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding,
+            QtWidgets.QSizePolicy.Policy.Expanding,
+        )
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(
+            self.dialog.webEngineView.sizePolicy().hasHeightForWidth()
+        )
+        self.dialog.webEngineView.setSizePolicy(sizePolicy)
+        self.dialog.webEngineView.setObjectName("webEngineView")
+        self.dialog.verticalLayout_2.addWidget(self.dialog.webEngineView)
+
         self.dialog.webEngineView.set_bridge_command(parent.on_bridge_cmd, parent)
 
         # Set in the middle of the screen
         width = 800
-        height = self.height() + 150
+        height = self.height() + 175
 
         if platform.system() == "Windows":
             user32 = ctypes.windll.user32
