@@ -51,18 +51,15 @@ class TradeWindow(QDialog):
         self.dialog.webEngineView.set_bridge_command(parent.on_bridge_cmd, parent)
 
         # Set in the middle of the screen
-        width = 800
-        height = self.height() + 175
-
         if platform.system() == "Windows":
             user32 = ctypes.windll.user32
-            posX = int(user32.GetSystemMetrics(0) / 2 - width / 2)
-            posY = int(user32.GetSystemMetrics(1) / 2 - height / 2)
+            posX = int(user32.GetSystemMetrics(0) / 2 - self.width() / 2)
+            posY = int(user32.GetSystemMetrics(1) / 2 - self.height() / 2)
         else:
-            posX = int(mw.frameGeometry().width() / 2 - width / 2)
-            posY = int(mw.frameGeometry().height() / 2 - height / 2)
+            posX = int(mw.frameGeometry().width() / 2 - self.width() / 2)
+            posY = int(mw.frameGeometry().height() / 2 - self.height() / 2)
 
-        self.setGeometry(posX, posY, width, height)
+        self.setGeometry(posX, posY, self.width(), self.height())
 
     def setup_trades(self, trades):
         """Set up the web view's html.
@@ -96,8 +93,12 @@ def _trades_html(trades):
     :return: The html code.
     :rtype: str
     """
+
+    # Write trade function
+    txt = "<script>" "function callTrade(n) { pycmd(n); }" "</script>"
+
     # Open trades container
-    txt = '<div class="pk-td-container">'
+    txt += '<div class="pk-td-container">'
 
     # Generate each of the trades
     for i in range(len(trades)):
@@ -118,10 +119,8 @@ def _trade_html(i, trades):
     :rtype: str
     """
 
-    trade = "<script>" "function callTrade(n) { pycmd(n); }" "</script>"
-
     # Open trade container
-    trade += '<div class="pk-td-trade">'
+    trade = '<div class="pk-td-trade">'
 
     ###########
     # Head info
