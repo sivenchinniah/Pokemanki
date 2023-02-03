@@ -1,12 +1,20 @@
-Pokemon is the intellectual property of Nintendo/Creatures Inc./GAME FREAK inc.
-The below license only applies to the code portions
+This Program is licensed under the GNU Affero General Public License
+version 3 ("AGPL"), extended by a number of Additional Terms under
+Section 7 of the AGPL.
+
+If not otherwise noted, this License applies to all files included
+with this Program. Files subject to different licensing terms might
+also ship with this Program, but will be clearly marked as such in
+additional LICENSE files accompanying them.
+
+The AGPLv3 License and Additional Terms follow.
 
 ==============================================================================
 
                     GNU AFFERO GENERAL PUBLIC LICENSE
                        Version 3, 19 November 2007
 
- Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+ Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
@@ -623,27 +631,83 @@ copy of the Program in return for a fee.
 
                      END OF TERMS AND CONDITIONS
 
-==============================================================================
+===============================================================================
 
-The modifications to the software(add-on) made by Yoonchae Lee
-(bluegreenmagick) is licensed under the MIT License, which follows: 
+                ADDITIONAL TERMS APPLICABLE TO THIS PROGRAM
+                     UNDER GNU AGPL VERSION 3 SECTION 7
 
-Copyright (c) 2021 Yoonchae Lee (bluegreenmagick)
+The following additional terms ("Additional Terms") supplement and modify the
+GNU Affero General Public License, Version 3 ("AGPL") applicable to the present
+Program.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+In addition to the terms and conditions of the AGPL, the present Program is
+subject to the further restrictions below:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. Trademark and Publicity Rights.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+  Except as expressly provided herein, no trademark or publicity rights are
+  granted. This license does NOT give you any right, title or interest in the
+  "Glutanimate" name or logo.
+
+  However, Licensees are granted a limited, non-exclusive right to use the
+  name "Glutanimate" and the Glutanimate logo as part of the preservation
+  of the legal notices and author attributions within this Program and
+  within Appropriate Legal Notices displayed by works containing it.
+
+2. Origin of the Program.
+
+  The origin of the Program must not be misrepresented; you must not claim
+  that you wrote the original Program. Altered source versions must be plainly
+  marked as such, and must not be misrepresented as being the original
+  Program.
+
+3. Legal Notices and Author Attributions.
+
+  You must reproduce faithfully all trademark, copyright and other proprietary
+  and legal notices on any copies of the Program or any other required author
+  attributions. Legal notices or author attributions displayed as part of the
+  user interface must be preserved as such.
+
+  Additionally, all copies of any covered work conveyed by you must include
+  in the Appropriate Legal Notices the following author attribution:
+
+  "Uses Libaddon by Glutanimate. Click here to support Glutanimate's work."
+
+  The word "Libaddon" must be a clickable hyperlink that leads directly
+  to the Internet URL "https://github.com/glutanimate/anki-libaddon/". 
+  The words "Click here to support Glutanimate's work." must be a
+  clickable hyperlink that leads directly to the Internet URL
+  "https://glutanimate.com/support-my-work/".
+
+  This attribution must also be included in copyright notices in the
+  README or description of any covered work conveyed by you (e.g. add-on
+  description text on AnkiWeb or README on GitHub).
+
+4. Use of Names of Licensors or Authors for Publicity Purposes.
+
+  Outside of the aforementioned legal notices and author attributions, neither
+  the name of the copyright holder or its affiliates, any other party who
+  modifies and/or conveys the Program, nor the names of the Program's
+  sponsors/supporters/patrons may be used to endorse or promote products
+  derived from this software without specific prior written permission.
+
+5. Indemnification.
+
+  IF YOU CONVEY A COVERED WORK AND AGREE WITH ANY RECIPIENT OF THAT COVERED
+  WORK THAT YOU WILL ASSUME ANY LIABILITY FOR THAT COVERED WORK, YOU HEREBY
+  AGREE TO INDEMNIFY, DEFEND AND HOLD HARMLESS THE OTHER LICENSORS AND AUTHORS
+  OF THAT COVERED WORK FOR ANY DAMAGES, DEMANDS, CLAIMS, LOSSES, CAUSES OF
+  ACTION, LAWSUITS, JUDGMENTS EXPENSES (INCLUDING WITHOUT LIMITATION
+  REASONABLE ATTORNEYS' FEES AND EXPENSES) OR ANY OTHER LIABLITY ARISING FROM,
+  RELATED TO OR IN CONNECTION WITH YOUR ASSUMPTIONS OF LIABILITY.
+
+6. Preservation of Licensing Terms.
+
+  Any covered work conveyed by you must include this license text in its
+  entirety.
+
+-------------------------------------------------------------------------------
+
+If you have any questions regarding this license, about any other legal
+details, or want to report an infringement of the aforementioned licensing
+terms, please feel free to contact me at: <https://glutanimate.com/contact/>
